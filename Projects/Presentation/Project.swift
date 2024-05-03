@@ -19,10 +19,12 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
+                .project(target: "Domain", path: .relativeToRoot("Projects/Domain")),
                 .external(name: "ReactorKit"),
                 .external(name: "RxSwift"),
                 .external(name: "SnapKit"),
                 .external(name: "Kingfisher"),
+                .external(name: "RxCocoa")
             ]
         ),
     ]
