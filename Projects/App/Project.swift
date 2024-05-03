@@ -26,7 +26,11 @@ let project = Project(
             ),
             sources: ["Sources/**"],
             resources: ["Resources/**"],
-            dependencies: []
+            dependencies: [
+                .project(target: "Presentation", path: .relativeToRoot("Projects/Presentation")),
+                .external(name: "Kingfisher"),
+                
+            ]
         ),
     ]
 )
