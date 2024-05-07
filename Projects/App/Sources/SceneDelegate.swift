@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Presentation
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -16,10 +17,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
 
-        let viewController = UIViewController()
-        viewController.view.backgroundColor = .orange
+        let navigationController = UINavigationController()
         
-        window?.rootViewController = viewController
+//        let viewController = UIViewController()
+//        viewController.view.backgroundColor = .orange
+        
+        let coordinator = AppCoordinator(navigationController: navigationController)
+        coordinator.start()
+        
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
     }
 }

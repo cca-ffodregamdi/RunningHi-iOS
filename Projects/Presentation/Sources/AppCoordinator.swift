@@ -5,4 +5,54 @@
 //  Created by 유현진 on 5/3/24.
 //
 
-import Foundation
+import UIKit
+
+final public class AppCoordinator: Coordinator{
+    
+    var childCoordinator: [Coordinator] = []
+    
+    private var navigationController: UINavigationController!
+    
+    private var isLoggedIn: Bool = false
+    
+    public init(navigationController: UINavigationController!) {
+        self.navigationController = navigationController
+    }
+    
+    public func start() {
+        if self.isLoggedIn{
+            self.showHomeViewController()
+        }else{
+            self.showLoginViewController()
+        }
+    }
+    
+    private func showHomeViewController(){
+        let coordinator = HomeCoordinator(navigationController: self.navigationController)
+        coordinator.delegate = self
+        coordinator.start()
+        self.childCoordinator.append(coordinator)
+    }
+    
+    private func showLoginViewController(){
+        let coordinator = LoginCoordinator(navigationController: self.navigationController)
+        coordinator.delegate = self
+        coordinator.start()
+        self.childCoordinator.append(coordinator)
+    }
+}
+
+extension AppCoordinator: LoginCoordinatorDelegate{
+    func didLoggedIn(coordinator: LoginCoordinator) {
+        self.childCoordinator = self.childCoordinator.filter{$0 !== coordinator}
+        self.navigationController.viewControllers.removeAll()
+        self.showHomeViewController()
+    }
+}
+
+extension AppCoordinator: HomeCoordinatorDelegate{
+    func didloggedOut(coordinator: HomeCoordinator) {
+        self.childCoordinator = self.childCoordinator.filter{$0 !== coordinator}
+        self.showLoginViewController()
+    }
+}

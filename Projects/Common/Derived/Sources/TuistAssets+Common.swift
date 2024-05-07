@@ -20,7 +20,7 @@
 
 // swiftlint:disable identifier_name line_length nesting type_body_length type_name
 public enum CommonAsset {
-  public static let kakaoLoginButtonImage = CommonImages(name: "kakao_login_medium_wide")
+  public static let kakaoLoginButton = CommonImages(name: "kakaoLoginButton")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 

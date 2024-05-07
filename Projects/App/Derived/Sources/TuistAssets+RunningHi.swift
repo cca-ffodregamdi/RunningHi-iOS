@@ -19,14 +19,14 @@
 // MARK: - Asset Catalogs
 
 // swiftlint:disable identifier_name line_length nesting type_body_length type_name
-public enum AppAsset {
-  public static let accentColor = AppColors(name: "AccentColor")
+public enum RunningHiAsset {
+  public static let accentColor = RunningHiColors(name: "AccentColor")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 
 // MARK: - Implementation Details
 
-public final class AppColors {
+public final class RunningHiColors {
   public fileprivate(set) var name: String
 
   #if os(macOS)
@@ -65,9 +65,9 @@ public final class AppColors {
   }
 }
 
-public extension AppColors.Color {
+public extension RunningHiColors.Color {
   @available(iOS 11.0, tvOS 11.0, watchOS 4.0, macOS 10.13, visionOS 1.0, *)
-  convenience init?(asset: AppColors) {
+  convenience init?(asset: RunningHiColors) {
     let bundle = Bundle.module
     #if os(iOS) || os(tvOS) || os(visionOS)
     self.init(named: asset.name, in: bundle, compatibleWith: nil)
@@ -82,7 +82,7 @@ public extension AppColors.Color {
 #if canImport(SwiftUI)
 @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, visionOS 1.0, *)
 public extension SwiftUI.Color {
-  init(asset: AppColors) {
+  init(asset: RunningHiColors) {
     let bundle = Bundle.module
     self.init(asset.name, bundle: bundle)
   }
