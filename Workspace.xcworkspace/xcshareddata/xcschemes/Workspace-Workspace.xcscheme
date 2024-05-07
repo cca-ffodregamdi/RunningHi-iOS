@@ -84,20 +84,6 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F6E2F8C3B7D9EB13105F5694"
-               BuildableName = "Kingfisher_Kingfisher.bundle"
-               BlueprintName = "Kingfisher_Kingfisher"
-               ReferencedContainer = "container:Tuist/.build/tuist-derived/Kingfisher/Kingfisher.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "A4DFF0D3EE507E4032CBEC48"
                BuildableName = "Moya.framework"
                BlueprintName = "Moya"
@@ -144,6 +130,48 @@
                BuildableName = "ReactorKitRuntime.framework"
                BlueprintName = "ReactorKitRuntime"
                ReferencedContainer = "container:Tuist/.build/tuist-derived/ReactorKit/ReactorKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "B8553AE058E48CADF8895B28"
+               BuildableName = "RxCocoa.framework"
+               BlueprintName = "RxCocoa"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/RxSwift/RxSwift.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8A30B8272F02FD2827613749"
+               BuildableName = "RxCocoaRuntime.framework"
+               BlueprintName = "RxCocoaRuntime"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/RxSwift/RxSwift.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "95C3C64AA50990FE5F757F3A"
+               BuildableName = "RxRelay.framework"
+               BlueprintName = "RxRelay"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/RxSwift/RxSwift.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
