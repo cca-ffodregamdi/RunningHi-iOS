@@ -10,7 +10,7 @@ import RxCocoa
 import ReactorKit
 import SnapKit
 
-protocol LoginViewControllerDelegate{
+protocol LoginViewControllerDelegate: AnyObject{
     func login()
 }
 
@@ -20,7 +20,7 @@ final class LoginViewController: UIViewController {
     
     var disposeBag: DisposeBag = DisposeBag()
     
-    var delegate: LoginViewControllerDelegate?
+    weak var delegate: LoginViewControllerDelegate?
     
     private lazy var loginView: LoginView = {
         return LoginView()

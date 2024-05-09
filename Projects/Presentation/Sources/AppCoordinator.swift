@@ -21,15 +21,14 @@ final public class AppCoordinator: Coordinator{
     
     public func start() {
         if self.isLoggedIn{
-            self.showHomeViewController()
+            self.showBaseTabBarController()
         }else{
             self.showLoginViewController()
         }
     }
     
-    private func showHomeViewController(){
-        let coordinator = HomeCoordinator(navigationController: self.navigationController)
-        coordinator.delegate = self
+    private func showBaseTabBarController(){
+        let coordinator = BaseTabBarCoordinator(navigationController: self.navigationController)
         coordinator.start()
         self.childCoordinator.append(coordinator)
     }
@@ -46,13 +45,7 @@ extension AppCoordinator: LoginCoordinatorDelegate{
     func didLoggedIn(coordinator: LoginCoordinator) {
         self.childCoordinator = self.childCoordinator.filter{$0 !== coordinator}
         self.navigationController.viewControllers.removeAll()
-        self.showHomeViewController()
+        self.showBaseTabBarController()
     }
 }
 
-extension AppCoordinator: HomeCoordinatorDelegate{
-    func didloggedOut(coordinator: HomeCoordinator) {
-        self.childCoordinator = self.childCoordinator.filter{$0 !== coordinator}
-        self.showLoginViewController()
-    }
-}
