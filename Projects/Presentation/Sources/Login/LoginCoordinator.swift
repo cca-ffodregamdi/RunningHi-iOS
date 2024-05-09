@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol LoginCoordinatorDelegate{
+protocol LoginCoordinatorDelegate: AnyObject{
     func didLoggedIn(coordinator: LoginCoordinator)
 }
 
@@ -27,6 +27,10 @@ class LoginCoordinator: Coordinator, LoginViewControllerDelegate{
         let vc = LoginViewController()
         vc.delegate = self
         self.navigationController.viewControllers = [vc]
+    }
+    
+    deinit{
+        print("deinit LoginCoordinator")
     }
     
     func login() {

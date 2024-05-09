@@ -7,13 +7,7 @@
 
 import UIKit
 
-protocol HomeCoordinatorDelegate{
-    func didloggedOut(coordinator: HomeCoordinator)
-}
-
 class HomeCoordinator: Coordinator{
-    
-    var delegate: HomeCoordinatorDelegate?
     
     var childCoordinator: [Coordinator] = []
     
@@ -25,13 +19,7 @@ class HomeCoordinator: Coordinator{
     
     func start() {
         let vc = HomeViewController()
-        vc.delegate = self
         self.navigationController.viewControllers = [vc]
     }
 }
 
-extension HomeCoordinator: HomeViewControllerDelegate{
-    func logout() {
-        self.delegate?.didloggedOut(coordinator: self)
-    }
-}
