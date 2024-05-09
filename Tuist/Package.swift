@@ -15,7 +15,9 @@ import PackageDescription
             "RxSwift" : .framework,
             "ReactorKit" : .framework,
             "Kingfisher" : .framework,
-            "RxCocoa" : .framework
+            "RxCocoa" : .framework,
+            "RxKakaoSDKAuth" : .framework,
+            "RxKakaoSDKUser" : .framework,
         ]
     )
 #endif
@@ -28,5 +30,6 @@ let package = Package(
         .package(url: "https://github.com/ReactiveX/RxSwift.git", .upToNextMajor(from: "6.7.0")),
         .package(url: "https://github.com/ReactorKit/ReactorKit.git", .upToNextMajor(from: "3.2.0")),
         .package(url: "https://github.com/onevcat/Kingfisher.git", .upToNextMajor(from: "7.0.0")),
+        .package(url: "https://github.com/kakao/kakao-ios-sdk-rx.git", .upToNextMajor(from: "2.22.1"))
     ]
 )
