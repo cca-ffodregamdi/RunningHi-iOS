@@ -18,6 +18,10 @@ import PackageDescription
             "RxCocoa" : .framework,
             "RxKakaoSDKAuth" : .framework,
             "RxKakaoSDKUser" : .framework,
+            "KakaoSDKAuth" : .framework,
+            "KakaoSDKUser" : .framework,
+            "KakaoSDKCommon" : .framework,
+            "RxKakaoSDKCommon" : .framework,
         ]
     )
 #endif
