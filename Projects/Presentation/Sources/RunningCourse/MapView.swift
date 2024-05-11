@@ -1,17 +1,20 @@
 //
-//  RunningCourseView.swift
+//  MapView.swift
 //  Presentation
 //
-//  Created by 오영석 on 5/8/24.
+//  Created by 오영석 on 5/11/24.
 //
 
 import UIKit
+import MapKit
 import SnapKit
 
-class RunningCourseView: UIView {
+class MapView: UIView {
     
-    private lazy var mapView: MapView = {
-        let mapView = MapView()
+    private lazy var mapView: MKMapView = {
+        let mapView = MKMapView()
+        mapView.layer.cornerRadius = 20
+        mapView.layer.shadowRadius = 3
         return mapView
     }()
     
@@ -38,7 +41,7 @@ class RunningCourseView: UIView {
             make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(padding)
             make.leading.equalTo(safeAreaLayoutGuide.snp.leading).offset(padding)
             make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing).offset(-padding)
-            make.bottom.equalTo(self.snp.centerY)
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
         }
     }
 }
