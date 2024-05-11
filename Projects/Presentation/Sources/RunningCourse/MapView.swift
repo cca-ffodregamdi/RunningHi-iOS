@@ -11,11 +11,22 @@ import SnapKit
 
 class MapView: UIView {
     
-    private lazy var mapView: MKMapView = {
+    lazy var mapView: MKMapView = {
         let mapView = MKMapView()
         mapView.layer.cornerRadius = 20
         mapView.layer.shadowRadius = 3
         return mapView
+    }()
+    
+    lazy var compassButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "scope"), for: .normal)
+        button.tintColor = .black
+        button.backgroundColor = .clear
+        button.layer.borderWidth = 1.0
+        button.layer.cornerRadius = 10
+        
+        return button
     }()
     
     override init(frame: CGRect) {
@@ -32,6 +43,11 @@ class MapView: UIView {
     
     private func setupViews() {
         addSubview(mapView)
+        
+        [compassButton]
+            .forEach { item in
+                self.addSubview(item)
+            }
     }
     
     private func setupConstraints() {
@@ -42,6 +58,10 @@ class MapView: UIView {
             make.leading.equalTo(safeAreaLayoutGuide.snp.leading).offset(padding)
             make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing).offset(-padding)
             make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+        }
+        compassButton.snp.makeConstraints { make in
+            make.trailing.equalTo(mapView.snp.trailing).offset(-padding)
+            make.bottom.equalTo(mapView.snp.bottom).offset(-padding)
         }
     }
 }

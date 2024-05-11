@@ -10,7 +10,7 @@ import SnapKit
 
 class RunningCourseView: UIView {
     
-    private lazy var mapView: MapView = {
+    lazy var mapView: MapView = {
         let mapView = MapView()
         return mapView
     }()

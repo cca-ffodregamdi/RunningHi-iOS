@@ -8,44 +8,56 @@
 import UIKit
 import MapKit
 import SnapKit
+import RxSwift
+import ReactorKit
 
-protocol RunningCourseViewControllerDelegate {
+protocol RunningCourseViewControllerDelegate: AnyObject {
     func didFinishCourse()
 }
 
-final class RunningCourseViewController: UIViewController {
+final class RunningCourseViewController: UIViewController, ReactorKit.View {
     
-    // MARK: Properties
-    var delegate: RunningCourseViewControllerDelegate?
+    var disposeBag = DisposeBag()
     
+    weak var delegate: RunningCourseViewControllerDelegate?
+
     private lazy var runningCourseView: RunningCourseView = {
         return RunningCourseView()
     }()
     
-    init() {
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        print("deinit RunningCourseViewController")
-    }
-    
-    // MARK: Lifecycles
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        reactor = RunningCourseRector()
     }
     
     private func configureUI() {
-        self.view.backgroundColor = .systemBackground
-        self.view.addSubview(runningCourseView)
+        view.backgroundColor = .systemBackground
+        view.addSubview(runningCourseView)
         
         runningCourseView.snp.makeConstraints { make in
-            make.edges.equalTo(self.view.safeAreaLayoutGuide)
+            make.edges.equalTo(view.safeAreaLayoutGuide)
         }
+    }
+}
+
+extension RunningCourseViewController {
+    func bind(reactor: RunningCourseRector) {
+        runningCourseView.mapView.compassButton.rx.tap
+            .map { Reactor.Action.centerMapOnUser }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isCentering }
+            .distinctUntilChanged()
+            .bind { [weak self] _ in
+                self?.centerMap()
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    func centerMap() {
+        runningCourseView.mapView.mapView.setUserTrackingMode(.follow, animated: true)
     }
 }
