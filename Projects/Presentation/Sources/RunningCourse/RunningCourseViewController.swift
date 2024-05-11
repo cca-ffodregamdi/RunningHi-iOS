@@ -18,9 +18,7 @@ protocol RunningCourseViewControllerDelegate: AnyObject {
 final class RunningCourseViewController: UIViewController, ReactorKit.View {
     
     var disposeBag = DisposeBag()
-    
     weak var delegate: RunningCourseViewControllerDelegate?
-
     private lazy var runningCourseView: RunningCourseView = {
         return RunningCourseView()
     }()
@@ -28,7 +26,7 @@ final class RunningCourseViewController: UIViewController, ReactorKit.View {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        reactor = RunningCourseRector()
+        reactor = RunningCourseReactor()
     }
     
     private func configureUI() {
@@ -42,7 +40,7 @@ final class RunningCourseViewController: UIViewController, ReactorKit.View {
 }
 
 extension RunningCourseViewController {
-    func bind(reactor: RunningCourseRector) {
+    func bind(reactor: RunningCourseReactor) {
         runningCourseView.mapView.compassButton.rx.tap
             .map { Reactor.Action.centerMapOnUser }
             .bind(to: reactor.action)
