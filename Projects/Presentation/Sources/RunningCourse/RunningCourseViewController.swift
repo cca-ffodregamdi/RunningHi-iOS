@@ -19,14 +19,20 @@ final class RunningCourseViewController: UIViewController, ReactorKit.View {
     
     var disposeBag = DisposeBag()
     weak var delegate: RunningCourseViewControllerDelegate?
+    private let locationManager = LocationManager.shared
     private lazy var runningCourseView: RunningCourseView = {
         return RunningCourseView()
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureLocation()
         configureUI()
         reactor = RunningCourseReactor()
+    }
+    
+    private func configureLocation() {
+        locationManager.checkUserDeviceLocationServiceAuthorization()
     }
     
     private func configureUI() {
