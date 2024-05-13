@@ -12,12 +12,10 @@ protocol RunningCourseCoordinatorDelegate{
     func didFinishCourse()
 }
 
-class RunningCourseCoordinator: Coordinator, RunningCourseCoordinatorDelegate, RunningCourseViewControllerDelegate{
+class RunningCourseCoordinator: Coordinator, RunningCourseCoordinatorDelegate, RunningCourseViewControllerDelegate {
     
-    var delegate: LoginCoordinatorDelegate?
-    
+    var delegate: RunningCourseCoordinatorDelegate?
     var childCoordinator: [Coordinator] = []
-    
     private var navigationController: UINavigationController!
     
     public init(navigationController: UINavigationController) {
@@ -27,9 +25,10 @@ class RunningCourseCoordinator: Coordinator, RunningCourseCoordinatorDelegate, R
     func start() {
         let vc = RunningCourseViewController()
         vc.delegate = self
-        self.navigationController.viewControllers = [vc]
+        navigationController.viewControllers = [vc]
     }
     
     func didFinishCourse() {
     }
 }
+
