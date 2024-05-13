@@ -19,19 +19,24 @@ final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
     }
     
     func checkUserDeviceLocationServiceAuthorization() {
-        guard CLLocationManager.locationServicesEnabled() else {
-            showRequestLocationServiceAlert()
-            return
+        DispatchQueue.global().async {
+            if CLLocationManager.locationServicesEnabled() {
+                
+                let authorization: CLAuthorizationStatus
+                
+                if #available(iOS 14.0, *) {
+                    authorization = self.authorizationStatus
+                } else {
+                    authorization = CLLocationManager.authorizationStatus()
+                }
+                
+                print("현재 사용자의 authorization status: \(authorization)")
+                
+            } else {
+                print("위치 권한 허용 꺼져있음")
+                self.showRequestLocationServiceAlert()
+            }
         }
-        
-        let authorizationStatus: CLAuthorizationStatus
-        
-        if #available(iOS 14.0, *) {
-            authorizationStatus = self.authorizationStatus
-        } else {
-            authorizationStatus = CLLocationManager.authorizationStatus()
-        }
-        
         checkUserCurrentLocationAuthorization(authorizationStatus)
     }
     
@@ -65,38 +70,38 @@ final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
 
 extension LocationManager {
     // 사용자의 위치를 성공적으로 가져왔을 때 호출
-        func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-            
-            // 위치 정보를 배열로 입력받는데, 마지막 index값이 가장 정확하다고 한다.
-            if (locations.last?.coordinate) != nil {
-                // ⭐️ 사용자 위치 정보 사용
-            }
-            
-            // startUpdatingLocation()을 사용하여 사용자 위치를 가져왔다면
-            // 불필요한 업데이트를 방지하기 위해 stopUpdatingLocation을 호출
-            stopUpdatingLocation()
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+        // 위치 정보를 배열로 입력받는데, 마지막 index값이 가장 정확하다고 한다.
+        if (locations.last?.coordinate) != nil {
+            // ⭐️ 사용자 위치 정보 사용
         }
-
+        
+        // startUpdatingLocation()을 사용하여 사용자 위치를 가져왔다면
+        // 불필요한 업데이트를 방지하기 위해 stopUpdatingLocation을 호출
+        stopUpdatingLocation()
+    }
+    
     // 사용자가 GPS 사용이 불가한 지역에 있는 등 위치 정보를 가져오지 못했을 때 호출
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print(#function)
     }
-
+    
     // 앱에 대한 권한 설정이 변경되면 호출 (iOS 14 이상)
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         // 사용자 디바이스의 위치 서비스가 활성화 상태인지 확인하는 메서드 호출
         checkUserDeviceLocationServiceAuthorization()
     }
-
+    
     // 앱에 대한 권한 설정이 변경되면 호출 (iOS 14 미만)
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         // 사용자 디바이스의 위치 서비스가 활성화 상태인지 확인하는 메서드 호출
         checkUserDeviceLocationServiceAuthorization()
     }
-
+    
     func showRequestLocationServiceAlert() {
         
-        let requestLocationServiceAlert = UIAlertController(title: "위치 정보 이용", message: "위치 서비스를 사용할 수 없습니다.\n디바이스의 '설정 > 개인정보 보호'에서 위치 서비스를 켜주세요.", preferredStyle: .alert)
+        let requestLocationServiceAlert = UIAlertController(title: "위치 정보 이용", message: "위치 서비스를 사용할 수 없습니다.\n디바이스의 '설정 - 개인정보 보호'에서 위치 서비스를 켜주세요.", preferredStyle: .alert)
         let goSetting = UIAlertAction(title: "설정으로 이동", style: .destructive) { _ in
             if let appSetting = URL(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(appSetting)
