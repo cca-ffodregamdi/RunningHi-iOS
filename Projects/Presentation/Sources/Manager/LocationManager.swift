@@ -106,9 +106,14 @@ extension LocationManager {
         requestLocationServiceAlert.addAction(cancel)
         requestLocationServiceAlert.addAction(goSetting)
         
-        if let viewController = UIApplication.shared.windows.first?.rootViewController {
-            viewController.present(requestLocationServiceAlert, animated: true)
+        if let windowScene = UIApplication.shared.connectedScenes
+            .filter({ $0.activationState == .foregroundActive })
+            .first as? UIWindowScene,
+           let rootViewController = windowScene.windows
+            .first(where: { $0.isKeyWindow })?.rootViewController {
+                rootViewController.present(requestLocationServiceAlert, animated: true)
         }
+
     }
 }
 
