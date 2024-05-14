@@ -22,6 +22,18 @@ let project = Project(
                             ]
                         ]
                     ],
+                    "LSApplicationQueriesSchemes": [
+                        "kakaokompassauth",
+                        "kakaolink"
+                    ],
+                    "CFBundleURLTypes": [
+                        [
+                            "CFBundleTypeRole": "Editor",
+                            "CFBundleURLSchemes": [
+                                "kakao9416fb784a8d5012e650504a17498e09"
+                            ]
+                        ]
+                    ]
                 ]
             ),
             sources: ["Sources/**"],
@@ -29,7 +41,8 @@ let project = Project(
             dependencies: [
                 .project(target: "Presentation", path: .relativeToRoot("Projects/Presentation")),
                 .external(name: "Kingfisher"),
-                
+                .external(name: "KakaoSDKAuth"),
+                .external(name: "KakaoSDKCommon"),
             ]
         ),
     ]

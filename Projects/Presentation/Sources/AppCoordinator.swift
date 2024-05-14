@@ -20,7 +20,8 @@ final public class AppCoordinator: Coordinator{
     }
     
     public func start() {
-        if self.isLoggedIn{
+//        if let object = UserDefaults.standard.object(forKey: "accessToken"){
+        if isLoggedIn{
             self.showBaseTabBarController()
         }else{
             self.showLoginViewController()

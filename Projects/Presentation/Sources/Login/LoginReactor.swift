@@ -8,50 +8,78 @@
 import Foundation
 import RxSwift
 import ReactorKit
+import KakaoSDKAuth
+import KakaoSDKUser
+import RxKakaoSDKAuth
+import RxKakaoSDKUser
+import KakaoSDKCommon
 
 final class LoginReactor: Reactor{
     public enum Action{
-        case login
+        case kakaoLogin
     }
     
     public enum Mutation{
-        case login
+        case getKakaoToken(OAuthToken)
         case setLoading(Bool)
     }
     
     public struct State{
-        var testLogin: Bool
         var isLoading: Bool
+        var successed: Bool
+        var kakaoOAuthToken: OAuthToken?
         init() {
-            testLogin = false
             isLoading = false
+            successed = false
         }
     }
     
     public var initialState: State = State()
     
-    
     func mutate(action: Action) -> Observable<Mutation> {
         switch action{
-        case .login:
+        case .kakaoLogin:
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                Observable.just(Mutation.login).delay(.milliseconds(500), scheduler: MainScheduler.instance),
+                kakaoLogin().map{Mutation.getKakaoToken($0)},
                 Observable.just(Mutation.setLoading(false))
             ])
             
         }
     }
     
-    
     func reduce(state: State, mutation: Mutation) -> State {
         var state = state
         switch mutation{
-        case .login:
-            state.testLogin = true
+        case .getKakaoToken(let token):
+            state.kakaoOAuthToken = token
+            if state.kakaoOAuthToken != nil{
+                state.successed = true
+            }
         case .setLoading(let value):
             state.isLoading = value
         }
         return state
+    }
+    
+    var disposeBag = DisposeBag()
+    
+    func kakaoLogin() -> Observable<OAuthToken>{
+        return Observable.create{ emitter in
+            if UserApi.isKakaoTalkLoginAvailable(){
+                UserApi.shared.rx.loginWithKakaoTalk()
+                    .bind{ oAuthToken in
+                        emitter.onNext(oAuthToken)
+                        emitter.onCompleted()
+                    }.disposed(by: self.disposeBag)
+            }else{
+                UserApi.shared.rx.loginWithKakaoAccount()
+                    .bind{ oAuthToken in
+                        emitter.onNext(oAuthToken)
+                        emitter.onCompleted()
+                    }.disposed(by: self.disposeBag)
+            }
+            return Disposables.create()
+        }
     }
 }

@@ -63,12 +63,12 @@ final class LoginViewController: UIViewController {
 extension LoginViewController: View{
     func bind(reactor: LoginReactor){
         loginView.kakaoLoginButton.rx.tap
-            .map{ Reactor.Action.login }
+            .map{ Reactor.Action.kakaoLogin }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
         reactor.state
-            .map{$0.testLogin}
+            .map{$0.successed}
             .distinctUntilChanged()
             .bind{ [weak self] isLogin in
                 if isLogin{
@@ -81,6 +81,13 @@ extension LoginViewController: View{
             .distinctUntilChanged()
             .bind{ isLoading in
                 // TODO: activityIndicator
+            }.disposed(by: self.disposeBag)
+        
+        reactor.state
+            .compactMap{$0.kakaoOAuthToken}
+            .bind{ token in
+                UserDefaults.standard.setValue(token.accessToken, forKey: "accessToken")
+                UserDefaults.standard.setValue(token.refreshToken, forKey: "refreshToken")
             }.disposed(by: self.disposeBag)
     }
 }

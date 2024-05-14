@@ -25,7 +25,13 @@ let project = Project(
                 .external(name: "RxSwift"),
                 .external(name: "SnapKit"),
                 .external(name: "Kingfisher"),
-                .external(name: "RxCocoa")
+                .external(name: "RxCocoa"),
+                .external(name: "KakaoSDKAuth"),
+                .external(name: "KakaoSDKUser"),
+                .external(name: "RxKakaoSDKAuth"),
+                .external(name: "RxKakaoSDKUser"),
+                .external(name: "KakaoSDKCommon"),
+                .external(name: "RxKakaoSDKCommon")
             ]
         ),
     ]

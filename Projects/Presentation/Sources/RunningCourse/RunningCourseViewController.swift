@@ -8,60 +8,44 @@
 import UIKit
 import MapKit
 import SnapKit
-import RxSwift
-import ReactorKit
 
-protocol RunningCourseViewControllerDelegate: AnyObject {
+protocol RunningCourseViewControllerDelegate {
     func didFinishCourse()
 }
 
-final class RunningCourseViewController: UIViewController, ReactorKit.View {
+final class RunningCourseViewController: UIViewController {
     
-    var disposeBag = DisposeBag()
-    weak var delegate: RunningCourseViewControllerDelegate?
-    private let locationManager = LocationManager.shared
+    // MARK: Properties
+    var delegate: RunningCourseViewControllerDelegate?
+    
     private lazy var runningCourseView: RunningCourseView = {
         return RunningCourseView()
     }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        configureLocation()
-        configureUI()
-        reactor = RunningCourseReactor()
+    init() {
+        super.init(nibName: nil, bundle: nil)
     }
     
-    private func configureLocation() {
-        locationManager.checkUserDeviceLocationServiceAuthorization()
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print("deinit RunningCourseViewController")
+    }
+    
+    // MARK: Lifecycles
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureUI()
     }
     
     private func configureUI() {
-        view.backgroundColor = .systemBackground
-        view.addSubview(runningCourseView)
+        self.view.backgroundColor = .systemBackground
+        self.view.addSubview(runningCourseView)
         
         runningCourseView.snp.makeConstraints { make in
-            make.edges.equalTo(view.safeAreaLayoutGuide)
+            make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
-    }
-}
-
-extension RunningCourseViewController {
-    func bind(reactor: RunningCourseReactor) {
-        runningCourseView.mapView.compassButton.rx.tap
-            .map { Reactor.Action.centerMapOnUser }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        reactor.state
-            .map { $0.isCentering }
-            .distinctUntilChanged()
-            .bind { [weak self] _ in
-                self?.centerMap()
-            }
-            .disposed(by: disposeBag)
-    }
-    
-    func centerMap() {
-        runningCourseView.mapView.mapView.setUserTrackingMode(.follow, animated: true)
     }
 }
