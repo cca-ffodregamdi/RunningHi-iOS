@@ -11,8 +11,8 @@ import SnapKit
 
 class RunningCourseView: UIView {
     
-    private lazy var mapView: MapView = {
-        let mapView = MapView()
+    private lazy var mapView: MKMapView = {
+        let mapView = MKMapView()
         mapView.layer.cornerRadius = 20
         mapView.layer.shadowRadius = 3
         return mapView
