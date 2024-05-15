@@ -17,7 +17,7 @@ final class RunningCourseViewController: UIViewController {
     
     // MARK: Properties
     var delegate: RunningCourseViewControllerDelegate?
-    
+    private let locationManager = LocationManager.shared
     private lazy var runningCourseView: RunningCourseView = {
         return RunningCourseView()
     }()
@@ -37,8 +37,13 @@ final class RunningCourseViewController: UIViewController {
     // MARK: Lifecycles
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureLocation()
         configureUI()
     }
+    
+    private func configureLocation() {
+            locationManager.checkUserDeviceLocationServiceAuthorization()
+        }
     
     private func configureUI() {
         self.view.backgroundColor = .systemBackground

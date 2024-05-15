@@ -84,8 +84,16 @@ extension LocationManager {
     
     // 사용자가 GPS 사용이 불가한 지역에 있는 등 위치 정보를 가져오지 못했을 때 호출
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print(#function)
+        if let clError = error as? CLError {
+            switch clError.code {
+            case .locationUnknown:
+                print("Temporary location error: \(error.localizedDescription)")
+            default:
+                print("Location Manager failed with error: \(error.localizedDescription)")
+            }
+        }
     }
+
     
     // 앱에 대한 권한 설정이 변경되면 호출 (iOS 14 이상)
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
