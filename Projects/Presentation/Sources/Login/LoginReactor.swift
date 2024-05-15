@@ -13,6 +13,8 @@ import KakaoSDKUser
 import RxKakaoSDKAuth
 import RxKakaoSDKUser
 import KakaoSDKCommon
+import Domain
+
 
 final class LoginReactor: Reactor{
     public enum Action{
@@ -34,14 +36,25 @@ final class LoginReactor: Reactor{
         }
     }
     
-    public var initialState: State = State()
+    public let initialState: State
+    private let loginUseCase: LoginUseCase
+    
+    init(loginUseCase: LoginUseCase) {
+        self.initialState = State()
+        self.loginUseCase = loginUseCase
+    }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .kakaoLogin:
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                kakaoLogin().map{Mutation.getKakaoToken($0)},
+                loginUseCase.login()
+                    .asObservable()
+                    .map{
+                        Mutation.getKakaoToken($0)
+                    }.catchAndReturn(Mutation.setLoading(false)),
+//                kakaoLogin().map{Mutation.getKakaoToken($0)},
                 Observable.just(Mutation.setLoading(false))
             ])
             
@@ -64,22 +77,22 @@ final class LoginReactor: Reactor{
     
     var disposeBag = DisposeBag()
     
-    func kakaoLogin() -> Observable<OAuthToken>{
-        return Observable.create{ emitter in
-            if UserApi.isKakaoTalkLoginAvailable(){
-                UserApi.shared.rx.loginWithKakaoTalk()
-                    .bind{ oAuthToken in
-                        emitter.onNext(oAuthToken)
-                        emitter.onCompleted()
-                    }.disposed(by: self.disposeBag)
-            }else{
-                UserApi.shared.rx.loginWithKakaoAccount()
-                    .bind{ oAuthToken in
-                        emitter.onNext(oAuthToken)
-                        emitter.onCompleted()
-                    }.disposed(by: self.disposeBag)
-            }
-            return Disposables.create()
-        }
-    }
+//    func kakaoLogin() -> Observable<OAuthToken>{
+//        return Observable.create{ emitter in
+//            if UserApi.isKakaoTalkLoginAvailable(){
+//                UserApi.shared.rx.loginWithKakaoTalk()
+//                    .bind{ oAuthToken in
+//                        emitter.onNext(oAuthToken)
+//                        emitter.onCompleted()
+//                    }.disposed(by: self.disposeBag)
+//            }else{
+//                UserApi.shared.rx.loginWithKakaoAccount()
+//                    .bind{ oAuthToken in
+//                        emitter.onNext(oAuthToken)
+//                        emitter.onCompleted()
+//                    }.disposed(by: self.disposeBag)
+//            }
+//            return Disposables.create()
+//        }
+//    }
 }

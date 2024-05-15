@@ -9,6 +9,7 @@ import UIKit
 import RxCocoa
 import ReactorKit
 import SnapKit
+import Domain
 
 protocol LoginViewControllerDelegate: AnyObject{
     func login()
@@ -28,7 +29,7 @@ final class LoginViewController: UIViewController {
     
     init(){
         super.init(nibName: nil, bundle: nil)   
-        self.reactor = LoginReactor()
+        self.reactor = LoginReactor(loginUseCase: LoginUseCase(loginRepository: LoginRepositoryImplementation))
     }
     
     required init?(coder: NSCoder) {
