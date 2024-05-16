@@ -13,6 +13,8 @@ import KakaoSDKUser
 import RxKakaoSDKAuth
 import RxKakaoSDKUser
 import KakaoSDKCommon
+import Domain
+import Data
 
 final class LoginReactor: Reactor{
     public enum Action{
@@ -34,17 +36,26 @@ final class LoginReactor: Reactor{
         }
     }
     
-    public var initialState: State = State()
+    public let initialState: State
+    private let loginUseCase: LoginUseCase
+    
+    public init() {
+        self.initialState = State()
+        self.loginUseCase = LoginUseCase(loginRepository: LoginRepositoryImplementation())
+    }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .kakaoLogin:
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                kakaoLogin().map{Mutation.getKakaoToken($0)},
+                loginUseCase.login()
+                    .asObservable()
+                    .flatMap{ token -> Observable<Mutation> in
+                        return Observable.just( Mutation.getKakaoToken(token))
+                    }.catchAndReturn(Mutation.setLoading(false)),
                 Observable.just(Mutation.setLoading(false))
             ])
-            
         }
     }
     
@@ -60,26 +71,5 @@ final class LoginReactor: Reactor{
             state.isLoading = value
         }
         return state
-    }
-    
-    var disposeBag = DisposeBag()
-    
-    func kakaoLogin() -> Observable<OAuthToken>{
-        return Observable.create{ emitter in
-            if UserApi.isKakaoTalkLoginAvailable(){
-                UserApi.shared.rx.loginWithKakaoTalk()
-                    .bind{ oAuthToken in
-                        emitter.onNext(oAuthToken)
-                        emitter.onCompleted()
-                    }.disposed(by: self.disposeBag)
-            }else{
-                UserApi.shared.rx.loginWithKakaoAccount()
-                    .bind{ oAuthToken in
-                        emitter.onNext(oAuthToken)
-                        emitter.onCompleted()
-                    }.disposed(by: self.disposeBag)
-            }
-            return Disposables.create()
-        }
     }
 }

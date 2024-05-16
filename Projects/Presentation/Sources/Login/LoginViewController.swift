@@ -9,6 +9,7 @@ import UIKit
 import RxCocoa
 import ReactorKit
 import SnapKit
+import Domain
 
 protocol LoginViewControllerDelegate: AnyObject{
     func login()
