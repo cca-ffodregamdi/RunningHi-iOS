@@ -9,8 +9,14 @@ import Foundation
 import UIKit
 import CoreLocation
 
+struct Location: Codable {
+    var latitude: Double = 0.0
+    var longitude: Double = 0.0
+}
+
 final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
     static let shared = LocationManager()
+    static var location = (latitude: Double(), longitude: Double())
     
     override init() {
         super.init()
@@ -21,7 +27,6 @@ final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
     func checkUserDeviceLocationServiceAuthorization() {
         DispatchQueue.global().async {
             if CLLocationManager.locationServicesEnabled() {
-                
                 let authorization: CLAuthorizationStatus
                 
                 if #available(iOS 14.0, *) {
@@ -30,40 +35,33 @@ final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
                     authorization = CLLocationManager.authorizationStatus()
                 }
                 
-                print("현재 사용자의 authorization status: \(authorization)")
-                
+//                print("현재 사용자의 authorization status: \(authorization)")
+                self.checkUserCurrentLocationAuthorization(authorization)
             } else {
-                print("위치 권한 허용 꺼져있음")
+//                print("위치 권한 허용 꺼져있음")
                 self.showRequestLocationServiceAlert()
             }
         }
-        checkUserCurrentLocationAuthorization(authorizationStatus)
     }
     
     func checkUserCurrentLocationAuthorization(_ status: CLAuthorizationStatus) {
         switch status {
         case .notDetermined:
-            // 사용자가 권한에 대한 설정을 선택하지 않은 상태
+//            print("NotDetermined")
+            self.desiredAccuracy = kCLLocationAccuracyBest
+            self.requestWhenInUseAuthorization()
             
-            // 권한 요청을 보내기 전에 desiredAccuracy 설정 필요
-            desiredAccuracy = kCLLocationAccuracyBest
+        case .restricted, .denied:
+//            print("Denied, 아이폰 설정으로 유도")
+            self.showRequestLocationServiceAlert()
             
-            // 권한 요청을 보낸다.
-            requestWhenInUseAuthorization()
-            
-        case .denied, .restricted:
-            // 사용자가 명시적으로 권한을 거부했거나, 위치 서비스 활성화가 제한된 상태
-            // 시스템 설정에서 설정값을 변경하도록 유도한다.
-            // 시스템 설정으로 유도하는 커스텀 얼럿
-            showRequestLocationServiceAlert()
-            
-        case .authorizedWhenInUse:
-            // 앱을 사용중일 때, 위치 서비스를 이용할 수 있는 상태
-            // manager 인스턴스를 사용하여 사용자의 위치를 가져온다.
-            startUpdatingLocation()
+        case .authorizedWhenInUse, .authorizedAlways:
+//            print("Authorized")
+            self.startUpdatingLocation()
             
         default:
-            print("Default")
+            break
+//            print("Default")
         }
     }
 }
@@ -73,8 +71,10 @@ extension LocationManager {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         // 위치 정보를 배열로 입력받는데, 마지막 index값이 가장 정확하다고 한다.
-        if (locations.last?.coordinate) != nil {
-            // ⭐️ 사용자 위치 정보 사용
+        if let lastLocation = locations.last {
+            LocationManager.location.latitude = lastLocation.coordinate.latitude
+            LocationManager.location.longitude = lastLocation.coordinate.longitude
+//            print("Latitude: \(LocationManager.location.latitude), Longitude: \(LocationManager.location.longitude)")
         }
         
         // startUpdatingLocation()을 사용하여 사용자 위치를 가져왔다면
@@ -86,14 +86,15 @@ extension LocationManager {
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         if let clError = error as? CLError {
             switch clError.code {
-            case .locationUnknown:
-                print("Temporary location error: \(error.localizedDescription)")
+            case .locationUnknown: 
+                break
+//                print("Temporary location error: \(error.localizedDescription)")
             default:
-                print("Location Manager failed with error: \(error.localizedDescription)")
+                break
+//                print("Location Manager failed with error: \(error.localizedDescription)")
             }
         }
     }
-
     
     // 앱에 대한 권한 설정이 변경되면 호출 (iOS 14 이상)
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -108,8 +109,11 @@ extension LocationManager {
     }
     
     func showRequestLocationServiceAlert() {
-        
-        let requestLocationServiceAlert = UIAlertController(title: "위치 정보 이용", message: "위치 서비스를 사용할 수 없습니다.\n디바이스의 '설정 - 개인정보 보호'에서 위치 서비스를 켜주세요.", preferredStyle: .alert)
+        let requestLocationServiceAlert = UIAlertController(
+            title: "위치 정보 이용",
+            message: "위치 서비스를 사용할 수 없습니다.\n디바이스의 '설정 - 개인정보 보호'에서 위치 서비스를 켜주세요.",
+            preferredStyle: .alert
+        )
         let goSetting = UIAlertAction(title: "설정으로 이동", style: .destructive) { _ in
             if let appSetting = URL(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(appSetting)
@@ -119,14 +123,14 @@ extension LocationManager {
         requestLocationServiceAlert.addAction(cancel)
         requestLocationServiceAlert.addAction(goSetting)
         
-        if let windowScene = UIApplication.shared.connectedScenes
-            .filter({ $0.activationState == .foregroundActive })
-            .first as? UIWindowScene,
-           let rootViewController = windowScene.windows
-            .first(where: { $0.isKeyWindow })?.rootViewController {
-                rootViewController.present(requestLocationServiceAlert, animated: true)
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes
+                .filter({ $0.activationState == .foregroundActive })
+                .first as? UIWindowScene,
+               let rootViewController = windowScene.windows
+                .first(where: { $0.isKeyWindow })?.rootViewController {
+                    rootViewController.present(requestLocationServiceAlert, animated: true)
+            }
         }
-
     }
 }
-

@@ -17,7 +17,7 @@ final class RunningCourseViewController: UIViewController {
     
     // MARK: Properties
     var delegate: RunningCourseViewControllerDelegate?
-    private let locationManager = LocationManager.shared
+    private let locationManager = LocationManager()
     private lazy var runningCourseView: RunningCourseView = {
         return RunningCourseView()
     }()
@@ -47,6 +47,7 @@ final class RunningCourseViewController: UIViewController {
     private func configureLocation() {
         locationManager.checkUserDeviceLocationServiceAuthorization()
         runningCourseView.mapView.mapView.setRegion(MKCoordinateRegion(center: defaultLocation, span: defaultSpanValue), animated: true)
+        runningCourseView.mapView.mapView.showsUserLocation = true
     }
     
     private func configureUI() {
