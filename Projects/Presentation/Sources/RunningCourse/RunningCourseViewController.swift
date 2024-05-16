@@ -22,6 +22,9 @@ final class RunningCourseViewController: UIViewController {
         return RunningCourseView()
     }()
     
+    let defaultLocation = CLLocationCoordinate2D(latitude: 36.0106098, longitude: 129.321296)
+    let defaultSpanValue = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+    
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -42,8 +45,9 @@ final class RunningCourseViewController: UIViewController {
     }
     
     private func configureLocation() {
-            locationManager.checkUserDeviceLocationServiceAuthorization()
-        }
+        locationManager.checkUserDeviceLocationServiceAuthorization()
+        runningCourseView.mapView.mapView.setRegion(MKCoordinateRegion(center: defaultLocation, span: defaultSpanValue), animated: true)
+    }
     
     private func configureUI() {
         self.view.backgroundColor = .systemBackground
