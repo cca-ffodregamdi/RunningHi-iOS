@@ -19,10 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.windowScene = windowScene
 
         let navigationController = UINavigationController()
-        
-//        let viewController = UIViewController()
-//        viewController.view.backgroundColor = .orange
-        
+
         let coordinator = AppCoordinator(navigationController: navigationController)
         coordinator.start()
         

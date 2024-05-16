@@ -29,7 +29,7 @@ final class LoginViewController: UIViewController {
     
     init(){
         super.init(nibName: nil, bundle: nil)   
-        self.reactor = LoginReactor(loginUseCase: LoginUseCase(loginRepository: LoginRepositoryImplementation))
+        self.reactor = LoginReactor()
     }
     
     required init?(coder: NSCoder) {

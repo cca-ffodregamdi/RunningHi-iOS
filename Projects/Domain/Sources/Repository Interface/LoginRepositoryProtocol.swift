@@ -10,5 +10,5 @@ import RxSwift
 import KakaoSDKAuth
 
 public protocol LoginRepositoryProtocol{
-    func login() -> Single<OAuthToken>
+    func login() -> Observable<OAuthToken>
 }

@@ -13,37 +13,39 @@ import KakaoSDKUser
 import RxSwift
 
 public class LoginRepositoryImplementation: LoginRepositoryProtocol{
+
+    public init(){
+        
+    }
     
-    var disposeBag: DisposeBag = DisposeBag()
+    deinit{
+        print("LoginRepositoryImplementation deinit")
+    }
     
-    public func login() -> Single<OAuthToken>{
-        return Single.create{ emitter in
+    public func login() -> Observable<OAuthToken>{
+        return Observable.create{ emitter in
+            let kakaoLoginObservable: Observable<OAuthToken>
+            
             if UserApi.isKakaoTalkLoginAvailable(){
-                UserApi.shared.rx.loginWithKakaoTalk().asSingle()
-                    .subscribe(
-                        onSuccess: {oAuthToken in
-                            emitter(.success(oAuthToken))
-                        },
-                        onFailure: { error in
-                            emitter(.failure(error))
-                        },
-                        onDisposed: {
-                            print("disposed")
-                        }
-                    )
-                    .disposed(by: self.disposeBag)
+                kakaoLoginObservable = UserApi.shared.rx.loginWithKakaoTalk()
             }else{
-                UserApi.shared.rx.loginWithKakaoAccount().asSingle()
-                    .subscribe(
-                        onSuccess: {oAuthToken in
-                            emitter(.success(oAuthToken))
-                        },
-                        onFailure: { error in
-                            emitter(.failure(error))
-                        }
-                    ).disposed(by: self.disposeBag)
+                kakaoLoginObservable = UserApi.shared.rx.loginWithKakaoAccount()
             }
-            return Disposables.create()
+            
+            let disposable = kakaoLoginObservable
+                .subscribe(
+                    onNext: { oAuthToken in
+                        emitter.onNext(oAuthToken)
+                        emitter.onCompleted()
+                    },
+                    onError: { error in
+                        emitter.onError(error)
+                    }
+                )
+            return Disposables.create{
+                disposable.dispose()
+            }
         }
     }
 }
+

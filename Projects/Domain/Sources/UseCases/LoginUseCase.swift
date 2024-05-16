@@ -12,11 +12,11 @@ import KakaoSDKAuth
 final public class LoginUseCase: LoginProtocol{
     private let loginRepository: LoginRepositoryProtocol
     
-    init(loginRepository: LoginRepositoryProtocol) {
+    public init(loginRepository: LoginRepositoryProtocol) {
         self.loginRepository = loginRepository
     }
     
-    public func login() -> Single<OAuthToken>{
+    public func login() -> Observable<OAuthToken>{
         return loginRepository.login()
     }
 }

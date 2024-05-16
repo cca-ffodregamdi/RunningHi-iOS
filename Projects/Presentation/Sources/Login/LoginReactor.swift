@@ -14,7 +14,7 @@ import RxKakaoSDKAuth
 import RxKakaoSDKUser
 import KakaoSDKCommon
 import Domain
-
+import Data
 
 final class LoginReactor: Reactor{
     public enum Action{
@@ -39,9 +39,9 @@ final class LoginReactor: Reactor{
     public let initialState: State
     private let loginUseCase: LoginUseCase
     
-    init(loginUseCase: LoginUseCase) {
+    public init() {
         self.initialState = State()
-        self.loginUseCase = loginUseCase
+        self.loginUseCase = LoginUseCase(loginRepository: LoginRepositoryImplementation())
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -51,13 +51,11 @@ final class LoginReactor: Reactor{
                 Observable.just(Mutation.setLoading(true)),
                 loginUseCase.login()
                     .asObservable()
-                    .map{
-                        Mutation.getKakaoToken($0)
+                    .flatMap{ token -> Observable<Mutation> in
+                        return Observable.just( Mutation.getKakaoToken(token))
                     }.catchAndReturn(Mutation.setLoading(false)),
-//                kakaoLogin().map{Mutation.getKakaoToken($0)},
                 Observable.just(Mutation.setLoading(false))
             ])
-            
         }
     }
     
@@ -74,25 +72,4 @@ final class LoginReactor: Reactor{
         }
         return state
     }
-    
-    var disposeBag = DisposeBag()
-    
-//    func kakaoLogin() -> Observable<OAuthToken>{
-//        return Observable.create{ emitter in
-//            if UserApi.isKakaoTalkLoginAvailable(){
-//                UserApi.shared.rx.loginWithKakaoTalk()
-//                    .bind{ oAuthToken in
-//                        emitter.onNext(oAuthToken)
-//                        emitter.onCompleted()
-//                    }.disposed(by: self.disposeBag)
-//            }else{
-//                UserApi.shared.rx.loginWithKakaoAccount()
-//                    .bind{ oAuthToken in
-//                        emitter.onNext(oAuthToken)
-//                        emitter.onCompleted()
-//                    }.disposed(by: self.disposeBag)
-//            }
-//            return Disposables.create()
-//        }
-//    }
 }

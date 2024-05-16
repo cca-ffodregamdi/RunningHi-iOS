@@ -13,15 +13,14 @@ final public class AppCoordinator: Coordinator{
     
     private var navigationController: UINavigationController!
     
-    private var isLoggedIn: Bool = false
-    
     public init(navigationController: UINavigationController!) {
         self.navigationController = navigationController
     }
     
     public func start() {
+        // TODO: 토큰 유효성 검증, 백엔드 API 추가되면 적용
 //        if let object = UserDefaults.standard.object(forKey: "accessToken"){
-        if isLoggedIn{
+        if false{
             self.showBaseTabBarController()
         }else{
             self.showLoginViewController()
