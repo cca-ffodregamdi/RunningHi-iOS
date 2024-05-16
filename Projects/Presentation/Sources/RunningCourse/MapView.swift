@@ -22,7 +22,7 @@ class MapView: UIView {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "scope"), for: .normal)
         button.tintColor = .black
-        button.backgroundColor = .clear
+        button.backgroundColor = .white
         button.layer.borderWidth = 1.0
         button.layer.cornerRadius = 10
         
