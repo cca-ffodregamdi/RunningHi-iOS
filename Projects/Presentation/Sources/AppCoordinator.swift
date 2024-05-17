@@ -19,6 +19,7 @@ final public class AppCoordinator: Coordinator{
     
     public func start() {
         // TODO: 토큰 유효성 검증, 백엔드 API 추가되면 적용
+        // TODO: splash 에서 검증 후 start()에 매개변수로 전달?
 //        if let object = UserDefaults.standard.object(forKey: "accessToken"){
         if false{
             self.showBaseTabBarController()
