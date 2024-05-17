@@ -56,7 +56,7 @@ class LoginView: UIView {
         self.loginButtonStackView.addArrangedSubview(kakaoLoginButton)
         
         logoImageView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(40)
+            make.top.equalToSuperview().offset(60)
             make.centerX.equalToSuperview()
             make.width.equalTo(180)
             make.height.equalTo(72)
