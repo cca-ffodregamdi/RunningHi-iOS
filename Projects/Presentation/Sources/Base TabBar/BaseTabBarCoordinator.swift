@@ -67,6 +67,7 @@ class BaseTabBarCoordinator: TabBarCoordinator{
             let myCoordinator: MyCoordinator = MyCoordinator(navigationController: tabNavigationController)
             self.childCoordinator.append(myCoordinator)
             myCoordinator.start()
+            tabNavigationController.viewControllers.first?.title = TabBarItemType.My.getTitle()
         }
     }
     
