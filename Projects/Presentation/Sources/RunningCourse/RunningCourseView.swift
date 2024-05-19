@@ -73,4 +73,9 @@ class RunningCourseView: UIView {
             make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing).offset(-padding)
         }
     }
+    
+    func updateRunningState(isRunning: Bool) {
+        startButton.isEnabled = !isRunning
+        stopButton.isEnabled = isRunning
+    }
 }
