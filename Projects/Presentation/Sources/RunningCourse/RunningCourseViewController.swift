@@ -9,12 +9,13 @@ import UIKit
 import MapKit
 import SnapKit
 import RxSwift
+import ReactorKit
 
 protocol RunningCourseViewControllerDelegate {
     func didFinishCourse()
 }
 
-final class RunningCourseViewController: UIViewController {
+final class RunningCourseViewController: UIViewController, View {
     
     // MARK: Properties
     var disposeBag = DisposeBag()
@@ -83,6 +84,16 @@ final class RunningCourseViewController: UIViewController {
                 self?.runningCourseView.updateRunningState(isRunning: isRunning)
             })
             .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.currentLocation }
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak self] location in
+                guard let location = location else { return }
+                print("Centering map on: \(location.latitude), \(location.longitude)")
+                self?.centerMap(on: location)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func updatePolyline(with coordinates: [CLLocationCoordinate2D]) {
@@ -93,6 +104,11 @@ final class RunningCourseViewController: UIViewController {
         if let polyline = polyline {
             runningCourseView.mapView.mapView.addOverlay(polyline)
         }
+    }
+    
+    private func centerMap(on location: CLLocationCoordinate2D) {
+        let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        runningCourseView.mapView.mapView.setRegion(region, animated: true)
     }
 }
 

@@ -5,10 +5,8 @@
 //  Created by 오영석 on 5/11/24.
 //
 
-import Foundation
 import ReactorKit
 import RxSwift
-import RxCocoa
 import CoreLocation
 
 final class RunningCourseReactor: Reactor {
@@ -21,11 +19,13 @@ final class RunningCourseReactor: Reactor {
     enum Mutation {
         case setCoordinates([CLLocationCoordinate2D])
         case setRunning(Bool)
+        case setCurrentLocation(CLLocationCoordinate2D)
     }
     
     struct State {
         var coordinates: [CLLocationCoordinate2D] = []
         var isRunning: Bool = false
+        var currentLocation: CLLocationCoordinate2D?
     }
     
     let initialState = State()
@@ -45,6 +45,12 @@ final class RunningCourseReactor: Reactor {
     
     private func startRunningCourse() -> Observable<Mutation> {
         locationManager.startLocationUpdates()
+        
+        let locationObservable = locationManager.rx.didUpdateLocations
+            .map { $0.last?.coordinate }
+            .compactMap { $0 }
+            .map(Mutation.setCurrentLocation)
+        
         let timerObservable = timer
             .withLatestFrom(locationManager.rx.didUpdateLocations)
             .map { $0.map { $0.coordinate } }
@@ -53,6 +59,7 @@ final class RunningCourseReactor: Reactor {
         
         return Observable.merge(
             Observable.just(Mutation.setRunning(true)),
+            locationObservable,
             timerObservable
         )
     }
@@ -64,6 +71,8 @@ final class RunningCourseReactor: Reactor {
             newState.coordinates.append(contentsOf: coordinates)
         case .setRunning(let isRunning):
             newState.isRunning = isRunning
+        case .setCurrentLocation(let location):
+            newState.currentLocation = location
         }
         return newState
     }
