@@ -8,6 +8,7 @@
 import UIKit
 import MapKit
 import SnapKit
+import RxSwift
 
 protocol RunningCourseViewControllerDelegate {
     func didFinishCourse()
@@ -16,14 +17,17 @@ protocol RunningCourseViewControllerDelegate {
 final class RunningCourseViewController: UIViewController {
     
     // MARK: Properties
+    var disposeBag = DisposeBag()
     var delegate: RunningCourseViewControllerDelegate?
-    private let locationManager = LocationManager()
+    var reactor: RunningCourseReactor? {
+        didSet {
+            bind(reactor: reactor!)
+        }
+    }
     private lazy var runningCourseView: RunningCourseView = {
         return RunningCourseView()
     }()
-    
-    let defaultLocation = CLLocationCoordinate2D(latitude: 36.0106098, longitude: 129.321296)
-    let defaultSpanValue = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+    private var polyline: MKPolyline?
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -40,14 +44,8 @@ final class RunningCourseViewController: UIViewController {
     // MARK: Lifecycles
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureLocation()
         configureUI()
-    }
-    
-    private func configureLocation() {
-        locationManager.checkUserDeviceLocationServiceAuthorization()
-        runningCourseView.mapView.mapView.setRegion(MKCoordinateRegion(center: defaultLocation, span: defaultSpanValue), animated: true)
-        runningCourseView.mapView.mapView.showsUserLocation = true
+        reactor = RunningCourseReactor()
     }
     
     private func configureUI() {
@@ -57,5 +55,55 @@ final class RunningCourseViewController: UIViewController {
         runningCourseView.snp.makeConstraints { make in
             make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
+    }
+    
+    func bind(reactor: RunningCourseReactor) {
+        runningCourseView.startButton.rx.tap
+            .map { RunningCourseReactor.Action.startRunningCourse }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        runningCourseView.stopButton.rx.tap
+            .map { RunningCourseReactor.Action.stopRunningCourse }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.coordinates }
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak self] coordinates in
+                self?.updatePolyline(with: coordinates)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isRunning }
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak self] isRunning in
+                self?.runningCourseView.updateRunningState(isRunning: isRunning)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func updatePolyline(with coordinates: [CLLocationCoordinate2D]) {
+        if let polyline = polyline {
+            runningCourseView.mapView.mapView.removeOverlay(polyline)
+        }
+        polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        if let polyline = polyline {
+            runningCourseView.mapView.mapView.addOverlay(polyline)
+        }
+    }
+}
+
+extension RunningCourseViewController: MKMapViewDelegate {
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        if let polyline = overlay as? MKPolyline {
+            let renderer = MKPolylineRenderer(polyline: polyline)
+            renderer.strokeColor = .blue
+            renderer.lineWidth = 3
+            return renderer
+        }
+        return MKOverlayRenderer(overlay: overlay)
     }
 }
