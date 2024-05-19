@@ -17,11 +17,20 @@ struct Location: Codable {
 final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
     static let shared = LocationManager()
     static var location = (latitude: Double(), longitude: Double())
+    var locations = [CLLocation]()
     
     override init() {
         super.init()
         self.delegate = self
-        self.desiredAccuracy = kCLLocationAccuracyBest
+        self.desiredAccuracy = kCLLocationAccuracyBestForNavigation
+    }
+    
+    func startLocationUpdates() {
+        self.startUpdatingLocation()
+    }
+
+    func stopLocationUpdates() {
+        self.stopUpdatingLocation()
     }
     
     func checkUserDeviceLocationServiceAuthorization() {
@@ -69,16 +78,11 @@ final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
 extension LocationManager {
     // 사용자의 위치를 성공적으로 가져왔을 때 호출
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        
-        // 위치 정보를 배열로 입력받는데, 마지막 index값이 가장 정확하다고 한다.
         if let lastLocation = locations.last {
             LocationManager.location.latitude = lastLocation.coordinate.latitude
             LocationManager.location.longitude = lastLocation.coordinate.longitude
-//            print("Latitude: \(LocationManager.location.latitude), Longitude: \(LocationManager.location.longitude)")
+            self.locations.append(lastLocation)
         }
-        
-        // startUpdatingLocation()을 사용하여 사용자 위치를 가져왔다면
-        // 불필요한 업데이트를 방지하기 위해 stopUpdatingLocation을 호출
         stopUpdatingLocation()
     }
     
@@ -132,5 +136,11 @@ extension LocationManager {
                     rootViewController.present(requestLocationServiceAlert, animated: true)
             }
         }
+    }
+}
+
+extension CLLocationCoordinate2D: Equatable {
+    public static func == (lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
+        return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
     }
 }
