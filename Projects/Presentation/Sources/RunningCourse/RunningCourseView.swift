@@ -13,9 +13,26 @@ class RunningCourseView: UIView {
     
     lazy var mapView: MapView = {
         let mapView = MapView()
-        mapView.layer.cornerRadius = 20
-        mapView.layer.shadowRadius = 3
+        
         return mapView
+    }()
+    
+    lazy var startButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("시작", for: .normal)
+        button.tintColor = .white
+        button.backgroundColor = .green
+        button.layer.cornerRadius = 10
+        return button
+    }()
+    
+    lazy var stopButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("종료", for: .normal)
+        button.tintColor = .white
+        button.backgroundColor = .red
+        button.layer.cornerRadius = 10
+        return button
     }()
     
     override init(frame: CGRect) {
@@ -32,6 +49,8 @@ class RunningCourseView: UIView {
     
     private func setupViews() {
         addSubview(mapView)
+        addSubview(startButton)
+        addSubview(stopButton)
     }
     
     private func setupConstraints() {
@@ -42,6 +61,16 @@ class RunningCourseView: UIView {
             make.leading.equalTo(safeAreaLayoutGuide.snp.leading).offset(padding)
             make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing).offset(-padding)
             make.bottom.equalTo(self.snp.centerY)
+        }
+        
+        startButton.snp.makeConstraints { make in
+            make.top.equalTo(mapView.snp.bottom).offset(padding * 2)
+            make.leading.equalTo(safeAreaLayoutGuide.snp.leading).offset(padding)
+        }
+        
+        stopButton.snp.makeConstraints { make in
+            make.top.equalTo(mapView.snp.bottom).offset(padding * 2)
+            make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing).offset(-padding)
         }
     }
 }
