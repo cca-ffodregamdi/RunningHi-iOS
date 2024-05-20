@@ -29,6 +29,9 @@ final class RunningCourseViewController: UIViewController, View {
         return RunningCourseView()
     }()
     private var polyline: MKPolyline?
+    private var defaultLocation = CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
+    private let defaultSpanValue = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+        
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -46,6 +49,7 @@ final class RunningCourseViewController: UIViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        configureLocation()
         reactor = RunningCourseReactor()
     }
     
@@ -56,6 +60,11 @@ final class RunningCourseViewController: UIViewController, View {
         runningCourseView.snp.makeConstraints { make in
             make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
+    }
+    
+    private func configureLocation() {
+        runningCourseView.mapView.mapView.setRegion(MKCoordinateRegion(center: defaultLocation, span: defaultSpanValue), animated: true)
+        runningCourseView.mapView.mapView.showsUserLocation = true
     }
     
     func bind(reactor: RunningCourseReactor) {
