@@ -5,37 +5,95 @@
 //  Created by 오영석 on 5/11/24.
 //
 
-import Foundation
 import ReactorKit
 import RxSwift
+import CoreLocation
 
 final class RunningCourseReactor: Reactor {
+    
     enum Action {
-        case centerMapOnUser
+        case startRunningCourse
+        case stopRunningCourse
+        case moveToCurrentLocation
+        case initializeLocation
     }
     
     enum Mutation {
-        case setMapCentering(Bool)
+        case setCoordinates([CLLocationCoordinate2D])
+        case setRunning(Bool)
+        case setCurrentLocation(CLLocationCoordinate2D)
+        case moveToCurrentLocation(CLLocationCoordinate2D)
     }
     
     struct State {
-        var isCentering: Bool
+        var coordinates: [CLLocationCoordinate2D] = []
+        var isRunning: Bool = false
+        var currentLocation: CLLocationCoordinate2D?
+        var moveToLocation: CLLocationCoordinate2D?
     }
     
-    var initialState: State = State(isCentering: false)
+    let initialState = State()
+    private let locationManager = LocationManager.shared
+    private let timer = Observable<Int>.interval(.seconds(5), scheduler: MainScheduler.instance)
+    private let disposeBag = DisposeBag()
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .centerMapOnUser:
-            return Observable.just(Mutation.setMapCentering(true))
+        case .startRunningCourse:
+            return startRunningCourse()
+        case .stopRunningCourse:
+            locationManager.stopLocationUpdates()
+            return Observable.just(Mutation.setRunning(false))
+        case .moveToCurrentLocation:
+            guard let currentLocation = locationManager.location?.coordinate else {
+                return Observable.empty()
+            }
+            return Observable.just(Mutation.moveToCurrentLocation(currentLocation))
+        case .initializeLocation:
+            return initializeLocation()
         }
+    }
+    
+    private func initializeLocation() -> Observable<Mutation> {
+        return locationManager.rx.didUpdateLocations
+            .map { $0.last?.coordinate }
+            .compactMap { $0 }
+            .take(1)
+            .map { Mutation.setCurrentLocation($0) }
+    }
+    
+    private func startRunningCourse() -> Observable<Mutation> {
+        locationManager.startLocationUpdates()
+        
+        let locationObservable = locationManager.rx.didUpdateLocations
+            .map { $0.last?.coordinate }
+            .compactMap { $0 }
+            .map(Mutation.setCurrentLocation)
+        
+        let timerObservable = timer
+            .withLatestFrom(locationManager.rx.didUpdateLocations)
+            .map { $0.map { $0.coordinate } }
+            .distinctUntilChanged()
+            .map(Mutation.setCoordinates)
+        
+        return Observable.merge(
+            Observable.just(Mutation.setRunning(true)),
+            locationObservable,
+            timerObservable
+        )
     }
     
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setMapCentering(let isCentering):
-            newState.isCentering = isCentering
+        case .setCoordinates(let coordinates):
+            newState.coordinates.append(contentsOf: coordinates)
+        case .setRunning(let isRunning):
+            newState.isRunning = isRunning
+        case .setCurrentLocation(let location):
+            newState.currentLocation = location
+        case .moveToCurrentLocation(let location):
+            newState.moveToLocation = location
         }
         return newState
     }
