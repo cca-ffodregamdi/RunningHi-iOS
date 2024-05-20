@@ -14,18 +14,21 @@ final class RunningCourseReactor: Reactor {
     enum Action {
         case startRunningCourse
         case stopRunningCourse
+        case moveToCurrentLocation
     }
     
     enum Mutation {
         case setCoordinates([CLLocationCoordinate2D])
         case setRunning(Bool)
         case setCurrentLocation(CLLocationCoordinate2D)
+        case moveToCurrentLocation(CLLocationCoordinate2D)
     }
     
     struct State {
         var coordinates: [CLLocationCoordinate2D] = []
         var isRunning: Bool = false
         var currentLocation: CLLocationCoordinate2D?
+        var moveToLocation: CLLocationCoordinate2D?
     }
     
     let initialState = State()
@@ -40,6 +43,11 @@ final class RunningCourseReactor: Reactor {
         case .stopRunningCourse:
             locationManager.stopLocationUpdates()
             return Observable.just(Mutation.setRunning(false))
+        case .moveToCurrentLocation:
+            guard let currentLocation = locationManager.location?.coordinate else {
+                return Observable.empty()
+            }
+            return Observable.just(Mutation.moveToCurrentLocation(currentLocation))
         }
     }
     
@@ -73,6 +81,8 @@ final class RunningCourseReactor: Reactor {
             newState.isRunning = isRunning
         case .setCurrentLocation(let location):
             newState.currentLocation = location
+        case .moveToCurrentLocation(let location):
+            newState.moveToLocation = location
         }
         return newState
     }

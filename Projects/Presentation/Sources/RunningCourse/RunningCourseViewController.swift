@@ -10,6 +10,7 @@ import MapKit
 import SnapKit
 import RxSwift
 import ReactorKit
+import RxRelay
 
 protocol RunningCourseViewControllerDelegate {
     func didFinishCourse()
@@ -22,7 +23,9 @@ final class RunningCourseViewController: UIViewController, View {
     var delegate: RunningCourseViewControllerDelegate?
     var reactor: RunningCourseReactor? {
         didSet {
-            bind(reactor: reactor!)
+            if let reactor = reactor {
+                bind(reactor: reactor)
+            }
         }
     }
     private lazy var runningCourseView: RunningCourseView = {
@@ -78,6 +81,11 @@ final class RunningCourseViewController: UIViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        runningCourseView.mapView.compassButton.rx.tap
+            .map { RunningCourseReactor.Action.moveToCurrentLocation }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
         reactor.state
             .map { $0.coordinates }
             .distinctUntilChanged()
@@ -100,6 +108,15 @@ final class RunningCourseViewController: UIViewController, View {
             .subscribe(onNext: { [weak self] location in
                 guard let location = location else { return }
                 print("Centering map on: \(location.latitude), \(location.longitude)")
+                self?.centerMap(on: location)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.moveToLocation }
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak self] location in
+                guard let location = location else { return }
                 self?.centerMap(on: location)
             })
             .disposed(by: disposeBag)
