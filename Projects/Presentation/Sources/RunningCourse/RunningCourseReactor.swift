@@ -15,6 +15,7 @@ final class RunningCourseReactor: Reactor {
         case startRunningCourse
         case stopRunningCourse
         case moveToCurrentLocation
+        case initializeLocation
     }
     
     enum Mutation {
@@ -48,7 +49,17 @@ final class RunningCourseReactor: Reactor {
                 return Observable.empty()
             }
             return Observable.just(Mutation.moveToCurrentLocation(currentLocation))
+        case .initializeLocation:
+            return initializeLocation()
         }
+    }
+    
+    private func initializeLocation() -> Observable<Mutation> {
+        return locationManager.rx.didUpdateLocations
+            .map { $0.last?.coordinate }
+            .compactMap { $0 }
+            .take(1)
+            .map { Mutation.setCurrentLocation($0) }
     }
     
     private func startRunningCourse() -> Observable<Mutation> {

@@ -32,10 +32,8 @@ final class RunningCourseViewController: UIViewController, View {
         return RunningCourseView()
     }()
     private var polyline: MKPolyline?
-    private var defaultLocation = CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
     private let defaultSpanValue = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         
-    
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -54,6 +52,7 @@ final class RunningCourseViewController: UIViewController, View {
         configureUI()
         configureLocation()
         reactor = RunningCourseReactor()
+        reactor?.action.onNext(.initializeLocation)
     }
     
     private func configureUI() {
@@ -66,7 +65,6 @@ final class RunningCourseViewController: UIViewController, View {
     }
     
     private func configureLocation() {
-        runningCourseView.mapView.mapView.setRegion(MKCoordinateRegion(center: defaultLocation, span: defaultSpanValue), animated: true)
         runningCourseView.mapView.mapView.showsUserLocation = true
     }
     
@@ -107,7 +105,6 @@ final class RunningCourseViewController: UIViewController, View {
             .distinctUntilChanged()
             .subscribe(onNext: { [weak self] location in
                 guard let location = location else { return }
-                print("Centering map on: \(location.latitude), \(location.longitude)")
                 self?.centerMap(on: location)
             })
             .disposed(by: disposeBag)
@@ -133,7 +130,7 @@ final class RunningCourseViewController: UIViewController, View {
     }
     
     private func centerMap(on location: CLLocationCoordinate2D) {
-        let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        let region = MKCoordinateRegion(center: location, span: defaultSpanValue)
         runningCourseView.mapView.mapView.setRegion(region, animated: true)
     }
 }
