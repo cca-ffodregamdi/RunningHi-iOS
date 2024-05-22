@@ -69,9 +69,6 @@ final class RunningCourseReactor: Reactor {
         let locationObservable = locationManager.rx.didUpdateLocations
             .map { $0.last?.coordinate }
             .compactMap { $0 }
-            .distinctUntilChanged { lhs, rhs in
-                return lhs.distance(from: rhs) < 10
-            }
             .map { [currentState = self.currentState] newCoordinate in
                 var updatedCoordinates = currentState.coordinates
                 updatedCoordinates.append(newCoordinate)

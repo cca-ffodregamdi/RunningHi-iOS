@@ -87,7 +87,6 @@ final class RunningCourseViewController: UIViewController, View {
 
         reactor.state
             .map { $0.coordinates }
-            .distinctUntilChanged()
             .subscribe(onNext: { [weak self] coordinates in
                 print("Coordinates for polyline: \(coordinates)")
                 self?.updatePolyline(with: coordinates)
@@ -131,7 +130,7 @@ final class RunningCourseViewController: UIViewController, View {
     }
     
     private func updatePolyline(with coordinates: [CLLocationCoordinate2D]) {
-        guard !coordinates.isEmpty else { return }
+        guard coordinates.count > 1 else { return }
         
         if let polyline = polyline {
             runningCourseView.mapView.mapView.removeOverlay(polyline)
