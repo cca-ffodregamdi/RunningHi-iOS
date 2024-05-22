@@ -32,6 +32,8 @@ final class RunningCourseViewController: UIViewController, View {
         return RunningCourseView()
     }()
     private var polyline: MKPolyline?
+    private var startAnnotation: MKPointAnnotation?
+    private var stopAnnotation: MKPointAnnotation?
     private let defaultSpanValue = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         
     init() {
@@ -127,6 +129,15 @@ final class RunningCourseViewController: UIViewController, View {
                 self?.addStartLocationMarker(at: location)
             })
             .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.stopLocation }
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak self] location in
+                guard let location = location else { return }
+                self?.addStopLocationMarker(at: location)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func updatePolyline(with coordinates: [CLLocationCoordinate2D]) {
@@ -149,9 +160,27 @@ final class RunningCourseViewController: UIViewController, View {
     }
 
     private func addStartLocationMarker(at location: CLLocationCoordinate2D) {
-        let startAnnotation = MKPointAnnotation()
-        startAnnotation.coordinate = location
-        runningCourseView.mapView.mapView.addAnnotation(startAnnotation)
+        if let startAnnotation = startAnnotation {
+            runningCourseView.mapView.mapView.removeAnnotation(startAnnotation)
+        }
+        startAnnotation = MKPointAnnotation()
+        startAnnotation?.coordinate = location
+        startAnnotation?.title = "시작 지점"
+        if let startAnnotation = startAnnotation {
+            runningCourseView.mapView.mapView.addAnnotation(startAnnotation)
+        }
+    }
+    
+    private func addStopLocationMarker(at location: CLLocationCoordinate2D) {
+        if let stopAnnotation = stopAnnotation {
+            runningCourseView.mapView.mapView.removeAnnotation(stopAnnotation)
+        }
+        stopAnnotation = MKPointAnnotation()
+        stopAnnotation?.coordinate = location
+        stopAnnotation?.title = "종료 지점"
+        if let stopAnnotation = stopAnnotation {
+            runningCourseView.mapView.mapView.addAnnotation(stopAnnotation)
+        }
     }
 }
 

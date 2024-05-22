@@ -24,6 +24,8 @@ final class RunningCourseReactor: Reactor {
         case setCurrentLocation(CLLocationCoordinate2D)
         case moveToCurrentLocation(CLLocationCoordinate2D)
         case setStartLocation(CLLocationCoordinate2D)
+        case setStopLocation(CLLocationCoordinate2D)
+        case clearCourse
     }
     
     struct State {
@@ -32,6 +34,7 @@ final class RunningCourseReactor: Reactor {
         var currentLocation: CLLocationCoordinate2D?
         var moveToLocation: CLLocationCoordinate2D?
         var startLocation: CLLocationCoordinate2D?
+        var stopLocation: CLLocationCoordinate2D?
     }
     
     let initialState = State()
@@ -41,10 +44,12 @@ final class RunningCourseReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .startRunningCourse:
-            return startRunningCourse()
+            return Observable.concat([
+                Observable.just(Mutation.clearCourse),
+                startRunningCourse()
+            ])
         case .stopRunningCourse:
-            locationManager.stopLocationUpdates()
-            return Observable.just(Mutation.setRunning(false))
+            return stopRunningCourse()
         case .moveToCurrentLocation:
             guard let currentLocation = locationManager.location?.coordinate else {
                 return Observable.empty()
@@ -88,6 +93,21 @@ final class RunningCourseReactor: Reactor {
         )
     }
     
+    private func stopRunningCourse() -> Observable<Mutation> {
+        locationManager.stopLocationUpdates()
+        
+        let stopLocationObservable = locationManager.rx.didUpdateLocations
+            .map { $0.last?.coordinate }
+            .compactMap { $0 }
+            .take(1)
+            .map { coordinate in Mutation.setStopLocation(coordinate) }
+        
+        return Observable.concat([
+            Observable.just(Mutation.setRunning(false)),
+            stopLocationObservable
+        ])
+    }
+    
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
@@ -101,6 +121,12 @@ final class RunningCourseReactor: Reactor {
             newState.moveToLocation = location
         case .setStartLocation(let location):
             newState.startLocation = location
+        case .setStopLocation(let location):
+            newState.stopLocation = location
+        case .clearCourse:
+            newState.coordinates = []
+            newState.startLocation = nil
+            newState.stopLocation = nil
         }
         return newState
     }
