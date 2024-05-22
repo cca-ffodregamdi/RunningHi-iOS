@@ -66,6 +66,7 @@ final class RunningCourseViewController: UIViewController, View {
     
     private func configureLocation() {
         runningCourseView.mapView.mapView.showsUserLocation = true
+        runningCourseView.mapView.mapView.delegate = self
     }
     
     func bind(reactor: RunningCourseReactor) {
@@ -88,6 +89,7 @@ final class RunningCourseViewController: UIViewController, View {
             .map { $0.coordinates }
             .distinctUntilChanged()
             .subscribe(onNext: { [weak self] coordinates in
+                print("Coordinates for polyline: \(coordinates)")
                 self?.updatePolyline(with: coordinates)
             })
             .disposed(by: disposeBag)
@@ -117,13 +119,26 @@ final class RunningCourseViewController: UIViewController, View {
                 self?.centerMap(on: location)
             })
             .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.startLocation }
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak self] location in
+                guard let location = location else { return }
+                self?.addStartLocationMarker(at: location)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func updatePolyline(with coordinates: [CLLocationCoordinate2D]) {
+        guard !coordinates.isEmpty else { return }
+        
         if let polyline = polyline {
             runningCourseView.mapView.mapView.removeOverlay(polyline)
         }
+        
         polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        
         if let polyline = polyline {
             runningCourseView.mapView.mapView.addOverlay(polyline)
         }
@@ -133,6 +148,12 @@ final class RunningCourseViewController: UIViewController, View {
         let region = MKCoordinateRegion(center: location, span: defaultSpanValue)
         runningCourseView.mapView.mapView.setRegion(region, animated: true)
     }
+
+    private func addStartLocationMarker(at location: CLLocationCoordinate2D) {
+        let startAnnotation = MKPointAnnotation()
+        startAnnotation.coordinate = location
+        runningCourseView.mapView.mapView.addAnnotation(startAnnotation)
+    }
 }
 
 extension RunningCourseViewController: MKMapViewDelegate {
@@ -141,6 +162,7 @@ extension RunningCourseViewController: MKMapViewDelegate {
             let renderer = MKPolylineRenderer(polyline: polyline)
             renderer.strokeColor = .blue
             renderer.lineWidth = 3
+            
             return renderer
         }
         return MKOverlayRenderer(overlay: overlay)

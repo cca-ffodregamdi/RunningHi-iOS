@@ -23,6 +23,7 @@ final class RunningCourseReactor: Reactor {
         case setRunning(Bool)
         case setCurrentLocation(CLLocationCoordinate2D)
         case moveToCurrentLocation(CLLocationCoordinate2D)
+        case setStartLocation(CLLocationCoordinate2D)
     }
     
     struct State {
@@ -30,11 +31,11 @@ final class RunningCourseReactor: Reactor {
         var isRunning: Bool = false
         var currentLocation: CLLocationCoordinate2D?
         var moveToLocation: CLLocationCoordinate2D?
+        var startLocation: CLLocationCoordinate2D?
     }
     
     let initialState = State()
     private let locationManager = LocationManager.shared
-    private let timer = Observable<Int>.interval(.seconds(5), scheduler: MainScheduler.instance)
     private let disposeBag = DisposeBag()
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -68,18 +69,25 @@ final class RunningCourseReactor: Reactor {
         let locationObservable = locationManager.rx.didUpdateLocations
             .map { $0.last?.coordinate }
             .compactMap { $0 }
-            .map(Mutation.setCurrentLocation)
+            .distinctUntilChanged { lhs, rhs in
+                return lhs.distance(from: rhs) < 10
+            }
+            .map { [currentState = self.currentState] newCoordinate in
+                var updatedCoordinates = currentState.coordinates
+                updatedCoordinates.append(newCoordinate)
+                return Mutation.setCoordinates(updatedCoordinates)
+            }
         
-        let timerObservable = timer
-            .withLatestFrom(locationManager.rx.didUpdateLocations)
-            .map { $0.map { $0.coordinate } }
-            .distinctUntilChanged()
-            .map(Mutation.setCoordinates)
+        let startLocationObservable = locationManager.rx.didUpdateLocations
+            .map { $0.last?.coordinate }
+            .compactMap { $0 }
+            .take(1)
+            .map { coordinate in Mutation.setStartLocation(coordinate) }
         
         return Observable.merge(
             Observable.just(Mutation.setRunning(true)),
             locationObservable,
-            timerObservable
+            startLocationObservable
         )
     }
     
@@ -87,14 +95,24 @@ final class RunningCourseReactor: Reactor {
         var newState = state
         switch mutation {
         case .setCoordinates(let coordinates):
-            newState.coordinates.append(contentsOf: coordinates)
+            newState.coordinates = coordinates
         case .setRunning(let isRunning):
             newState.isRunning = isRunning
         case .setCurrentLocation(let location):
             newState.currentLocation = location
         case .moveToCurrentLocation(let location):
             newState.moveToLocation = location
+        case .setStartLocation(let location):
+            newState.startLocation = location
         }
         return newState
+    }
+}
+
+extension CLLocationCoordinate2D {
+    func distance(from coordinate: CLLocationCoordinate2D) -> CLLocationDistance {
+        let fromLocation = CLLocation(latitude: self.latitude, longitude: self.longitude)
+        let toLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        return fromLocation.distance(from: toLocation)
     }
 }
