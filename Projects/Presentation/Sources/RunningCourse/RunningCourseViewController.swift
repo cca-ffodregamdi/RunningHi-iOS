@@ -71,6 +71,64 @@ final class RunningCourseViewController: UIViewController, View {
         runningCourseView.mapView.mapView.delegate = self
     }
     
+    private func updatePolyline(with coordinates: [CLLocationCoordinate2D]) {
+        guard coordinates.count > 1 else { return }
+        
+        if let polyline = polyline {
+            runningCourseView.mapView.mapView.removeOverlay(polyline)
+        }
+        
+        polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        
+        if let polyline = polyline {
+            runningCourseView.mapView.mapView.addOverlay(polyline)
+        }
+    }
+    
+    private func centerMap(on location: CLLocationCoordinate2D) {
+        let region = MKCoordinateRegion(center: location, span: defaultSpanValue)
+        runningCourseView.mapView.mapView.setRegion(region, animated: true)
+    }
+
+    private func addStartLocationMarker(at location: CLLocationCoordinate2D) {
+        if let startAnnotation = startAnnotation {
+            runningCourseView.mapView.mapView.removeAnnotation(startAnnotation)
+        }
+        startAnnotation = MKPointAnnotation()
+        startAnnotation?.coordinate = location
+        startAnnotation?.title = "시작 지점"
+        if let startAnnotation = startAnnotation {
+            runningCourseView.mapView.mapView.addAnnotation(startAnnotation)
+        }
+    }
+    
+    private func addStopLocationMarker(at location: CLLocationCoordinate2D) {
+        if let stopAnnotation = stopAnnotation {
+            runningCourseView.mapView.mapView.removeAnnotation(stopAnnotation)
+        }
+        stopAnnotation = MKPointAnnotation()
+        stopAnnotation?.coordinate = location
+        stopAnnotation?.title = "종료 지점"
+        if let stopAnnotation = stopAnnotation {
+            runningCourseView.mapView.mapView.addAnnotation(stopAnnotation)
+        }
+    }
+}
+
+extension RunningCourseViewController: MKMapViewDelegate {
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        if let polyline = overlay as? MKPolyline {
+            let renderer = MKPolylineRenderer(polyline: polyline)
+            renderer.strokeColor = .blue
+            renderer.lineWidth = 3
+            
+            return renderer
+        }
+        return MKOverlayRenderer(overlay: overlay)
+    }
+}
+
+extension RunningCourseViewController {
     func bind(reactor: RunningCourseReactor) {
         runningCourseView.startButton.rx.tap
             .map { RunningCourseReactor.Action.startRunningCourse }
@@ -138,61 +196,5 @@ final class RunningCourseViewController: UIViewController, View {
                 self?.addStopLocationMarker(at: location)
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func updatePolyline(with coordinates: [CLLocationCoordinate2D]) {
-        guard coordinates.count > 1 else { return }
-        
-        if let polyline = polyline {
-            runningCourseView.mapView.mapView.removeOverlay(polyline)
-        }
-        
-        polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
-        
-        if let polyline = polyline {
-            runningCourseView.mapView.mapView.addOverlay(polyline)
-        }
-    }
-    
-    private func centerMap(on location: CLLocationCoordinate2D) {
-        let region = MKCoordinateRegion(center: location, span: defaultSpanValue)
-        runningCourseView.mapView.mapView.setRegion(region, animated: true)
-    }
-
-    private func addStartLocationMarker(at location: CLLocationCoordinate2D) {
-        if let startAnnotation = startAnnotation {
-            runningCourseView.mapView.mapView.removeAnnotation(startAnnotation)
-        }
-        startAnnotation = MKPointAnnotation()
-        startAnnotation?.coordinate = location
-        startAnnotation?.title = "시작 지점"
-        if let startAnnotation = startAnnotation {
-            runningCourseView.mapView.mapView.addAnnotation(startAnnotation)
-        }
-    }
-    
-    private func addStopLocationMarker(at location: CLLocationCoordinate2D) {
-        if let stopAnnotation = stopAnnotation {
-            runningCourseView.mapView.mapView.removeAnnotation(stopAnnotation)
-        }
-        stopAnnotation = MKPointAnnotation()
-        stopAnnotation?.coordinate = location
-        stopAnnotation?.title = "종료 지점"
-        if let stopAnnotation = stopAnnotation {
-            runningCourseView.mapView.mapView.addAnnotation(stopAnnotation)
-        }
-    }
-}
-
-extension RunningCourseViewController: MKMapViewDelegate {
-    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        if let polyline = overlay as? MKPolyline {
-            let renderer = MKPolylineRenderer(polyline: polyline)
-            renderer.strokeColor = .blue
-            renderer.lineWidth = 3
-            
-            return renderer
-        }
-        return MKOverlayRenderer(overlay: overlay)
     }
 }
