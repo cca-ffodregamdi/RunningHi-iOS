@@ -9,14 +9,15 @@ import Foundation
 import UIKit
 import CoreLocation
 
-struct Location: Codable {
-    var latitude: Double = 0.0
-    var longitude: Double = 0.0
+struct RouteInfo: Codable {
+    var latitude: Double
+    var longitude: Double
+    var timestamp: Date
 }
 
 final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
     static let shared = LocationManager()
-    static var location = (latitude: Double(), longitude: Double())
+    static var RouteInfo = (latitude: Double(), longitude: Double(), timestamp: Date())
     var locations = [CLLocation]()
     
     override init() {
@@ -79,8 +80,8 @@ extension LocationManager {
     // 사용자의 위치를 성공적으로 가져왔을 때 호출
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let lastLocation = locations.last {
-            LocationManager.location.latitude = lastLocation.coordinate.latitude
-            LocationManager.location.longitude = lastLocation.coordinate.longitude
+            LocationManager.RouteInfo.latitude = lastLocation.coordinate.latitude
+            LocationManager.RouteInfo.longitude = lastLocation.coordinate.longitude
             self.locations.append(lastLocation)
         }
         stopUpdatingLocation()
