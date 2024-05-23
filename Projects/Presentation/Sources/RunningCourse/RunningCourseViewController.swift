@@ -71,8 +71,10 @@ final class RunningCourseViewController: UIViewController, View {
         runningCourseView.mapView.mapView.delegate = self
     }
     
-    private func updatePolyline(with coordinates: [CLLocationCoordinate2D]) {
-        guard coordinates.count > 1 else { return }
+    private func updatePolyline(with routeInfos: [RouteInfo]) {
+        guard routeInfos.count > 1 else { return }
+        
+        let coordinates = routeInfos.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
         
         if let polyline = polyline {
             runningCourseView.mapView.mapView.removeOverlay(polyline)
@@ -146,10 +148,10 @@ extension RunningCourseViewController {
             .disposed(by: disposeBag)
 
         reactor.state
-            .map { $0.coordinates }
-            .subscribe(onNext: { [weak self] coordinates in
-                print("Coordinates for polyline: \(coordinates)")
-                self?.updatePolyline(with: coordinates)
+            .map { $0.routeInfos }
+            .subscribe(onNext: { [weak self] routeInfos in
+                print("경로 정보: \(routeInfos)")
+                self?.updatePolyline(with: routeInfos)
             })
             .disposed(by: disposeBag)
         

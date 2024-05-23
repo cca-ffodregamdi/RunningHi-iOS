@@ -19,7 +19,7 @@ final class RunningCourseReactor: Reactor {
     }
     
     enum Mutation {
-        case setCoordinates([CLLocationCoordinate2D])
+        case setRouteInfo([RouteInfo])
         case setRunning(Bool)
         case setCurrentLocation(CLLocationCoordinate2D)
         case moveToCurrentLocation(CLLocationCoordinate2D)
@@ -29,7 +29,7 @@ final class RunningCourseReactor: Reactor {
     }
     
     struct State {
-        var coordinates: [CLLocationCoordinate2D] = []
+        var routeInfos: [RouteInfo] = []
         var isRunning: Bool = false
         var currentLocation: CLLocationCoordinate2D?
         var moveToLocation: CLLocationCoordinate2D?
@@ -51,7 +51,7 @@ final class RunningCourseReactor: Reactor {
         case .stopRunningCourse:
             return stopRunningCourse()
         case .moveToCurrentLocation:
-            guard let currentLocation = locationManager.location?.coordinate else {
+            guard let currentLocation = locationManager.routeInfo.coordinate else {
                 return Observable.empty()
             }
             return Observable.just(Mutation.moveToCurrentLocation(currentLocation))
@@ -72,19 +72,24 @@ final class RunningCourseReactor: Reactor {
         locationManager.startLocationUpdates()
         
         let locationObservable = locationManager.rx.didUpdateLocations
-            .map { $0.last?.coordinate }
+            .map { $0.last }
             .compactMap { $0 }
-            .map { [currentState = self.currentState] newCoordinate in
-                var updatedCoordinates = currentState.coordinates
-                updatedCoordinates.append(newCoordinate)
-                return Mutation.setCoordinates(updatedCoordinates)
+            .distinctUntilChanged { lhs, rhs in
+                lhs.coordinate == rhs.coordinate
+            }
+            .map { [currentState = self.currentState] newLocation in
+                var updatedRouteInfos = currentState.routeInfos
+                updatedRouteInfos.append(RouteInfo(latitude: newLocation.coordinate.latitude, longitude: newLocation.coordinate.longitude, timestamp: Date()))
+                return Mutation.setRouteInfo(updatedRouteInfos)
             }
         
         let startLocationObservable = locationManager.rx.didUpdateLocations
-            .map { $0.last?.coordinate }
+            .map { $0.last }
             .compactMap { $0 }
             .take(1)
-            .map { coordinate in Mutation.setStartLocation(coordinate) }
+            .map { location in
+                Mutation.setStartLocation(location.coordinate)
+            }
         
         return Observable.merge(
             Observable.just(Mutation.setRunning(true)),
@@ -96,25 +101,25 @@ final class RunningCourseReactor: Reactor {
     private func stopRunningCourse() -> Observable<Mutation> {
         locationManager.stopLocationUpdates()
         
-        guard let lastLocation = locationManager.location?.coordinate else {
+        guard let lastLocation = locationManager.routeInfo.coordinate else {
             return Observable.just(Mutation.setRunning(false))
         }
         
         let stopLocationMutation = Mutation.setStopLocation(lastLocation)
-        let coordinatesMutation = Mutation.setCoordinates(currentState.coordinates)
+        let routeInfoMutation = Mutation.setRouteInfo(currentState.routeInfos)
         
         return Observable.concat([
             Observable.just(Mutation.setRunning(false)),
             Observable.just(stopLocationMutation),
-            Observable.just(coordinatesMutation)
+            Observable.just(routeInfoMutation)
         ])
     }
     
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setCoordinates(let coordinates):
-            newState.coordinates = coordinates
+        case .setRouteInfo(let routeInfos):
+            newState.routeInfos = routeInfos
         case .setRunning(let isRunning):
             newState.isRunning = isRunning
         case .setCurrentLocation(let location):
@@ -126,7 +131,7 @@ final class RunningCourseReactor: Reactor {
         case .setStopLocation(let location):
             newState.stopLocation = location
         case .clearCourse:
-            newState.coordinates = []
+            newState.routeInfos = []
             newState.startLocation = nil
             newState.stopLocation = nil
         }

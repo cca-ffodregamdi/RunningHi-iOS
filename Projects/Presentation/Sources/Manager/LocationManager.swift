@@ -17,8 +17,8 @@ struct RouteInfo: Codable {
 
 final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
     static let shared = LocationManager()
-    static var routeInfo = (latitude: Double(), longitude: Double(), timestamp: Date())
-    var locations = [RouteInfo]()
+    static var routeInfo = RouteInfo(latitude: 0.0, longitude: 0.0, timestamp: Date())
+    var routeInfos = [RouteInfo]()
     
     override init() {
         super.init()
@@ -74,8 +74,8 @@ extension LocationManager {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let lastLocation = locations.last {
             let timestamp = Date()
-            LocationManager.routeInfo = (lastLocation.coordinate.latitude, lastLocation.coordinate.longitude, timestamp)
-            self.locations.append(RouteInfo(latitude: lastLocation.coordinate.latitude, longitude: lastLocation.coordinate.longitude, timestamp: timestamp))
+            LocationManager.routeInfo = RouteInfo(latitude: lastLocation.coordinate.latitude, longitude: lastLocation.coordinate.longitude, timestamp: timestamp)
+            self.routeInfos.append(RouteInfo(latitude: lastLocation.coordinate.latitude, longitude: lastLocation.coordinate.longitude, timestamp: timestamp))
         }
     }
     
