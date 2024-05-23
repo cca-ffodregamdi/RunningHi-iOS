@@ -133,11 +133,3 @@ final class RunningCourseReactor: Reactor {
         return newState
     }
 }
-
-extension CLLocationCoordinate2D {
-    func distance(from coordinate: CLLocationCoordinate2D) -> CLLocationDistance {
-        let fromLocation = CLLocation(latitude: self.latitude, longitude: self.longitude)
-        let toLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        return fromLocation.distance(from: toLocation)
-    }
-}

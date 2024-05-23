@@ -17,7 +17,7 @@ struct RouteInfo: Codable {
 
 final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
     static let shared = LocationManager()
-    static var RouteInfo = (latitude: Double(), longitude: Double(), timestamp: Date())
+    static var routeInfo = (latitude: Double(), longitude: Double(), timestamp: Date())
     var locations = [CLLocation]()
     
     override init() {
@@ -80,8 +80,9 @@ extension LocationManager {
     // 사용자의 위치를 성공적으로 가져왔을 때 호출
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let lastLocation = locations.last {
-            LocationManager.RouteInfo.latitude = lastLocation.coordinate.latitude
-            LocationManager.RouteInfo.longitude = lastLocation.coordinate.longitude
+            LocationManager.routeInfo.latitude = lastLocation.coordinate.latitude
+            LocationManager.routeInfo.longitude = lastLocation.coordinate.longitude
+            LocationManager.routeInfo.timestamp = Date()
             self.locations.append(lastLocation)
         }
         stopUpdatingLocation()
@@ -143,5 +144,11 @@ extension LocationManager {
 extension CLLocationCoordinate2D: Equatable {
     public static func == (lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
         return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
+    }
+    
+    func distance(from coordinate: CLLocationCoordinate2D) -> CLLocationDistance {
+        let fromLocation = CLLocation(latitude: self.latitude, longitude: self.longitude)
+        let toLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        return fromLocation.distance(from: toLocation)
     }
 }
