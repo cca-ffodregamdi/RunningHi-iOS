@@ -8,8 +8,10 @@
 import Foundation
 import UIKit
 import CoreLocation
+import RxSwift
+import RxCocoa
 
-struct RouteInfo: Codable {
+struct RouteInfo: Codable, Equatable {
     var latitude: Double
     var longitude: Double
     var timestamp: Date
@@ -23,6 +25,8 @@ final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
     static let shared = LocationManager()
     static var routeInfo = RouteInfo(latitude: 0.0, longitude: 0.0, timestamp: Date())
     var routeInfos = [RouteInfo]()
+    
+    let didUpdateLocationsSubject = PublishSubject<[CLLocation]>()
     
     override init() {
         super.init()
@@ -78,8 +82,11 @@ extension LocationManager {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let lastLocation = locations.last {
             let timestamp = Date()
-            LocationManager.routeInfo = RouteInfo(latitude: lastLocation.coordinate.latitude, longitude: lastLocation.coordinate.longitude, timestamp: timestamp)
-            self.routeInfos.append(RouteInfo(latitude: lastLocation.coordinate.latitude, longitude: lastLocation.coordinate.longitude, timestamp: timestamp))
+            let newRouteInfo = RouteInfo(latitude: lastLocation.coordinate.latitude, longitude: lastLocation.coordinate.longitude, timestamp: timestamp)
+            LocationManager.routeInfo = newRouteInfo
+            self.routeInfos.append(newRouteInfo)
+            didUpdateLocationsSubject.onNext(locations)
+            NotificationCenter.default.post(name: .didUpdateLocations, object: nil)
         }
     }
     
@@ -139,4 +146,8 @@ extension CLLocationCoordinate2D: Equatable {
         let toLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         return fromLocation.distance(from: toLocation)
     }
+}
+
+extension Notification.Name {
+    static let didUpdateLocations = Notification.Name("didUpdateLocations")
 }

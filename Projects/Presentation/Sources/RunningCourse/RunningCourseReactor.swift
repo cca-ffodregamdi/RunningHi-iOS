@@ -40,6 +40,7 @@ final class RunningCourseReactor: Reactor {
     let initialState = State()
     private let locationManager = LocationManager.shared
     private let disposeBag = DisposeBag()
+    private var lastLocation: CLLocationCoordinate2D?
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
@@ -68,31 +69,39 @@ final class RunningCourseReactor: Reactor {
     
     private func startRunningCourse() -> Observable<Mutation> {
         locationManager.startLocationUpdates()
-        
-        let locationObservable = locationManager.rx.didUpdateLocations
+        lastLocation = nil
+
+        let locationObservable = locationManager.didUpdateLocationsSubject
             .map { $0.last }
             .compactMap { $0 }
-            .distinctUntilChanged { lhs, rhs in
-                lhs.coordinate == rhs.coordinate
+            .filter { [weak self] newLocation in
+                guard let self = self, let lastLocation = self.lastLocation else {
+                    self?.lastLocation = newLocation.coordinate
+                    return true
+                }
+                let distance = lastLocation.distance(from: newLocation.coordinate)
+                return distance >= 10
             }
-            .map { [currentState = self.currentState] newLocation in
+            .flatMapLatest { [currentState = self.currentState] newLocation -> Observable<Mutation> in
                 var updatedRouteInfos = currentState.routeInfos
-                updatedRouteInfos.append(RouteInfo(latitude: newLocation.coordinate.latitude, longitude: newLocation.coordinate.longitude, timestamp: Date()))
-                return Mutation.setRouteInfo(updatedRouteInfos)
+                let newRouteInfo = RouteInfo(latitude: newLocation.coordinate.latitude, longitude: newLocation.coordinate.longitude, timestamp: Date())
+                updatedRouteInfos.append(newRouteInfo)
+                self.lastLocation = newLocation.coordinate
+                return Observable.just(Mutation.setRouteInfo(updatedRouteInfos))
             }
-        
-        let startLocationObservable = locationManager.rx.didUpdateLocations
+
+        let startLocationObservable = locationManager.didUpdateLocationsSubject
             .map { $0.last }
             .compactMap { $0 }
             .take(1)
             .map { location in
                 Mutation.setStartLocation(location.coordinate)
             }
-        
+
         return Observable.merge(
             Observable.just(Mutation.setRunning(true)),
-            locationObservable,
-            startLocationObservable
+            startLocationObservable,
+            locationObservable
         )
     }
     
@@ -100,13 +109,13 @@ final class RunningCourseReactor: Reactor {
         locationManager.stopLocationUpdates()
         
         let lastLocation = LocationManager.routeInfo.coordinate
-        let stopLocationMutation = Mutation.setStopLocation(lastLocation)
-        let routeInfoMutation = Mutation.setRouteInfo(currentState.routeInfos)
+        let stopLocationMutation = Observable.just(Mutation.setStopLocation(lastLocation))
+        let routeInfoMutation = Observable.just(Mutation.setRouteInfo(currentState.routeInfos))
         
         return Observable.concat([
-            Observable.just(Mutation.setRunning(false)),
-            Observable.just(stopLocationMutation),
-            Observable.just(routeInfoMutation)
+            stopLocationMutation,
+            routeInfoMutation,
+            Observable.just(Mutation.setRunning(false))
         ])
     }
     

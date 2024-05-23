@@ -18,7 +18,6 @@ protocol RunningCourseViewControllerDelegate {
 
 final class RunningCourseViewController: UIViewController, View {
     
-    // MARK: Properties
     var disposeBag = DisposeBag()
     var delegate: RunningCourseViewControllerDelegate?
     var reactor: RunningCourseReactor? {
@@ -34,7 +33,7 @@ final class RunningCourseViewController: UIViewController, View {
     private var polyline: MKPolyline?
     private var startAnnotation: MKPointAnnotation?
     private var stopAnnotation: MKPointAnnotation?
-    private let defaultSpanValue = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+    private let defaultSpanValue = MKCoordinateSpan(latitudeDelta: 0.003, longitudeDelta: 0.003)
         
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -48,13 +47,20 @@ final class RunningCourseViewController: UIViewController, View {
         print("deinit RunningCourseViewController")
     }
     
-    // MARK: Lifecycles
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         configureLocation()
         reactor = RunningCourseReactor()
         reactor?.action.onNext(.initializeLocation)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didUpdateLocations), name: .didUpdateLocations, object: nil)
+    }
+    
+    @objc private func didUpdateLocations() {
+        if let routeInfos = reactor?.currentState.routeInfos {
+            updatePolyline(with: routeInfos)
+        }
     }
     
     private func configureUI() {
@@ -73,18 +79,15 @@ final class RunningCourseViewController: UIViewController, View {
     
     private func updatePolyline(with routeInfos: [RouteInfo]) {
         guard routeInfos.count > 1 else { return }
-        
+
         let coordinates = routeInfos.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
-        
+
         if let polyline = polyline {
             runningCourseView.mapView.mapView.removeOverlay(polyline)
         }
         
         polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
-        
-        if let polyline = polyline {
-            runningCourseView.mapView.mapView.addOverlay(polyline)
-        }
+        runningCourseView.mapView.mapView.addOverlay(polyline!)
     }
     
     private func centerMap(on location: CLLocationCoordinate2D) {
@@ -133,6 +136,9 @@ extension RunningCourseViewController: MKMapViewDelegate {
 extension RunningCourseViewController {
     func bind(reactor: RunningCourseReactor) {
         runningCourseView.startButton.rx.tap
+            .do(onNext: { [weak self] in
+                self?.runningCourseView.mapView.mapView.removeOverlays(self?.runningCourseView.mapView.mapView.overlays ?? [])
+            })
             .map { RunningCourseReactor.Action.startRunningCourse }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -149,8 +155,8 @@ extension RunningCourseViewController {
 
         reactor.state
             .map { $0.routeInfos }
+            .distinctUntilChanged()
             .subscribe(onNext: { [weak self] routeInfos in
-                print("경로 정보: \(routeInfos)")
                 self?.updatePolyline(with: routeInfos)
             })
             .disposed(by: disposeBag)
