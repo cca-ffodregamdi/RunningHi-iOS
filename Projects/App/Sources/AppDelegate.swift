@@ -8,6 +8,8 @@
 import UIKit
 import KakaoSDKCommon
 import KakaoSDKUser
+import Presentation
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
@@ -23,4 +25,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        }
         return true
     }
+    
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        LocationManager.shared.startLocationUpdates()
+    }
+
+    func applicationWillEnterForeground(_ application: UIApplication) {
+        LocationManager.shared.startLocationUpdates()
+    }
 }
+

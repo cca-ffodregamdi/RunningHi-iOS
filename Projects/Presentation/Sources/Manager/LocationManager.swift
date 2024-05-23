@@ -11,38 +11,46 @@ import CoreLocation
 import RxSwift
 import RxCocoa
 
-struct RouteInfo: Codable, Equatable {
-    var latitude: Double
-    var longitude: Double
-    var timestamp: Date
+public struct RouteInfo: Codable, Equatable {
+    public var latitude: Double
+    public var longitude: Double
+    public var timestamp: Date
     
-    var coordinate: CLLocationCoordinate2D {
+    public var coordinate: CLLocationCoordinate2D {
         return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+
+    public init(latitude: Double, longitude: Double, timestamp: Date) {
+        self.latitude = latitude
+        self.longitude = longitude
+        self.timestamp = timestamp
     }
 }
 
-final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
-    static let shared = LocationManager()
-    static var routeInfo = RouteInfo(latitude: 0.0, longitude: 0.0, timestamp: Date())
-    var routeInfos = [RouteInfo]()
+public final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
+    public static let shared = LocationManager()
+    public static var routeInfo = RouteInfo(latitude: 0.0, longitude: 0.0, timestamp: Date())
+    public var routeInfos = [RouteInfo]()
     
-    let didUpdateLocationsSubject = PublishSubject<[CLLocation]>()
+    public let didUpdateLocationsSubject = PublishSubject<[CLLocation]>()
     
-    override init() {
+    override public init() {
         super.init()
         self.delegate = self
         self.desiredAccuracy = kCLLocationAccuracyBestForNavigation
+        self.allowsBackgroundLocationUpdates = true
+        self.pausesLocationUpdatesAutomatically = false
     }
     
-    func startLocationUpdates() {
+    public func startLocationUpdates() {
         self.startUpdatingLocation()
     }
 
-    func stopLocationUpdates() {
+    public func stopLocationUpdates() {
         self.stopUpdatingLocation()
     }
     
-    func checkUserDeviceLocationServiceAuthorization() {
+    public func checkUserDeviceLocationServiceAuthorization() {
         DispatchQueue.global().async {
             if CLLocationManager.locationServicesEnabled() {
                 let authorization: CLAuthorizationStatus
@@ -60,7 +68,7 @@ final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
         }
     }
     
-    func checkUserCurrentLocationAuthorization(_ status: CLAuthorizationStatus) {
+    public func checkUserCurrentLocationAuthorization(_ status: CLAuthorizationStatus) {
         switch status {
         case .notDetermined:
             self.desiredAccuracy = kCLLocationAccuracyBest
@@ -79,7 +87,7 @@ final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
 }
 
 extension LocationManager {
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let lastLocation = locations.last {
             let timestamp = Date()
             let newRouteInfo = RouteInfo(latitude: lastLocation.coordinate.latitude, longitude: lastLocation.coordinate.longitude, timestamp: timestamp)
@@ -90,7 +98,7 @@ extension LocationManager {
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         if let clError = error as? CLError {
             switch clError.code {
             case .locationUnknown:
@@ -101,15 +109,15 @@ extension LocationManager {
         }
     }
     
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+    public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         checkUserDeviceLocationServiceAuthorization()
     }
     
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         checkUserDeviceLocationServiceAuthorization()
     }
     
-    func showRequestLocationServiceAlert() {
+    public func showRequestLocationServiceAlert() {
         let requestLocationServiceAlert = UIAlertController(
             title: "위치 정보 이용",
             message: "위치 서비스를 사용할 수 없습니다.\n디바이스의 '설정 - 개인정보 보호'에서 위치 서비스를 켜주세요.",
@@ -141,7 +149,7 @@ extension CLLocationCoordinate2D: Equatable {
         return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
     }
     
-    func distance(from coordinate: CLLocationCoordinate2D) -> CLLocationDistance {
+    public func distance(from coordinate: CLLocationCoordinate2D) -> CLLocationDistance {
         let fromLocation = CLLocation(latitude: self.latitude, longitude: self.longitude)
         let toLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         return fromLocation.distance(from: toLocation)
@@ -149,5 +157,5 @@ extension CLLocationCoordinate2D: Equatable {
 }
 
 extension Notification.Name {
-    static let didUpdateLocations = Notification.Name("didUpdateLocations")
+    public static let didUpdateLocations = Notification.Name("didUpdateLocations")
 }
