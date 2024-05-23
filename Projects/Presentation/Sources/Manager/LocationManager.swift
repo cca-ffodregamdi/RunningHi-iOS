@@ -18,7 +18,7 @@ struct RouteInfo: Codable {
 final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
     static let shared = LocationManager()
     static var routeInfo = (latitude: Double(), longitude: Double(), timestamp: Date())
-    var locations = [CLLocation]()
+    var locations = [RouteInfo]()
     
     override init() {
         super.init()
@@ -45,10 +45,8 @@ final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
                     authorization = CLLocationManager.authorizationStatus()
                 }
                 
-//                print("현재 사용자의 authorization status: \(authorization)")
                 self.checkUserCurrentLocationAuthorization(authorization)
             } else {
-//                print("위치 권한 허용 꺼져있음")
                 self.showRequestLocationServiceAlert()
             }
         }
@@ -57,60 +55,46 @@ final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
     func checkUserCurrentLocationAuthorization(_ status: CLAuthorizationStatus) {
         switch status {
         case .notDetermined:
-//            print("NotDetermined")
             self.desiredAccuracy = kCLLocationAccuracyBest
             self.requestWhenInUseAuthorization()
             
         case .restricted, .denied:
-//            print("Denied, 아이폰 설정으로 유도")
             self.showRequestLocationServiceAlert()
             
         case .authorizedWhenInUse, .authorizedAlways:
-//            print("Authorized")
             self.startUpdatingLocation()
             
         default:
             break
-//            print("Default")
         }
     }
 }
 
 extension LocationManager {
-    // 사용자의 위치를 성공적으로 가져왔을 때 호출
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let lastLocation = locations.last {
-            LocationManager.routeInfo.latitude = lastLocation.coordinate.latitude
-            LocationManager.routeInfo.longitude = lastLocation.coordinate.longitude
-            LocationManager.routeInfo.timestamp = Date()
-            self.locations.append(lastLocation)
+            let timestamp = Date()
+            LocationManager.routeInfo = (lastLocation.coordinate.latitude, lastLocation.coordinate.longitude, timestamp)
+            self.locations.append(RouteInfo(latitude: lastLocation.coordinate.latitude, longitude: lastLocation.coordinate.longitude, timestamp: timestamp))
         }
-        stopUpdatingLocation()
     }
     
-    // 사용자가 GPS 사용이 불가한 지역에 있는 등 위치 정보를 가져오지 못했을 때 호출
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         if let clError = error as? CLError {
             switch clError.code {
-            case .locationUnknown: 
+            case .locationUnknown:
                 break
-//                print("Temporary location error: \(error.localizedDescription)")
             default:
                 break
-//                print("Location Manager failed with error: \(error.localizedDescription)")
             }
         }
     }
     
-    // 앱에 대한 권한 설정이 변경되면 호출 (iOS 14 이상)
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        // 사용자 디바이스의 위치 서비스가 활성화 상태인지 확인하는 메서드 호출
         checkUserDeviceLocationServiceAuthorization()
     }
     
-    // 앱에 대한 권한 설정이 변경되면 호출 (iOS 14 미만)
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        // 사용자 디바이스의 위치 서비스가 활성화 상태인지 확인하는 메서드 호출
         checkUserDeviceLocationServiceAuthorization()
     }
     
