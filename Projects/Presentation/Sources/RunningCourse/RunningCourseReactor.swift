@@ -51,9 +51,7 @@ final class RunningCourseReactor: Reactor {
         case .stopRunningCourse:
             return stopRunningCourse()
         case .moveToCurrentLocation:
-            guard let currentLocation = locationManager.routeInfo.coordinate else {
-                return Observable.empty()
-            }
+            let currentLocation = LocationManager.routeInfo.coordinate
             return Observable.just(Mutation.moveToCurrentLocation(currentLocation))
         case .initializeLocation:
             return initializeLocation()
@@ -101,10 +99,7 @@ final class RunningCourseReactor: Reactor {
     private func stopRunningCourse() -> Observable<Mutation> {
         locationManager.stopLocationUpdates()
         
-        guard let lastLocation = locationManager.routeInfo.coordinate else {
-            return Observable.just(Mutation.setRunning(false))
-        }
-        
+        let lastLocation = LocationManager.routeInfo.coordinate
         let stopLocationMutation = Mutation.setStopLocation(lastLocation)
         let routeInfoMutation = Mutation.setRouteInfo(currentState.routeInfos)
         

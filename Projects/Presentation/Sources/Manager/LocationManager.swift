@@ -13,6 +13,10 @@ struct RouteInfo: Codable {
     var latitude: Double
     var longitude: Double
     var timestamp: Date
+    
+    var coordinate: CLLocationCoordinate2D {
+        return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
 }
 
 final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
