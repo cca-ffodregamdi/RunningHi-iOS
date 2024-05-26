@@ -74,14 +74,6 @@ final class RunningCourseReactor: Reactor {
         let locationObservable = locationManager.didUpdateLocationsSubject
             .map { $0.last }
             .compactMap { $0 }
-            .filter { [weak self] newLocation in
-                guard let self = self, let lastLocation = self.lastLocation else {
-                    self?.lastLocation = newLocation.coordinate
-                    return true
-                }
-                let distance = lastLocation.distance(from: newLocation.coordinate)
-                return distance >= 10
-            }
             .flatMapLatest { [currentState = self.currentState] newLocation -> Observable<Mutation> in
                 var updatedRouteInfos = currentState.routeInfos
                 let newRouteInfo = RouteInfo(latitude: newLocation.coordinate.latitude, longitude: newLocation.coordinate.longitude, timestamp: Date())
@@ -142,3 +134,4 @@ final class RunningCourseReactor: Reactor {
         return newState
     }
 }
+
