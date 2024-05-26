@@ -29,6 +29,7 @@ final public class AppCoordinator: Coordinator{
     }
     
     private func showBaseTabBarController(){
+        self.navigationController.viewControllers.removeAll()
         let coordinator = BaseTabBarCoordinator(navigationController: self.navigationController)
         coordinator.start()
         self.childCoordinator.append(coordinator)
@@ -45,7 +46,6 @@ final public class AppCoordinator: Coordinator{
 extension AppCoordinator: LoginCoordinatorDelegate{
     func didLoggedIn(coordinator: LoginCoordinator) {
         self.childCoordinator = self.childCoordinator.filter{$0 !== coordinator}
-        self.navigationController.viewControllers.removeAll()
         self.showBaseTabBarController()
     }
 }

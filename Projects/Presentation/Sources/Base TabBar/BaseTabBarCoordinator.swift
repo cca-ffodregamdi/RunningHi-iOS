@@ -53,7 +53,6 @@ class BaseTabBarCoordinator: TabBarCoordinator{
         switch tabBarItemType{
         case .Home:
             let homeCoordinator: HomeCoordinator = HomeCoordinator(navigationController: tabNavigationController)
-            
             self.childCoordinator.append(homeCoordinator)
             homeCoordinator.start()
         case .Collection:
@@ -65,8 +64,10 @@ class BaseTabBarCoordinator: TabBarCoordinator{
         case .Rank:
             return
         case .My:
-            return
-            
+            let myCoordinator: MyCoordinator = MyCoordinator(navigationController: tabNavigationController)
+            self.childCoordinator.append(myCoordinator)
+            myCoordinator.start()
+            tabNavigationController.viewControllers.first?.title = TabBarItemType.My.getTitle()
         }
     }
     
@@ -76,6 +77,7 @@ class BaseTabBarCoordinator: TabBarCoordinator{
         self.tabBarController.view.backgroundColor = .systemBackground
         self.tabBarController.tabBar.backgroundColor = .systemBackground
         self.tabBarController.tabBar.tintColor = .black
+        
     }
     
     private func addTabBarController(){
