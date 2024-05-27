@@ -52,9 +52,9 @@ class BaseTabBarCoordinator: TabBarCoordinator{
         
         switch tabBarItemType{
         case .Feed:
-            let homeCoordinator: HomeCoordinator = HomeCoordinator(navigationController: tabNavigationController)
-            self.childCoordinator.append(homeCoordinator)
-            homeCoordinator.start()
+            let feedCoordinator: FeedCoordinator = FeedCoordinator(navigationController: tabNavigationController)
+            self.childCoordinator.append(feedCoordinator)
+            feedCoordinator.start()
         case .Challenge:
             return
         case .Course:

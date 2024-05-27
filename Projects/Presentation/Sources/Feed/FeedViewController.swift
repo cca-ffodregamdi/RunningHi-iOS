@@ -13,7 +13,7 @@ import SnapKit
 import RxDataSources
 import Domain
 
-final class HomeViewController: UIViewController{
+final class FeedViewController: UIViewController{
     
     
     // MARK: Properties
@@ -62,13 +62,12 @@ final class HomeViewController: UIViewController{
     }
 }
 
-extension HomeViewController: View{
+extension FeedViewController: View{
     
     func bind(reactor: FeedReactor) {
         Observable.just(Reactor.Action.fetchFeeds)
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
-        
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
