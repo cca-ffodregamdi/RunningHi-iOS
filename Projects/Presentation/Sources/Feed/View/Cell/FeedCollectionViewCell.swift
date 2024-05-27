@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Domain
+import Common
 
 class FeedCollectionViewCell: UICollectionViewCell {
     
@@ -49,7 +50,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
     
     private lazy var shareButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "xmark"), for: .normal)
+        button.setImage(CommonAsset.shareOutline.image, for: .normal)
         return button
     }()
     
@@ -71,7 +72,8 @@ class FeedCollectionViewCell: UICollectionViewCell {
     
     private lazy var likeButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "xmark"), for: .normal)
+        button.setImage(CommonAsset.thumbUpOutline.image, for: .normal)
+        button.setImage(CommonAsset.thumbUpFilled.image, for: .selected)
         return button
     }()
     
@@ -83,7 +85,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
     
     private lazy var commentButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "xmark"), for: .normal)
+        button.setImage(CommonAsset.annotationOutline.image, for: .normal)
         return button
     }()
     
@@ -95,7 +97,8 @@ class FeedCollectionViewCell: UICollectionViewCell {
     
     private lazy var bookMarkButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "xmark"), for: .normal)
+        button.setImage(CommonAsset.bookmarkOutline.image, for: .normal)
+        button.setImage(CommonAsset.bookmarkFilled.image, for: .selected)
         return button
     }()
     
