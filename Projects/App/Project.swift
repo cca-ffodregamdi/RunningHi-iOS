@@ -33,6 +33,9 @@ let project = Project(
                                 "kakao9416fb784a8d5012e650504a17498e09"
                             ]
                         ]
+                    ],
+                    "NSAppTransportSecurity" : [
+                        "NSAllowsArbitraryLoads": true
                     ]
                 ]
             ),
