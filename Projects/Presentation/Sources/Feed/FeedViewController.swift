@@ -25,6 +25,7 @@ final class FeedViewController: UIViewController{
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .systemBackground
         collectionView.register(FeedCollectionViewCell.self, forCellWithReuseIdentifier: "feedCell")
+        collectionView.alwaysBounceVertical = true
         return collectionView
     }()
     
@@ -71,6 +72,7 @@ extension FeedViewController: View{
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
+            cell.configureModel(model: feed)
             return cell
         })
         
@@ -78,5 +80,14 @@ extension FeedViewController: View{
             .map{[SectionModel(model: "feeds", items: $0.feeds)]}
             .bind(to: self.feedCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: self.disposeBag)
+        
+        self.feedCollectionView.rx.setDelegate(self)
+            .disposed(by: self.disposeBag)
+    }
+}
+
+extension FeedViewController: UICollectionViewDelegateFlowLayout{
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: collectionView.bounds.width, height: 400)
     }
 }
