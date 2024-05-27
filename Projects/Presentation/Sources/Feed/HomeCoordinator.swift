@@ -21,5 +21,9 @@ class HomeCoordinator: Coordinator{
         let vc = HomeViewController()
         self.navigationController.viewControllers = [vc]
     }
+    
+    deinit{
+        print("deinit HomeCoordinator")
+    }
 }
 
