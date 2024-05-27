@@ -54,12 +54,12 @@ final class RunningCourseViewController: UIViewController, View {
         reactor = RunningCourseReactor()
         reactor?.action.onNext(.initializeLocation)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(didUpdateLocations), name: .didUpdateLocations, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didUpdatePolyline(_:)), name: .didUpdateLocations, object: nil)
     }
     
-    @objc private func didUpdateLocations() {
-        if let routeInfos = reactor?.currentState.routeInfos {
-            updatePolyline(with: routeInfos)
+    @objc private func didUpdatePolyline(_ notification: Notification) {
+        if let polyline = notification.object as? MKPolyline {
+            runningCourseView.mapView.mapView.addOverlay(polyline)
         }
     }
     
@@ -73,21 +73,10 @@ final class RunningCourseViewController: UIViewController, View {
     }
     
     private func configureLocation() {
+        runningCourseView.mapView.mapView.mapType = MKMapType.standard
         runningCourseView.mapView.mapView.showsUserLocation = true
         runningCourseView.mapView.mapView.delegate = self
-    }
-    
-    private func updatePolyline(with routeInfos: [RouteInfo]) {
-        guard routeInfos.count > 1 else { return }
-
-        let coordinates = routeInfos.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
-
-        if let polyline = polyline {
-            runningCourseView.mapView.mapView.removeOverlay(polyline)
-        }
-        
-        polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
-        runningCourseView.mapView.mapView.addOverlay(polyline!)
+        runningCourseView.mapView.mapView.setUserTrackingMode(.follow, animated: true)
     }
     
     private func centerMap(on location: CLLocationCoordinate2D) {
@@ -117,6 +106,19 @@ final class RunningCourseViewController: UIViewController, View {
         if let stopAnnotation = stopAnnotation {
             runningCourseView.mapView.mapView.addAnnotation(stopAnnotation)
         }
+    }
+    
+    private func updatePolyline(with routeInfos: [RouteInfo]) {
+        guard routeInfos.count > 1 else { return }
+
+        let coordinates = routeInfos.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+
+        if let polyline = polyline {
+            runningCourseView.mapView.mapView.removeOverlay(polyline)
+        }
+        
+        polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        runningCourseView.mapView.mapView.addOverlay(polyline!)
     }
 }
 

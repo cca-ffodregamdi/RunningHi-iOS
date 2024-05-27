@@ -10,26 +10,23 @@ import UIKit
 import CoreLocation
 import RxSwift
 import RxCocoa
+import MapKit
 
 public struct RouteInfo: Codable, Equatable {
     public var latitude: Double
     public var longitude: Double
-    public var timestamp: Date
     
     public var coordinate: CLLocationCoordinate2D {
         return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
-
-    public init(latitude: Double, longitude: Double, timestamp: Date) {
-        self.latitude = latitude
-        self.longitude = longitude
-        self.timestamp = timestamp
-    }
+    
+    public var timestamp: Date
 }
 
 public final class LocationManager: CLLocationManager, CLLocationManagerDelegate {
     public static let shared = LocationManager()
     public static var routeInfo = RouteInfo(latitude: 0.0, longitude: 0.0, timestamp: Date())
+    public var previousCoordinate: CLLocationCoordinate2D?
     public var routeInfos = [RouteInfo]()
     
     public let didUpdateLocationsSubject = PublishSubject<[CLLocation]>()
@@ -88,15 +85,30 @@ public final class LocationManager: CLLocationManager, CLLocationManagerDelegate
 
 extension LocationManager {
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let lastLocation = locations.last {
+            
+            guard let location = locations.last else { return }
+            let latitude = location.coordinate.latitude
+            let longitude = location.coordinate.longitude
+                    
+            if let previousCoordinate = self.previousCoordinate {
+                var points: [CLLocationCoordinate2D] = []
+                let point1 = CLLocationCoordinate2DMake(previousCoordinate.latitude, previousCoordinate.longitude)
+                let point2 = CLLocationCoordinate2DMake(latitude, longitude)
+                points.append(point1)
+                points.append(point2)
+                let lineDraw = MKPolyline(coordinates: points, count: points.count)
+                NotificationCenter.default.post(name: .didUpdateLocations, object: lineDraw)
+            }
+            
+            self.previousCoordinate = location.coordinate
+            
             let timestamp = Date()
-            let newRouteInfo = RouteInfo(latitude: lastLocation.coordinate.latitude, longitude: lastLocation.coordinate.longitude, timestamp: timestamp)
+            let newRouteInfo = RouteInfo(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, timestamp: timestamp)
+            
             LocationManager.routeInfo = newRouteInfo
             self.routeInfos.append(newRouteInfo)
             didUpdateLocationsSubject.onNext(locations)
-            NotificationCenter.default.post(name: .didUpdateLocations, object: nil)
         }
-    }
     
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         if let clError = error as? CLError {
