@@ -10,6 +10,7 @@ import PackageDescription
         // productTypes: ["Alamofire": .framework,] 
         productTypes: [
             "Moya" : .framework,
+            "RxMoya" : .framework,
             "Alamofire" : .framework,
             "SnapKit" : .framework,
             "RxSwift" : .framework,

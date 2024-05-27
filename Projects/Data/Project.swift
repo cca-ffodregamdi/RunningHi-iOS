@@ -21,6 +21,7 @@ let project = Project(
             dependencies: [
                 .project(target: "Domain", path: .relativeToRoot("Projects/Domain")),
                 .external(name: "Moya"),
+                .external(name: "RxMoya"),
             ]
         ),
     ]
