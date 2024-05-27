@@ -7,6 +7,7 @@
 
 import UIKit
 import ReactorKit
+import Common
 import RxSwift
 import RxCocoa
 import SnapKit
@@ -18,6 +19,24 @@ final class FeedViewController: UIViewController{
     
     // MARK: Properties
     var disposeBag: DisposeBag = DisposeBag()
+    
+    private lazy var filterButton: UIButton = {
+        let button = UIButton()
+        button.setImage(CommonAsset.adjustmentsOutline.image, for: .normal)
+        return button
+    }()
+    
+    private lazy var showBookMarkButton: UIButton = {
+        let button = UIButton()
+        button.setImage(CommonAsset.bookmarkOutline.image, for: .normal)
+        return button
+    }()
+    
+    private lazy var notificationButton: UIButton = {
+        let button = UIButton()
+        button.setImage(CommonAsset.bellOutline.image, for: .normal)
+        return button
+    }()
     
     private lazy var feedCollectionView: UICollectionView = {
         var layout = UICollectionViewFlowLayout()
@@ -35,6 +54,7 @@ final class FeedViewController: UIViewController{
         super.viewDidLoad()
           
         configureUI()
+        configureNavigationBarItem()
     }
     
     deinit{
@@ -51,6 +71,14 @@ final class FeedViewController: UIViewController{
             make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
             make.left.right.equalToSuperview()
         }
+    }
+    
+    private func configureNavigationBarItem(){
+        var barButtonItems: [UIBarButtonItem] = []
+        barButtonItems.append(UIBarButtonItem(customView: notificationButton))
+        barButtonItems.append(UIBarButtonItem(customView: showBookMarkButton))
+        barButtonItems.append(UIBarButtonItem(customView: filterButton))
+        self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
     
     init(){
