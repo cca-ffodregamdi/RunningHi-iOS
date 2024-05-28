@@ -16,7 +16,6 @@ import Domain
 
 final class FeedViewController: UIViewController{
     
-    
     // MARK: Properties
     var disposeBag: DisposeBag = DisposeBag()
     
@@ -80,6 +79,8 @@ final class FeedViewController: UIViewController{
         barButtonItems.append(UIBarButtonItem(customView: filterButton))
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
+    
+    
     
     init(){
         super.init(nibName: nil, bundle: nil)

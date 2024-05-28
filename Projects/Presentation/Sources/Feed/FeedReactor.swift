@@ -36,7 +36,7 @@ final class FeedReactor: Reactor{
     func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .fetchFeeds:
-            return self.feedUseCase.fetchFeeds(page: 0, size: 10, keyword: ["강아지랑","초보자용"])
+            return self.feedUseCase.fetchFeeds(page: 0, size: 10, keyword: [])
                 .map{ Mutation.setFeeds($0)}
             
         }

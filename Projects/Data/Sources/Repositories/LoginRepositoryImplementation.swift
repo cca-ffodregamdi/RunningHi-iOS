@@ -19,7 +19,7 @@ public class LoginRepositoryImplementation: LoginRepositoryProtocol{
     }
     
     deinit{
-        print("LoginRepositoryImplementation deinit")
+        print("deinit LoginRepositoryImplementation")
     }
     
     public func login() -> Observable<OAuthToken>{
