@@ -47,6 +47,9 @@ final class FeedViewController: UIViewController{
         return collectionView
     }()
     
+    private lazy var feedRefreshControl: UIRefreshControl = {
+        return UIRefreshControl()
+    }()
     
     // MARK: LifeCycle
     override func viewDidLoad() {
@@ -54,10 +57,11 @@ final class FeedViewController: UIViewController{
           
         configureUI()
         configureNavigationBarItem()
+        addRefreshControl()
     }
     
     deinit{
-        print("deinit HomeViewController")
+        print("deinit FeedViewController")
     }
     
     private func configureUI(){
@@ -80,7 +84,10 @@ final class FeedViewController: UIViewController{
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
     
-    
+    private func addRefreshControl(){
+        feedCollectionView.refreshControl = feedRefreshControl
+        feedRefreshControl.endRefreshing()
+    }
     
     init(){
         super.init(nibName: nil, bundle: nil)
@@ -112,6 +119,18 @@ extension FeedViewController: View{
         
         self.feedCollectionView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
+        
+        feedRefreshControl.rx.controlEvent(.valueChanged)
+            .map{Reactor.Action.refresh}
+            .bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
+            
+        reactor.state
+            .map{$0.isEndRefreshing}
+            .distinctUntilChanged()
+            .bind{ _ in
+                self.feedRefreshControl.endRefreshing()
+            }.disposed(by: self.disposeBag)
     }
 }
 

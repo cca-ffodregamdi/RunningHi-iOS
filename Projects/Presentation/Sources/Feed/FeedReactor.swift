@@ -15,14 +15,17 @@ final class FeedReactor: Reactor{
     
     public enum Action{
         case fetchFeeds
+        case refresh
     }
     
     public enum Mutation{
         case setFeeds([FeedModel])
+        case setEndRefreshing(Bool)
     }
     
     public struct State{
         var feeds: [FeedModel] = []
+        var isEndRefreshing = true
     }
 
     public let initialState: State
@@ -38,7 +41,13 @@ final class FeedReactor: Reactor{
         case .fetchFeeds:
             return self.feedUseCase.fetchFeeds(page: 0, size: 10, keyword: [])
                 .map{ Mutation.setFeeds($0)}
-            
+        case .refresh:
+            return Observable.concat([
+                Observable.just(Mutation.setEndRefreshing(false)),
+                feedUseCase.fetchFeeds(page: 0, size: 10, keyword: [])
+                    .map{ Mutation.setFeeds($0)},
+                Observable.just(Mutation.setEndRefreshing(true)),
+            ])
         }
     }
     
@@ -47,6 +56,8 @@ final class FeedReactor: Reactor{
         switch mutation{
         case .setFeeds(let feeds):
             newState.feeds = feeds
+        case .setEndRefreshing(let value):
+            newState.isEndRefreshing = value
         }
         return newState
     }
