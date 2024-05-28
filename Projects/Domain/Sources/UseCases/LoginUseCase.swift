@@ -19,4 +19,6 @@ final public class LoginUseCase: LoginProtocol{
     public func login() -> Observable<OAuthToken>{
         return loginRepository.login()
     }
+    
 }
+
