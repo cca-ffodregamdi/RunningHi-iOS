@@ -32,7 +32,7 @@ public struct FeedResponseData: Decodable{
 public struct FeedModel: Decodable{
     public let postNo: Int
     public let nickname: String?
-//    public let createDate: String
+    public let createDate: String
     public let postContent: String
     public let role: String
     public let locationName: String
@@ -40,6 +40,7 @@ public struct FeedModel: Decodable{
     enum CodingKeys: CodingKey {
         case postNo
         case nickname
+        case createDate
         case postContent
         case role
         case locationName
