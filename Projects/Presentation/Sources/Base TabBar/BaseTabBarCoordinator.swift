@@ -34,7 +34,7 @@ class BaseTabBarCoordinator: TabBarCoordinator{
     private func createTabBarItem(type: TabBarItemType) -> UITabBarItem{
         return UITabBarItem(
             title: type.getTitle(),
-            image: UIImage(systemName: "xmark"),
+            image: type.getImage(),
             tag: type.getNumber()
         )
     }
@@ -51,11 +51,11 @@ class BaseTabBarCoordinator: TabBarCoordinator{
         guard let tabBarItemType: TabBarItemType = TabBarItemType(index: tabBarItemTag) else { return }
         
         switch tabBarItemType{
-        case .Home:
-            let homeCoordinator: HomeCoordinator = HomeCoordinator(navigationController: tabNavigationController)
-            self.childCoordinator.append(homeCoordinator)
-            homeCoordinator.start()
-        case .Collection:
+        case .Feed:
+            let feedCoordinator: FeedCoordinator = FeedCoordinator(navigationController: tabNavigationController)
+            self.childCoordinator.append(feedCoordinator)
+            feedCoordinator.start()
+        case .Challenge:
             return
         case .Course:
             let courseCoordinator: RunningCourseCoordinator = RunningCourseCoordinator(navigationController: tabNavigationController)
@@ -73,7 +73,7 @@ class BaseTabBarCoordinator: TabBarCoordinator{
     
     private func configureTabBarController(tabNavigationController: [UIViewController]){
         self.tabBarController.setViewControllers(tabNavigationController, animated: false)
-        self.tabBarController.selectedIndex = TabBarItemType.Home.getNumber()
+        self.tabBarController.selectedIndex = TabBarItemType.Feed.getNumber()
         self.tabBarController.view.backgroundColor = .systemBackground
         self.tabBarController.tabBar.backgroundColor = .systemBackground
         self.tabBarController.tabBar.tintColor = .black

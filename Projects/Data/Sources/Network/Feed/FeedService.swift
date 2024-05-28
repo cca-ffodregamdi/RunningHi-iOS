@@ -15,7 +15,7 @@ public enum FeedService{
 
 extension FeedService: TargetType{
     public var baseURL: URL {
-        return .init(string: "http://ec2-43-200-142-9.ap-northeast-2.compute.amazonaws.com:8080/api/v1")!
+        return .init(string: "https://runninghi.store/api/v1")!
         
     }
     
@@ -48,7 +48,7 @@ extension FeedService: TargetType{
         switch self{
         case .fetchFeeds:
             return ["Content-type": "application/json",
-                    "Authorization": "Bearer " + accessToken]
+                    "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZSI6IlVTRVIiLCJpc3MiOiJydW5uaW5naGktdjIuY29tIiwiaWF0IjoxNzE2ODA5NTUyLCJleHAiOjE3MjE5OTM1NTJ9.LSKLVrypmTsS5gVerFZUnTVfbwST9_-xDOpO_0i_KxzKl8se6AoAdyr85VQztRuB_khbEbpWEDatd_yK1r2vUA"]
                     
         }
     }

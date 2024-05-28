@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Common
+import Moya
 
 protocol TabBarCoordinator: Coordinator{
     var tabBarController: UITabBarController { get set }
@@ -13,12 +15,12 @@ protocol TabBarCoordinator: Coordinator{
 
 
 enum TabBarItemType: String, CaseIterable{
-    case Home, Collection, Course, Rank, My
+    case Feed, Challenge, Course, Rank, My
     
     init?(index: Int){
         switch index{
-        case 0: self = .Home
-        case 1: self = .Collection
+        case 0: self = .Feed
+        case 1: self = .Challenge
         case 2: self = .Course
         case 3: self = .Rank
         case 4: self = .My
@@ -28,8 +30,8 @@ enum TabBarItemType: String, CaseIterable{
     
     func getNumber() -> Int{
         switch self{
-        case .Home: return 0
-        case .Collection: return 1
+        case .Feed: return 0
+        case .Challenge: return 1
         case .Course: return 2
         case .Rank: return 3
         case .My: return 4
@@ -38,21 +40,21 @@ enum TabBarItemType: String, CaseIterable{
     
     func getTitle() -> String{
         switch self{
-        case .Home: return "홈"
-        case .Collection: return "저장"
-        case .Course: return "코스 등록"
-        case .Rank: return "순위"
-        case .My: return "내 정보"
+        case .Feed: return "피드"
+        case .Challenge: return "챌린지"
+        case .Course: return ""
+        case .Rank: return "기록"
+        case .My: return "마이페이지"
         }
     }
     
-//    func getImage() -> Image{
-//        switch self{
-//        case .Home: return 
-//        case .Collection: return
-//        case .Course: return
-//        case .Rank: return
-//        case .My: return
-//        }
-//    }
+    func getImage() -> Image{
+        switch self{
+        case .Feed: return CommonAsset.homeOutline.image
+        case .Challenge: return CommonAsset.fireOutline.image
+        case .Course: return CommonAsset.plusCircle.image
+        case .Rank: return CommonAsset.chartBarOutline.image
+        case .My: return CommonAsset.userOutline.image
+        }
+    }
 }

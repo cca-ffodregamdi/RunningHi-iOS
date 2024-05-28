@@ -7,7 +7,7 @@
 
 import UIKit
 
-class HomeCoordinator: Coordinator{
+class FeedCoordinator: Coordinator{
     
     var childCoordinator: [Coordinator] = []
     
@@ -18,7 +18,7 @@ class HomeCoordinator: Coordinator{
     }
     
     func start() {
-        let vc = HomeViewController()
+        let vc = FeedViewController()
         self.navigationController.viewControllers = [vc]
     }
     

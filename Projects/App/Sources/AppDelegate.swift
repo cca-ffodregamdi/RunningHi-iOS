@@ -12,7 +12,6 @@ import KakaoSDKUser
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         KakaoSDK.initSDK(appKey: "9416fb784a8d5012e650504a17498e09")
-        sleep(1)
 //        UserApi.shared.unlink {(error) in
 //            if let error = error {
 //                print(error)
