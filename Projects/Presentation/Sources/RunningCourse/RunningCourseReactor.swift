@@ -70,7 +70,7 @@ final class RunningCourseReactor: Reactor {
     private func startRunningCourse() -> Observable<Mutation> {
         locationManager.startLocationUpdates()
         lastLocation = nil
-
+        locationManager.isStartRunning = true
         let locationObservable = locationManager.didUpdateLocationsSubject
             .map { $0.last }
             .compactMap { $0 }
@@ -99,6 +99,7 @@ final class RunningCourseReactor: Reactor {
     
     private func stopRunningCourse() -> Observable<Mutation> {
         locationManager.stopLocationUpdates()
+        locationManager.isStartRunning = false
         
         let lastLocation = LocationManager.routeInfo.coordinate
         let stopLocationMutation = Observable.just(Mutation.setStopLocation(lastLocation))

@@ -28,7 +28,7 @@ public final class LocationManager: CLLocationManager, CLLocationManagerDelegate
     public static var routeInfo = RouteInfo(latitude: 0.0, longitude: 0.0, timestamp: Date())
     public var previousCoordinate: CLLocationCoordinate2D?
     public var routeInfos = [RouteInfo]()
-    
+    public var isStartRunning = false
     public let didUpdateLocationsSubject = PublishSubject<[CLLocation]>()
     
     override public init() {
@@ -42,7 +42,7 @@ public final class LocationManager: CLLocationManager, CLLocationManagerDelegate
     public func startLocationUpdates() {
         self.startUpdatingLocation()
     }
-
+    
     public func stopLocationUpdates() {
         self.stopUpdatingLocation()
     }
@@ -85,11 +85,12 @@ public final class LocationManager: CLLocationManager, CLLocationManagerDelegate
 
 extension LocationManager {
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-            
-            guard let location = locations.last else { return }
-            let latitude = location.coordinate.latitude
-            let longitude = location.coordinate.longitude
-                    
+        
+        guard let location = locations.last else { return }
+        let latitude = location.coordinate.latitude
+        let longitude = location.coordinate.longitude
+        
+        if isStartRunning == true {
             if let previousCoordinate = self.previousCoordinate {
                 var points: [CLLocationCoordinate2D] = []
                 let point1 = CLLocationCoordinate2DMake(previousCoordinate.latitude, previousCoordinate.longitude)
@@ -109,6 +110,7 @@ extension LocationManager {
             self.routeInfos.append(newRouteInfo)
             didUpdateLocationsSubject.onNext(locations)
         }
+    }
     
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         if let clError = error as? CLError {
@@ -150,7 +152,7 @@ extension LocationManager {
                 .first as? UIWindowScene,
                let rootViewController = windowScene.windows
                 .first(where: { $0.isKeyWindow })?.rootViewController {
-                    rootViewController.present(requestLocationServiceAlert, animated: true)
+                rootViewController.present(requestLocationServiceAlert, animated: true)
             }
         }
     }
