@@ -1,14 +1,13 @@
 //
-//  FeedCoordinator.swift
+//  ChallengeCoordinator.swift
 //  Presentation
 //
-//  Created by 유현진 on 5/3/24.
+//  Created by 유현진 on 5/28/24.
 //
 
 import UIKit
 
-class FeedCoordinator: Coordinator{
-    
+class ChallengeCoordinator: Coordinator{
     var childCoordinator: [Coordinator] = []
     
     var navigationController: UINavigationController!
@@ -18,12 +17,11 @@ class FeedCoordinator: Coordinator{
     }
     
     func start() {
-        let vc = FeedViewController()
-        self.navigationController.viewControllers = [vc]
+        let vc = ChallengeViewController()
+        navigationController.viewControllers = [vc]
     }
     
     deinit{
-        print("deinit FeedCoordinator")
+        print("deinit ChallengeCoordinator")
     }
 }
-
