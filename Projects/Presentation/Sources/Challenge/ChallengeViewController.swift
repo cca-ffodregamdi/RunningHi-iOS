@@ -29,14 +29,19 @@ final class ChallengeViewController: UIViewController{
         button.setImage(CommonAsset.bellOutline.image, for: .normal)
         return button
     }()
-    
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        return scrollView
+    }()
     private lazy var challengeTableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .insetGrouped)
-//        let tableView = UITableView(frame: .zero, style: .plain)
-        tableView.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
-        
-        tableView.alwaysBounceVertical = true
-        tableView.showsHorizontalScrollIndicator = false
+//        let tableView = UITableView(frame: .zero, style: .insetGrouped)
+        let tableView = UITableView(frame: .zero, style: .plain)
+//        tableView.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
+        tableView.isScrollEnabled = false
+//        tableView.alwaysBounceVertical = true
+//        tableView.showsHorizontalScrollIndicator = false
         tableView.rowHeight = 84
         tableView.sectionHeaderTopPadding = 0
         tableView.sectionHeaderHeight = tableView.estimatedSectionHeaderHeight
@@ -69,19 +74,30 @@ final class ChallengeViewController: UIViewController{
     
     private func configureUI(){
         self.view.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
+        self.view.addSubview(scrollView)
         
-        self.view.addSubview(challengeTableView)
-        self.view.addSubview(challengeHeaderView)
+        [challengeHeaderView, challengeTableView].forEach{
+            self.scrollView.addSubview($0)
+        }
+        
+        scrollView.snp.makeConstraints { make in
+            make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
+            make.left.right.equalToSuperview()
+        }
         
         challengeHeaderView.snp.makeConstraints { make in
-            make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+            make.top.equalToSuperview()
             make.left.right.equalToSuperview()
+            make.width.equalToSuperview()
         }
         
         challengeTableView.snp.makeConstraints { make in
             make.top.equalTo(challengeHeaderView.snp.bottom)
-            make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
+            make.bottom.equalToSuperview()
             make.left.right.equalToSuperview()
+            make.width.equalToSuperview()
+            make.height.equalToSuperview().offset(-(self.challengeHeaderView.bounds.height))
         }
     }
 }
