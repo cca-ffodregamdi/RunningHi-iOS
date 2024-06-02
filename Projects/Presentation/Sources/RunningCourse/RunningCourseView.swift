@@ -35,6 +35,22 @@ class RunningCourseView: UIView {
         return button
     }()
     
+    lazy var timeLabel: UILabel = {
+        let label = UILabel()
+        label.text = "00:00"
+        label.font = UIFont.monospacedDigitSystemFont(ofSize: 20, weight: .medium)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    lazy var distanceLabel: UILabel = {
+        let label = UILabel()
+        label.text = "0.00km"
+        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        label.textAlignment = .center
+        return label
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -51,6 +67,8 @@ class RunningCourseView: UIView {
         addSubview(mapView)
         addSubview(startButton)
         addSubview(stopButton)
+        addSubview(timeLabel)
+        addSubview(distanceLabel)
     }
     
     private func setupConstraints() {
@@ -72,10 +90,30 @@ class RunningCourseView: UIView {
             make.top.equalTo(mapView.snp.bottom).offset(padding * 2)
             make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing).offset(-padding)
         }
+        
+        timeLabel.snp.makeConstraints { make in
+            make.top.equalTo(startButton.snp.bottom).offset(padding * 2)
+            make.leading.equalTo(safeAreaLayoutGuide.snp.leading).offset(padding)
+        }
+        
+        distanceLabel.snp.makeConstraints { make in
+            make.top.equalTo(stopButton.snp.bottom).offset(padding * 2)
+            make.trailing.equalTo(safeAreaLayoutGuide.snp.trailing).offset(-padding)
+        }
     }
-    
+}
+
+extension RunningCourseView {
     func updateRunningState(isRunning: Bool) {
         startButton.isEnabled = !isRunning
         stopButton.isEnabled = isRunning
+    }
+    
+    func updateTimerLabel(timeString: String) {
+        timeLabel.text = timeString
+    }
+    
+    func updateDistanceLabel(distance: Double) {
+        distanceLabel.text = String(format: "%.2fkm", distance / 1000)
     }
 }
