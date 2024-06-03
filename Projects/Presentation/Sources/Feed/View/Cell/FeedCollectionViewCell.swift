@@ -216,6 +216,9 @@ class FeedCollectionViewCell: UICollectionViewCell {
         self.nickNameLabel.text = model.nickname
         self.contentLabel.text = model.postContent
         self.locationLabel.text = model.locationName
-        self.createdDateLabel.text = Date().createDateToString(createDate: model.createDate)
+        if let createDate = model.createDate{
+            self.createdDateLabel.text = Date().createDateToString(createDate: createDate)
+        }
+        
     }
 }

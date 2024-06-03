@@ -1,5 +1,5 @@
 //
-//  HomeCoordinator.swift
+//  FeedCoordinator.swift
 //  Presentation
 //
 //  Created by 유현진 on 5/3/24.
@@ -23,7 +23,7 @@ class FeedCoordinator: Coordinator{
     }
     
     deinit{
-        print("deinit HomeCoordinator")
+        print("deinit FeedCoordinator")
     }
 }
 

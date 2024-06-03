@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 import KakaoSDKAuth
 
-final public class LoginUseCase: LoginProtocol{
+final public class LoginUseCase: LoginUseCaseProtocol{
     private let loginRepository: LoginRepositoryProtocol
     
     public init(loginRepository: LoginRepositoryProtocol) {

@@ -9,6 +9,6 @@ import Foundation
 import RxSwift
 import KakaoSDKAuth
 
-protocol LoginProtocol{
+protocol LoginUseCaseProtocol{
     func login() -> Observable<OAuthToken>
 }
