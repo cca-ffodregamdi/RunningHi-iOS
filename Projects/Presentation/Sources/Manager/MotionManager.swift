@@ -51,6 +51,7 @@ class MotionManager {
                 self.currentMotion = newMotion
                 self.onMotionUpdate?(newMotion)
             }
+            print(currentMotion)
         }
     }
 }

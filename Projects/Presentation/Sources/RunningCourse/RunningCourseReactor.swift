@@ -71,6 +71,7 @@ final class RunningCourseReactor: Reactor {
     }
     
     private func startRunningCourse() -> Observable<Mutation> {
+        locationManager.startMonitoringMotion()
         locationManager.startLocationUpdates()
         lastLocation = nil
         locationManager.isStartRunning = true
@@ -112,6 +113,7 @@ final class RunningCourseReactor: Reactor {
         let stopLocationMutation = Observable.just(Mutation.setStopLocation(lastLocation))
         let routeInfoMutation = Observable.just(Mutation.setRouteInfo(currentState.routeInfos))
         
+        print("RouteInfos: \(currentState.routeInfos)")
         return Observable.concat([
             stopLocationMutation,
             routeInfoMutation,
