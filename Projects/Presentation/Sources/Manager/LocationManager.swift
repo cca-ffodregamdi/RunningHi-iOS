@@ -5,12 +5,20 @@
 //  Created by 오영석 on 5/13/24.
 //
 
+//
+//  LocationManager.swift
+//  Presentation
+//
+//  Created by 오영석 on 5/13/24.
+//
+
 import Foundation
 import UIKit
 import CoreLocation
 import RxSwift
 import RxCocoa
 import MapKit
+import CoreMotion
 
 public struct RouteInfo: Codable, Equatable {
     public var latitude: Double
@@ -30,6 +38,7 @@ public final class LocationManager: CLLocationManager, CLLocationManagerDelegate
     public var routeInfos = [RouteInfo]()
     public var isStartRunning = false
     public let didUpdateLocationsSubject = PublishSubject<[CLLocation]>()
+    private let motionManager = MotionManager()
     
     override public init() {
         super.init()
@@ -37,6 +46,23 @@ public final class LocationManager: CLLocationManager, CLLocationManagerDelegate
         self.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         self.allowsBackgroundLocationUpdates = true
         self.pausesLocationUpdatesAutomatically = false
+        self.distanceFilter = 10
+        
+        motionManager.onMotionUpdate = { [weak self] activity in
+            guard let self = self else { return }
+            switch activity {
+            case .running, .walking:
+                if self.isStartRunning {
+                    self.startLocationUpdates()
+                }
+            default:
+                self.stopLocationUpdates()
+            }
+        }
+    }
+    
+    public func startMonitoringMotion() {
+        motionManager.checkMotionActivity()
     }
     
     public func startLocationUpdates() {
