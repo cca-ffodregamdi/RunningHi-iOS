@@ -18,6 +18,7 @@ final class ChallengeViewController: UIViewController{
     
     // MARK: Properties
     var disposeBag: DisposeBag = DisposeBag()
+    var coordinator: ChallengeCoordinator
     private var dataSource: RxTableViewSectionedReloadDataSource<ChallengeSection>!
     
     private lazy var challengeHeaderView: ChallengeHeaderView = {
@@ -35,13 +36,12 @@ final class ChallengeViewController: UIViewController{
         scrollView.alwaysBounceVertical = true
         return scrollView
     }()
+    
     private lazy var challengeTableView: UITableView = {
-//        let tableView = UITableView(frame: .zero, style: .insetGrouped)
+//                let tableView = UITableView(frame: .zero, style: .insetGrouped)
         let tableView = UITableView(frame: .zero, style: .plain)
-//        tableView.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
+//                tableView.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
         tableView.isScrollEnabled = false
-//        tableView.alwaysBounceVertical = true
-//        tableView.showsHorizontalScrollIndicator = false
         tableView.rowHeight = 84
         tableView.sectionHeaderTopPadding = 0
         tableView.sectionHeaderHeight = tableView.estimatedSectionHeaderHeight
@@ -57,7 +57,14 @@ final class ChallengeViewController: UIViewController{
         configureNavigationBarItem()
     }
     
-    init(){
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.title = "챌린지"
+        self.navigationController?.navigationBar.prefersLargeTitles = false
+    }
+    
+    init(coordinator: ChallengeCoordinator){
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         self.reactor = ChallengeReactor()
     }
@@ -103,7 +110,7 @@ final class ChallengeViewController: UIViewController{
 }
 
 extension ChallengeViewController: View, UITableViewDelegate{
-
+    
     func bind(reactor: ChallengeReactor) {
         Observable.just(Reactor.Action.fetchChallenge)
             .bind(to: reactor.action)
@@ -121,6 +128,14 @@ extension ChallengeViewController: View, UITableViewDelegate{
         
         self.challengeTableView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
+        
+        self.challengeTableView.rx.itemSelected
+            .bind{ [weak self] indexPath in
+                guard let self = self else {return}
+                let model = self.dataSource[indexPath]
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator.showChallengeDetail(model: model)
+            }.disposed(by: self.disposeBag)
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

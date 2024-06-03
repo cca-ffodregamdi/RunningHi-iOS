@@ -9,4 +9,5 @@ import Foundation
 import RxSwift
 protocol ChallengeUseCaseProtocol{
     func getChallengeList() -> Observable<[ChallengeModel]>
+    func getRank() -> Observable<[RankModel]>
 }

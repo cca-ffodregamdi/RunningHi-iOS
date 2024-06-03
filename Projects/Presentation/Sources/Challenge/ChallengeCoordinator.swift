@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 class ChallengeCoordinator: Coordinator{
     var childCoordinator: [Coordinator] = []
@@ -17,8 +18,13 @@ class ChallengeCoordinator: Coordinator{
     }
     
     func start() {
-        let vc = ChallengeViewController()
+        let vc = ChallengeViewController(coordinator: self)
         navigationController.viewControllers = [vc]
+    }
+    
+    func showChallengeDetail(model: ChallengeModel){
+        let vc = ChallengeDetailViewController(challengeModel: model)
+        navigationController.pushViewController(vc, animated: false)
     }
     
     deinit{

@@ -19,4 +19,8 @@ public class ChallengeUseCase: ChallengeUseCaseProtocol{
     public func getChallengeList() -> Observable<[ChallengeModel]> {
         return repository.getChallengeList()
     }
+    
+    public func getRank() -> Observable<[RankModel]> {
+        return repository.getRank()
+    }
 }
