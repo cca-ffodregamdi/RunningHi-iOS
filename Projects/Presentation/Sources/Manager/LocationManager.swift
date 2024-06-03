@@ -93,8 +93,8 @@ extension LocationManager {
         if isStartRunning == true {
             if let previousCoordinate = self.previousCoordinate {
                 var points: [CLLocationCoordinate2D] = []
-                let point1 = CLLocationCoordinate2DMake(previousCoordinate.latitude, previousCoordinate.longitude)
-                let point2 = CLLocationCoordinate2DMake(latitude, longitude)
+                let point1 = CLLocationCoordinate2D(latitude: previousCoordinate.latitude, longitude: previousCoordinate.longitude)
+                let point2 = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
                 points.append(point1)
                 points.append(point2)
                 let lineDraw = MKPolyline(coordinates: points, count: points.count)
@@ -172,4 +172,66 @@ extension CLLocationCoordinate2D: Equatable {
 
 extension Notification.Name {
     public static let didUpdateLocations = Notification.Name("didUpdateLocations")
+}
+
+extension MKCoordinateRegion {
+    
+    init?(coordinates: [CLLocationCoordinate2D]) {
+        let primeRegion = MKCoordinateRegion.region(for: coordinates, transform: { $0 }, inverseTransform: { $0 })
+        
+        let transformedRegion = MKCoordinateRegion.region(for: coordinates, transform: MKCoordinateRegion.transform, inverseTransform: MKCoordinateRegion.inverseTransform)
+        
+        if let a = primeRegion,
+           let b = transformedRegion,
+           let min = [a, b].min(by: { $0.span.longitudeDelta < $1.span.longitudeDelta }) {
+            self = min
+        } else if let a = primeRegion {
+            self = a
+        } else if let b = transformedRegion {
+            self = b
+        } else {
+            return nil
+        }
+    }
+    
+    private static func transform(c: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
+        if c.longitude < 0 { return CLLocationCoordinate2D(latitude: c.latitude, longitude: 360 + c.longitude) }
+        return c
+    }
+    
+    private static func inverseTransform(c: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
+        if c.longitude > 180 { return CLLocationCoordinate2D(latitude: c.latitude, longitude: -360 + c.longitude) }
+        return c
+    }
+    
+    private typealias Transform = (CLLocationCoordinate2D) -> (CLLocationCoordinate2D)
+    
+    private static func region(for coordinates: [CLLocationCoordinate2D], transform: Transform, inverseTransform: Transform) -> MKCoordinateRegion? {
+        guard !coordinates.isEmpty else { return nil }
+        
+        guard coordinates.count > 1 else {
+            return MKCoordinateRegion(center: coordinates[0], span: MKCoordinateSpan(latitudeDelta: 0.003, longitudeDelta: 0.003))
+        }
+        
+        let transformed = coordinates.map(transform)
+        
+        let minLat = transformed.min { $0.latitude < $1.latitude }!.latitude
+        let maxLat = transformed.max { $0.latitude < $1.latitude }!.latitude
+        let minLon = transformed.min { $0.longitude < $1.longitude }!.longitude
+        let maxLon = transformed.max { $0.longitude < $1.longitude }!.longitude
+        let span = MKCoordinateSpan(latitudeDelta: 0.003, longitudeDelta: 0.003)
+        
+        let center = inverseTransform(CLLocationCoordinate2D(latitude: (maxLat + minLat) / 2, longitude: (maxLon + minLon) / 2))
+        
+        return MKCoordinateRegion(center: center, span: span)
+    }
+}
+
+extension MKCoordinateRegion: Equatable {
+    public static func == (lhs: MKCoordinateRegion, rhs: MKCoordinateRegion) -> Bool {
+        return lhs.center.latitude == rhs.center.latitude &&
+               lhs.center.longitude == rhs.center.longitude &&
+               lhs.span.latitudeDelta == rhs.span.latitudeDelta &&
+               lhs.span.longitudeDelta == rhs.span.longitudeDelta
+    }
 }

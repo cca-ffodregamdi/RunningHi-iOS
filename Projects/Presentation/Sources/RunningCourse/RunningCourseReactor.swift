@@ -8,6 +8,7 @@
 import ReactorKit
 import RxSwift
 import CoreLocation
+import MapKit
 
 final class RunningCourseReactor: Reactor {
     
@@ -26,6 +27,7 @@ final class RunningCourseReactor: Reactor {
         case setStartLocation(CLLocationCoordinate2D)
         case setStopLocation(CLLocationCoordinate2D)
         case clearCourse
+        case setRegion(MKCoordinateRegion?)
     }
     
     struct State {
@@ -35,6 +37,7 @@ final class RunningCourseReactor: Reactor {
         var moveToLocation: CLLocationCoordinate2D?
         var startLocation: CLLocationCoordinate2D?
         var stopLocation: CLLocationCoordinate2D?
+        var region: MKCoordinateRegion?
     }
     
     let initialState = State()
@@ -79,7 +82,11 @@ final class RunningCourseReactor: Reactor {
                 let newRouteInfo = RouteInfo(latitude: newLocation.coordinate.latitude, longitude: newLocation.coordinate.longitude, timestamp: Date())
                 updatedRouteInfos.append(newRouteInfo)
                 self.lastLocation = newLocation.coordinate
-                return Observable.just(Mutation.setRouteInfo(updatedRouteInfos))
+                let region = MKCoordinateRegion(coordinates: updatedRouteInfos.map { $0.coordinate })
+                return Observable.concat([
+                    Observable.just(Mutation.setRouteInfo(updatedRouteInfos)),
+                    Observable.just(Mutation.setRegion(region))
+                ])
             }
 
         let startLocationObservable = locationManager.didUpdateLocationsSubject
@@ -131,6 +138,8 @@ final class RunningCourseReactor: Reactor {
             newState.routeInfos = []
             newState.startLocation = nil
             newState.stopLocation = nil
+        case .setRegion(let region):
+            newState.region = region
         }
         return newState
     }

@@ -7,7 +7,6 @@
 
 import UIKit
 import MapKit
-import SnapKit
 import RxSwift
 import ReactorKit
 import RxRelay
@@ -119,6 +118,10 @@ final class RunningCourseViewController: UIViewController, View {
         
         polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
         runningCourseView.mapView.mapView.addOverlay(polyline!)
+        
+        if let region = MKCoordinateRegion(coordinates: coordinates) {
+            runningCourseView.mapView.mapView.setRegion(region, animated: true)
+        }
     }
 }
 
@@ -204,6 +207,15 @@ extension RunningCourseViewController {
             .subscribe(onNext: { [weak self] location in
                 guard let location = location else { return }
                 self?.addStopLocationMarker(at: location)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.region }
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak self] region in
+                guard let region = region else { return }
+                self?.runningCourseView.mapView.mapView.setRegion(region, animated: true)
             })
             .disposed(by: disposeBag)
     }
