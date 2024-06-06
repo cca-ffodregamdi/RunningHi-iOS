@@ -77,6 +77,7 @@ final public class MyViewController: UIViewController, View{
         self.myProfileHeaderView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.width.equalToSuperview()
+            make.left.right.equalToSuperview()
         }
         
         self.settingTableView.snp.makeConstraints { make in
@@ -84,7 +85,7 @@ final public class MyViewController: UIViewController, View{
             make.bottom.equalToSuperview()
             make.left.right.equalToSuperview()
             make.width.equalToSuperview()
-            make.height.equalTo(500)
+            make.height.equalTo(settingTableView.contentSize.height)
         }
     }
     
@@ -95,7 +96,7 @@ final public class MyViewController: UIViewController, View{
         
         let dataSource = DataSource{ dataSource, tableView, indexPath, item in
             let cell = tableView.dequeueReusableCell(withIdentifier: "MySettingCell", for: indexPath) as! SettingTableViewCell
-            cell.setSectionModel(title: item.title)
+            cell.setSectionModel(model: item)
             return cell
         }
         
@@ -104,33 +105,3 @@ final public class MyViewController: UIViewController, View{
             .disposed(by: self.disposeBag)
     }
 }
-
-//extension MyViewController: View{
-//
-//    func bind(reactor: MyReactor) {
-//        Observable.just(Reactor.Action.load)
-//            .bind(to: reactor.action)
-//            .disposed(by: self.disposeBag)
-//
-//
-//
-//
-//        reactor.state
-//            .map{ $0.sections }
-//            .bind(to: settingTableView.rx.items){ tableView, index, sectionModel in
-//                let section = sectionModel.section
-//                let item = sectionModel.items[0]
-//                let cell = tableView.dequeueReusableCell(withIdentifier: "MySettingCell", for: IndexPath(row: index, section: 0)) as! SettingTableViewCell
-//                switch item{
-//                case .notices(let title):
-//                    cell.setSectionModel(title: title)
-//                case .comment(let title):
-//                    cell.setSectionModel(title: title)
-//                case .myPosts(let title):
-//                    cell.setSectionModel(title: title)
-//                }
-//                return cell
-//            }
-//            .disposed(by: self.disposeBag)
-//    }
-//}

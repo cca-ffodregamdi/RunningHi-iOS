@@ -7,12 +7,13 @@
 
 import UIKit
 import SnapKit
+import Common
+
 
 class SettingTableViewCell: UITableViewCell {
 
     private lazy var typeImageView: UIImageView = {
         var imageView = UIImageView()
-        imageView.image = UIImage(systemName: "xmark")
         return imageView
     }()
     
@@ -24,7 +25,7 @@ class SettingTableViewCell: UITableViewCell {
 
     private lazy var arrowButtonImageView: UIImageView = {
         var imageView = UIImageView()
-        imageView.image = UIImage(systemName: "xmark")
+        imageView.image = CommonAsset.chevronRightOutline.image
         return imageView
     }()
     
@@ -73,7 +74,8 @@ class SettingTableViewCell: UITableViewCell {
         }
     }
     
-    func setSectionModel(title: String){
-        self.typeLabel.text = title
+    func setSectionModel(model: MyPageItem){
+        self.typeLabel.text = model.title
+        self.typeImageView.image = model.image
     }
 }
