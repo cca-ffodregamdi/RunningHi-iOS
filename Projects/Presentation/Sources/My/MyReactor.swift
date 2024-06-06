@@ -33,9 +33,11 @@ final public class MyReactor: Reactor{
         switch action{
         case .load:
             let items: [MyPageItem] = [
-                .notices,
                 .myFeed,
-                .feedback,
+                .notices,
+                .setting,
+                .customerCenter,
+                .logOut
             ]
             return .just(.setSections(items))
         }

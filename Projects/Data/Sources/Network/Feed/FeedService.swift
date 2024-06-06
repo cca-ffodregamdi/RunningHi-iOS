@@ -48,7 +48,7 @@ extension FeedService: TargetType{
         switch self{
         case .fetchFeeds:
             return ["Content-type": "application/json",
-                    "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwicm9sZSI6IlVTRVIiLCJpc3MiOiJydW5uaW5naGktdjIuY29tIiwiaWF0IjoxNzE2ODA5NTUyLCJleHAiOjE3MjE5OTM1NTJ9.LSKLVrypmTsS5gVerFZUnTVfbwST9_-xDOpO_0i_KxzKl8se6AoAdyr85VQztRuB_khbEbpWEDatd_yK1r2vUA"]
+                    "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkFETUlOIiwiaXNzIjoicnVubmluZ2hpLXYyLmNvbSIsImlhdCI6MTcxNzY3NjY0MywiZXhwIjoxNzIyODYwNjQzfQ.COT-FPDUOTk5J8auZe770_hl34IF1vcD1KXtcVoDBK7Gv1cX4RqX724hHnFgyU8QBwUKYopH_D2X72ngFYCg9w"]
                     
         }
     }

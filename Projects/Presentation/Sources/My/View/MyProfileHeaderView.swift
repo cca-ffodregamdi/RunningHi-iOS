@@ -22,6 +22,8 @@ class MyProfileHeaderView: UIView{
         var stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 2
+        stackView.distribution = .fillProportionally
+        stackView.alignment = .fill
         return stackView
     }()
     
