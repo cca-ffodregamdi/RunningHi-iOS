@@ -134,9 +134,9 @@ extension ChallengeViewController: View, UITableViewDelegate{
         self.challengeTableView.rx.itemSelected
             .bind{ [weak self] indexPath in
                 guard let self = self else {return}
-                let model = self.dataSource[indexPath]
+                let model = dataSource[indexPath]
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self.coordinator?.showChallengeDetailView()
+                self.coordinator?.showChallengeDetailView(model: model)
             }.disposed(by: self.disposeBag)
     }
     

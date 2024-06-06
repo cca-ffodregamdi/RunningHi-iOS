@@ -14,7 +14,6 @@ import RxKakaoSDKAuth
 import RxKakaoSDKUser
 import KakaoSDKCommon
 import Domain
-import Data
 
 final public class LoginReactor: Reactor{
     public enum Action{

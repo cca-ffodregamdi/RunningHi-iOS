@@ -1,5 +1,5 @@
 //
-//  LoginCoordinatorTest.swift
+//  LoginCoordinator.swift
 //  Coordinator
 //
 //  Created by 유현진 on 6/5/24.
@@ -8,16 +8,16 @@
 import Presentation
 import UIKit
 
-protocol LoginCoordinatorDelegateTest: AnyObject{
-    func didLoggedIn(coordinator: LoginCoordinatorTest)
+protocol LoginCoordinatorDelegate: AnyObject{
+    func didLoggedIn(coordinator: LoginCoordinator)
 }
 
-class LoginCoordinatorTest: CoordinatorTest{
+class LoginCoordinator: Coordinator{
     
     private let navigationController: UINavigationController
     
-    var childCoordinator: [CoordinatorTest] = []
-    var delegate: LoginCoordinatorDelegateTest?
+    var childCoordinator: [Coordinator] = []
+    var delegate: LoginCoordinatorDelegate?
     let loginDiContainer: LoginDIContainer
     
     init(navigationController: UINavigationController) {
@@ -31,13 +31,7 @@ class LoginCoordinatorTest: CoordinatorTest{
     }
 }
 
-//extension LoginCoordinatorTest: LoginViewControllerDelegate{
-//    func login(){
-//        self.delegate?.didLoggedIn(coordinator: self)
-//    }
-//}
-
-extension LoginCoordinatorTest: LoginCoordinatorInterface{
+extension LoginCoordinator: LoginCoordinatorInterface{
     func login(){
         self.delegate?.didLoggedIn(coordinator: self)
     }

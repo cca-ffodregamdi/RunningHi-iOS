@@ -1,5 +1,5 @@
 //
-//  FeedCoordinatorTest.swift
+//  FeedCoordinator.swift
 //  Coordinator
 //
 //  Created by 유현진 on 6/5/24.
@@ -7,9 +7,9 @@
 
 import UIKit
 import Presentation
-class FeedCoordinatorTest: CoordinatorTest{
+class FeedCoordinator: Coordinator{
     
-    var childCoordinator: [CoordinatorTest] = []
+    var childCoordinator: [Coordinator] = []
     
     private var navigationController: UINavigationController!
     
@@ -26,6 +26,6 @@ class FeedCoordinatorTest: CoordinatorTest{
     }
 }
 
-extension FeedCoordinatorTest: FeedCoordinatorInterface{
+extension FeedCoordinator: FeedCoordinatorInterface{
     
 }

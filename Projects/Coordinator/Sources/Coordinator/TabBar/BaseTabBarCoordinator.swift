@@ -1,5 +1,5 @@
 //
-//  BaseTabBarCoordinatorTest.swift
+//  BaseTabBarCoordinator.swift
 //  Coordinator
 //
 //  Created by 유현진 on 6/5/24.
@@ -8,10 +8,10 @@
 import UIKit
 import Common
 
-class BaseTabBarCoordinatorTest: TabBarCoordinatorTest{
+class BaseTabBarCoordinator: TabBarCoordinator{
     var tabBarController: UITabBarController
     
-    var childCoordinator: [CoordinatorTest] = []
+    var childCoordinator: [Coordinator] = []
     
     private var navigationController: UINavigationController!
     
@@ -21,7 +21,7 @@ class BaseTabBarCoordinatorTest: TabBarCoordinatorTest{
     }
     
     func start() {
-        let pages: [TabBarItemTypeTest] = TabBarItemTypeTest.allCases
+        let pages: [TabBarItemType] = TabBarItemType.allCases
         let tabBarItems: [UITabBarItem] = pages.map{ self.createTabBarItem(type: $0) }
         let controllers: [UINavigationController] = tabBarItems.map{
             self.createTabNavigationController(tabBarItem: $0)
@@ -31,7 +31,7 @@ class BaseTabBarCoordinatorTest: TabBarCoordinatorTest{
         self.addTabBarController()
     }
     
-    private func createTabBarItem(type: TabBarItemTypeTest) -> UITabBarItem{
+    private func createTabBarItem(type: TabBarItemType) -> UITabBarItem{
         return UITabBarItem(
             title: type.getTitle(),
             image: type.getImage(),
@@ -48,18 +48,18 @@ class BaseTabBarCoordinatorTest: TabBarCoordinatorTest{
     
     private func startTabCoordinator(tabNavigationController: UINavigationController){
         let tabBarItemTag: Int = tabNavigationController.tabBarItem.tag
-        guard let tabBarItemType: TabBarItemTypeTest = TabBarItemTypeTest(index: tabBarItemTag) else { return }
+        guard let tabBarItemType: TabBarItemType = TabBarItemType(index: tabBarItemTag) else { return }
         
         switch tabBarItemType{
         case .Feed:
-            let feedCoordinator: FeedCoordinatorTest = FeedCoordinatorTest(navigationController: tabNavigationController)
+            let feedCoordinator: FeedCoordinator = FeedCoordinator(navigationController: tabNavigationController)
             self.childCoordinator.append(feedCoordinator)
             feedCoordinator.start()
         case .Challenge:
-            let challengeCoordinator: ChallengeCoordinatorTest = ChallengeCoordinatorTest(navigationController: tabNavigationController)
+            let challengeCoordinator: ChallengeCoordinator = ChallengeCoordinator(navigationController: tabNavigationController)
             self.childCoordinator.append(challengeCoordinator)
             challengeCoordinator.start()
-            tabNavigationController.viewControllers.first?.title = TabBarItemTypeTest.Challenge.getTitle()
+            tabNavigationController.viewControllers.first?.title = TabBarItemType.Challenge.getTitle()
         case .Course:
             let courseCoordinator: RunningCourseCoordinatorTest = RunningCourseCoordinatorTest(navigationController: tabNavigationController)
             self.childCoordinator.append(courseCoordinator)
@@ -67,16 +67,16 @@ class BaseTabBarCoordinatorTest: TabBarCoordinatorTest{
         case .Record:
             return
         case .My:
-            let myCoordinator: MyCoordinatorTest = MyCoordinatorTest(navigationController: tabNavigationController)
+            let myCoordinator: MyCoordinator = MyCoordinator(navigationController: tabNavigationController)
             self.childCoordinator.append(myCoordinator)
             myCoordinator.start()
-            tabNavigationController.viewControllers.first?.title = TabBarItemTypeTest.My.getTitle()
+            tabNavigationController.viewControllers.first?.title = TabBarItemType.My.getTitle()
         }
     }
     
     private func configureTabBarController(tabNavigationController: [UIViewController]){
         self.tabBarController.setViewControllers(tabNavigationController, animated: false)
-        self.tabBarController.selectedIndex = TabBarItemTypeTest.Feed.getNumber()
+        self.tabBarController.selectedIndex = TabBarItemType.Feed.getNumber()
         self.tabBarController.view.backgroundColor = .systemBackground
         self.tabBarController.tabBar.backgroundColor = .systemBackground
         self.tabBarController.tabBar.tintColor = .black

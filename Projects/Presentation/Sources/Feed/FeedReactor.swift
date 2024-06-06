@@ -8,7 +8,6 @@
 import Foundation
 import ReactorKit
 import Domain
-import Data
 import RxSwift
 
 final public class FeedReactor: Reactor{

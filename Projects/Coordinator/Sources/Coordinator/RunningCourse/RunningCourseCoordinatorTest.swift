@@ -8,10 +8,10 @@
 import UIKit
 import Presentation
 
-class RunningCourseCoordinatorTest: CoordinatorTest{
+class RunningCourseCoordinatorTest: Coordinator{
     
     private var navigationController: UINavigationController!
-    var childCoordinator: [CoordinatorTest] = []
+    var childCoordinator: [Coordinator] = []
     
     let runningCourseDIContainer: RunningCourseDIContainer
     

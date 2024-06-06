@@ -19,7 +19,7 @@ class FeedDIContainer{
         return FeedUseCase(repository: feedRepository)
     }()
     
-    func makeFeedViewController(coordinator: FeedCoordinatorTest) -> FeedViewController{
+    func makeFeedViewController(coordinator: FeedCoordinator) -> FeedViewController{
         let feedUseCase = feedUseCase
         let vc = FeedViewController(reactor: FeedReactor(feedUseCase: feedUseCase))
         vc.coordinator = coordinator

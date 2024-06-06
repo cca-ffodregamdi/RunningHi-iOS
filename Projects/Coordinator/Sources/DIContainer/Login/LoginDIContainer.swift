@@ -21,7 +21,7 @@ class LoginDIContainer{
         return LoginUseCase(loginRepository: loginRepository)
     }()
     
-    func makeLoginViewController(coordinator: LoginCoordinatorTest) -> LoginViewController{
+    func makeLoginViewController(coordinator: LoginCoordinator) -> LoginViewController{
         let loginUseCase = loginUseCase
         let vc = LoginViewController(reactor: LoginReactor(loginUseCase: loginUseCase))
         vc.coordinator = coordinator

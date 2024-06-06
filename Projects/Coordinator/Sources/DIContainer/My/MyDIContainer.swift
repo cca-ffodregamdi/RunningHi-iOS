@@ -13,7 +13,7 @@ import Domain
 class MyDIContainer{
     
     
-    func makeMyViewController(coordinator: MyCoordinatorTest) -> MyViewController{
+    func makeMyViewController(coordinator: MyCoordinator) -> MyViewController{
         let vc = MyViewController()
         vc.coordinator = coordinator
         return vc

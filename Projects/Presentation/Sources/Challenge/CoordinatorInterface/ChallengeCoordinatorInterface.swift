@@ -6,7 +6,8 @@
 //
 
 import Foundation
+import Domain
 
 public protocol ChallengeCoordinatorInterface{
-    func showChallengeDetailView()
+    func showChallengeDetailView(model: ChallengeModel)
 }

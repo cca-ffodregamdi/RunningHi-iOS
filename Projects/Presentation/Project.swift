@@ -20,7 +20,6 @@ let project = Project(
             resources: ["Resources/**"],
             dependencies: [
                 .project(target: "Domain", path: .relativeToRoot("Projects/Domain")),
-                .project(target: "Data", path: .relativeToRoot("Projects/Data")),
                 .project(target: "Common", path: .relativeToRoot("Projects/Common")),
                 .external(name: "ReactorKit"),
                 .external(name: "RxSwift"),

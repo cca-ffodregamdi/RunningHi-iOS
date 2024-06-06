@@ -44,7 +44,6 @@ let project = Project(
             dependencies: [
                 .project(target: "Coordinator", path: .relativeToRoot("Projects/Coordinator")),
                 .project(target: "Presentation", path: .relativeToRoot("Projects/Presentation")),
-                .external(name: "Kingfisher"),
                 .external(name: "KakaoSDKAuth"),
                 .external(name: "KakaoSDKCommon"),
             ]

@@ -1,5 +1,5 @@
 //
-//  AppCoordinatorTest.swift
+//  AppCoordinator.swift
 //  Coordinator
 //
 //  Created by 유현진 on 6/5/24.
@@ -7,10 +7,8 @@
 
 import UIKit
 
-public class AppCoordinatorTest: CoordinatorTest{
-    
-    
-    var childCoordinator: [CoordinatorTest] = []
+public class AppCoordinator: Coordinator{
+    var childCoordinator: [Coordinator] = []
     
     private var navigationController: UINavigationController!
     
@@ -28,21 +26,21 @@ public class AppCoordinatorTest: CoordinatorTest{
     
     private func showBaseTabBarController(){
         self.navigationController.viewControllers.removeAll()
-        let coordinator = BaseTabBarCoordinatorTest(navigationController: self.navigationController)
+        let coordinator = BaseTabBarCoordinator(navigationController: self.navigationController)
         coordinator.start()
         self.childCoordinator.append(coordinator)
     }
     
     private func showLoginViewController(){
-        let coordinator = LoginCoordinatorTest(navigationController: self.navigationController)
+        let coordinator = LoginCoordinator(navigationController: self.navigationController)
         coordinator.start()
         coordinator.delegate = self
         self.childCoordinator.append(coordinator)
     }
 }
 
-extension AppCoordinatorTest: LoginCoordinatorDelegateTest{
-    func didLoggedIn(coordinator: LoginCoordinatorTest) {
+extension AppCoordinator: LoginCoordinatorDelegate{
+    func didLoggedIn(coordinator: LoginCoordinator) {
         self.childCoordinator = self.childCoordinator.filter{$0 !== coordinator}
         self.showBaseTabBarController()
     }

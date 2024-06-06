@@ -20,10 +20,24 @@ class ChallengeDIContainer{
         return ChallengeUseCase(repository: challengeRepository)
     }()
     
-    func makeChallengeViewController(coordinator: ChallengeCoordinatorTest) -> ChallengeViewController{
+    func makeChallengeViewController(coordinator: ChallengeCoordinator) -> ChallengeViewController{
         let challengeUseCase = challengeUseCase
         let vc = ChallengeViewController(reactor: ChallengeReactor(challengeUseCase: challengeUseCase))
         vc.coordinator = coordinator
         return vc
     }
+    
+    
+    
+    
+    func makeChallengeDetailViewController(model: ChallengeModel, coordinator: ChallengeCoordinator) -> ChallengeDetailViewController{
+        let challengeUseCase = challengeUseCase
+        let vc = ChallengeDetailViewController(challengeModel: model, reactor: ChallengeDetailReactor(challengeUseCase: challengeUseCase))
+        vc.coordinator = coordinator
+        return vc
+    }
+    
+    
+    
+    
 }

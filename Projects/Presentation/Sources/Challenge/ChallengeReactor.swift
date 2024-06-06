@@ -9,7 +9,6 @@ import Foundation
 import ReactorKit
 import RxSwift
 import Domain
-import Data
 
 public class ChallengeReactor: Reactor{
     public enum Action{

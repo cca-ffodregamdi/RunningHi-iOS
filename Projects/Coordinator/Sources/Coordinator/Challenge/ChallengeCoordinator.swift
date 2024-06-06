@@ -1,5 +1,5 @@
 //
-//  ChallengeCoordinatorTest.swift
+//  ChallengeCoordinator.swift
 //  Coordinator
 //
 //  Created by 유현진 on 6/5/24.
@@ -7,10 +7,11 @@
 
 import UIKit
 import Presentation
+import Domain
 
-class ChallengeCoordinatorTest: CoordinatorTest{
+class ChallengeCoordinator: Coordinator{
     
-    var childCoordinator: [CoordinatorTest] = []
+    var childCoordinator: [Coordinator] = []
     let challengeDIContainer: ChallengeDIContainer
     
     private let navigationController: UINavigationController
@@ -25,8 +26,10 @@ class ChallengeCoordinatorTest: CoordinatorTest{
         self.navigationController.pushViewController(vc, animated: true)
     }
 }
-extension ChallengeCoordinatorTest: ChallengeCoordinatorInterface{
-    func showChallengeDetailView() {
-        
+
+extension ChallengeCoordinator: ChallengeCoordinatorInterface{
+    func showChallengeDetailView(model: ChallengeModel) {
+        let vc = challengeDIContainer.makeChallengeDetailViewController(model: model, coordinator: self)
+        self.navigationController.pushViewController(vc, animated: true)
     }
 }
