@@ -9,7 +9,7 @@ import Foundation
 import ReactorKit
 import RxDataSources
 
-final class MyReactor: Reactor{
+final public class MyReactor: Reactor{
     
     public enum Action{
         case load
@@ -23,13 +23,13 @@ final class MyReactor: Reactor{
         var items: [MyPageItem] = []
     }
     
-    var initialState: State
+    public var initialState: State
     
-    init(){
+    public init(){
         self.initialState = State()
     }
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .load:
             let items: [MyPageItem] = [
@@ -41,7 +41,7 @@ final class MyReactor: Reactor{
         }
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation{
         case .setSections(let sections):

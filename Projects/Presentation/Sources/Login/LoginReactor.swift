@@ -14,9 +14,8 @@ import RxKakaoSDKAuth
 import RxKakaoSDKUser
 import KakaoSDKCommon
 import Domain
-import Data
 
-final class LoginReactor: Reactor{
+final public class LoginReactor: Reactor{
     public enum Action{
         case kakaoLogin
     }
@@ -39,12 +38,12 @@ final class LoginReactor: Reactor{
     public let initialState: State
     private let loginUseCase: LoginUseCase
     
-    public init() {
+    public init(loginUseCase: LoginUseCase) {
         self.initialState = State()
-        self.loginUseCase = LoginUseCase(loginRepository: LoginRepositoryImplementation())
+        self.loginUseCase = loginUseCase
     }
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .kakaoLogin:
             return Observable.concat([
@@ -59,7 +58,7 @@ final class LoginReactor: Reactor{
         }
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         var state = state
         switch mutation{
         case .getKakaoToken(let token):

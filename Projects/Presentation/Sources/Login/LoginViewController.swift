@@ -11,25 +11,27 @@ import ReactorKit
 import SnapKit
 import Domain
 
-protocol LoginViewControllerDelegate: AnyObject{
+public protocol LoginViewControllerDelegate: AnyObject{
     func login()
 }
 
-final class LoginViewController: UIViewController {
+final public class LoginViewController: UIViewController {
     
     // MARK: Properties
     
-    var disposeBag: DisposeBag = DisposeBag()
+    public var disposeBag: DisposeBag = DisposeBag()
     
     weak var delegate: LoginViewControllerDelegate?
+    
+    public var coordinator: LoginCoordinatorInterface?
     
     private lazy var loginView: LoginView = {
         return LoginView()
     }()
     
-    init(){
-        super.init(nibName: nil, bundle: nil)   
-        self.reactor = LoginReactor()
+    public init(reactor: LoginReactor){
+        super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -42,7 +44,7 @@ final class LoginViewController: UIViewController {
     
     // MARK: Lifecycles
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
     }
@@ -62,7 +64,7 @@ final class LoginViewController: UIViewController {
 
 
 extension LoginViewController: View{
-    func bind(reactor: LoginReactor){
+    public func bind(reactor: LoginReactor){
         loginView.kakaoLoginButton.rx.tap
             .map{ Reactor.Action.kakaoLogin }
             .bind(to: reactor.action)
@@ -73,7 +75,8 @@ extension LoginViewController: View{
             .distinctUntilChanged()
             .bind{ [weak self] isLogin in
                 if isLogin{
-                    self?.delegate?.login()
+//                    self?.delegate?.login()
+                    self?.coordinator?.login()
                 }
             }.disposed(by: self.disposeBag)
         

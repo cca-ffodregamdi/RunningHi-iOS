@@ -9,9 +9,8 @@ import Foundation
 import ReactorKit
 import RxSwift
 import Domain
-import Data
 
-class ChallengeReactor: Reactor{
+public class ChallengeReactor: Reactor{
     public enum Action{
         case fetchChallenge
     }
@@ -24,14 +23,15 @@ class ChallengeReactor: Reactor{
         var section: [ChallengeSection] = []
     }
     
-    var initialState: State
-    private let challengeUseCase = ChallengeUseCase(repository: ChallengeRepositoryImplementation())
+    public var initialState: State
+    private let challengeUseCase: ChallengeUseCase
     
-    public init() {
+    public init(challengeUseCase: ChallengeUseCase) {
         self.initialState = State()
+        self.challengeUseCase = challengeUseCase
     }
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .fetchChallenge: 
             return self.challengeUseCase.getChallengeList()
@@ -39,7 +39,7 @@ class ChallengeReactor: Reactor{
         }
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation{
         case .setChallenge(let challenges):

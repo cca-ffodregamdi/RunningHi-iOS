@@ -1,8 +1,8 @@
 //
 //  BaseTabBarCoordinator.swift
-//  Presentation
+//  Coordinator
 //
-//  Created by 유현진 on 5/9/24.
+//  Created by 유현진 on 6/5/24.
 //
 
 import UIKit
@@ -60,12 +60,11 @@ class BaseTabBarCoordinator: TabBarCoordinator{
             self.childCoordinator.append(challengeCoordinator)
             challengeCoordinator.start()
             tabNavigationController.viewControllers.first?.title = TabBarItemType.Challenge.getTitle()
-            return
         case .Course:
-            let courseCoordinator: RunningCourseCoordinator = RunningCourseCoordinator(navigationController: tabNavigationController)
+            let courseCoordinator: RunningCourseCoordinatorTest = RunningCourseCoordinatorTest(navigationController: tabNavigationController)
             self.childCoordinator.append(courseCoordinator)
             courseCoordinator.start()
-        case .Rank:
+        case .Record:
             return
         case .My:
             let myCoordinator: MyCoordinator = MyCoordinator(navigationController: tabNavigationController)

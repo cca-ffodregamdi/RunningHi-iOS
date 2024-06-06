@@ -1,11 +1,11 @@
 //
 //  Coordinator.swift
-//  Presentation
+//  Coordinator
 //
-//  Created by 유현진 on 5/3/24.
+//  Created by 유현진 on 6/5/24.
 //
 
-import UIKit
+import Foundation
 
 protocol Coordinator: AnyObject{
     var childCoordinator: [Coordinator] {get set}

@@ -8,10 +8,9 @@
 import Foundation
 import ReactorKit
 import Domain
-import Data
 import RxSwift
 
-final class FeedReactor: Reactor{
+final public class FeedReactor: Reactor{
     
     public enum Action{
         case fetchFeeds
@@ -31,12 +30,12 @@ final class FeedReactor: Reactor{
     public let initialState: State
     private let feedUseCase: FeedUseCase
     
-    public init(){
+    public init(feedUseCase: FeedUseCase){
         self.initialState = State()
-        self.feedUseCase = FeedUseCase(repository: FeedRepositoryImplementation())
+        self.feedUseCase = feedUseCase
     }
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .fetchFeeds:
             return self.feedUseCase.fetchFeeds(page: 0, size: 10, keyword: [])
@@ -51,7 +50,7 @@ final class FeedReactor: Reactor{
         }
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation{
         case .setFeeds(let feeds):

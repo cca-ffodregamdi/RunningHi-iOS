@@ -14,11 +14,12 @@ import RxCocoa
 import ReactorKit
 import Common
 
-final class ChallengeDetailViewController: UIViewController{
+final public class ChallengeDetailViewController: UIViewController{
 
     // MARK: Properties
     var challengeModel: ChallengeModel
-    var disposeBag: DisposeBag = DisposeBag()
+    public var disposeBag: DisposeBag = DisposeBag()
+    public var coordinator: ChallengeCoordinatorInterface?
     
     private var dataSource: RxTableViewSectionedReloadDataSource<SectionModel<String, RankModel>>!
     
@@ -54,23 +55,23 @@ final class ChallengeDetailViewController: UIViewController{
     }()
     
     // MARK: LifeCyecle
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         configureNavigationBar()
         configureUI()
     }
     
-    init(challengeModel: ChallengeModel) {
+    public init(challengeModel: ChallengeModel, reactor: ChallengeDetailReactor) {
         self.challengeModel = challengeModel
         super.init(nibName: nil, bundle: nil)
-        self.reactor = ChallengeDetailReactor()
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigationBar()
     }
@@ -140,7 +141,7 @@ final class ChallengeDetailViewController: UIViewController{
 
 extension ChallengeDetailViewController: View, UITableViewDelegate{
 
-    func bind(reactor: ChallengeDetailReactor) {
+    public func bind(reactor: ChallengeDetailReactor) {
         reactor.action.onNext(.fetchRank)
         
         self.dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, RankModel>>(configureCell: {

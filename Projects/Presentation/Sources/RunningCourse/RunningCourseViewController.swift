@@ -15,11 +15,12 @@ protocol RunningCourseViewControllerDelegate {
     func didFinishCourse()
 }
 
-final class RunningCourseViewController: UIViewController, View {
+final public class RunningCourseViewController: UIViewController, View {
     
-    var disposeBag = DisposeBag()
+    public var disposeBag = DisposeBag()
     var delegate: RunningCourseViewControllerDelegate?
-    var reactor: RunningCourseReactor? {
+    public var coordinator: RunningCourseCoordinatorInterface?
+    public var reactor: RunningCourseReactor? {
         didSet {
             if let reactor = reactor {
                 bind(reactor: reactor)
@@ -34,7 +35,7 @@ final class RunningCourseViewController: UIViewController, View {
     private var stopAnnotation: MKPointAnnotation?
     private let defaultSpanValue = MKCoordinateSpan(latitudeDelta: 0.003, longitudeDelta: 0.003)
         
-    init() {
+    public init() {
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -46,7 +47,7 @@ final class RunningCourseViewController: UIViewController, View {
         print("deinit RunningCourseViewController")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         configureLocation()
@@ -126,7 +127,7 @@ final class RunningCourseViewController: UIViewController, View {
 }
 
 extension RunningCourseViewController: MKMapViewDelegate {
-    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+    public func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         if let polyline = overlay as? MKPolyline {
             let renderer = MKPolylineRenderer(polyline: polyline)
             renderer.strokeColor = .blue
@@ -139,7 +140,7 @@ extension RunningCourseViewController: MKMapViewDelegate {
 }
 
 extension RunningCourseViewController {
-    func bind(reactor: RunningCourseReactor) {
+    public func bind(reactor: RunningCourseReactor) {
         runningCourseView.startButton.rx.tap
             .do(onNext: { [weak self] in
                 self?.runningCourseView.mapView.mapView.removeOverlays(self?.runningCourseView.mapView.mapView.overlays ?? [])

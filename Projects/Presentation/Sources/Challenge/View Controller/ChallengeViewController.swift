@@ -14,11 +14,13 @@ import RxDataSources
 import Domain
 import Common
 
-final class ChallengeViewController: UIViewController{
+final public class ChallengeViewController: UIViewController{
     
     // MARK: Properties
-    var disposeBag: DisposeBag = DisposeBag()
-    var coordinator: ChallengeCoordinator
+    public var disposeBag: DisposeBag = DisposeBag()
+//    var coordinator: ChallengeCoordinator
+    public var coordinator: ChallengeCoordinatorInterface?
+    
     private var dataSource: RxTableViewSectionedReloadDataSource<ChallengeSection>!
     
     private lazy var challengeHeaderView: ChallengeHeaderView = {
@@ -51,22 +53,22 @@ final class ChallengeViewController: UIViewController{
     }()
     
     // MARK: LifeCyecle
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         configureNavigationBarItem()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.title = "챌린지"
         self.navigationController?.navigationBar.prefersLargeTitles = false
     }
     
-    init(coordinator: ChallengeCoordinator){
-        self.coordinator = coordinator
+    public init(reactor: ChallengeReactor){
+//        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
-        self.reactor = ChallengeReactor()
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -111,7 +113,7 @@ final class ChallengeViewController: UIViewController{
 
 extension ChallengeViewController: View, UITableViewDelegate{
     
-    func bind(reactor: ChallengeReactor) {
+    public func bind(reactor: ChallengeReactor) {
         Observable.just(Reactor.Action.fetchChallenge)
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
@@ -132,13 +134,13 @@ extension ChallengeViewController: View, UITableViewDelegate{
         self.challengeTableView.rx.itemSelected
             .bind{ [weak self] indexPath in
                 guard let self = self else {return}
-                let model = self.dataSource[indexPath]
+                let model = dataSource[indexPath]
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self.coordinator.showChallengeDetail(model: model)
+                self.coordinator?.showChallengeDetailView(model: model)
             }.disposed(by: self.disposeBag)
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "challengeHeaderView") as! ChallengeHeaderFooterView
         headerView.configureModel(title: dataSource[section].header)
         return headerView

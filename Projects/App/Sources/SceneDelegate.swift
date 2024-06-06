@@ -7,7 +7,7 @@
 
 import UIKit
 import KakaoSDKAuth
-import Presentation
+import Coordinator
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     

@@ -9,9 +9,8 @@ import Foundation
 import ReactorKit
 import RxSwift
 import Domain
-import Data
 
-class ChallengeDetailReactor: Reactor{
+public class ChallengeDetailReactor: Reactor{
     public enum Action{
         case fetchRank
     }
@@ -25,22 +24,22 @@ class ChallengeDetailReactor: Reactor{
         var otherRank: [RankModel] = []
     }
     
-    var initialState: State
-    var usecase: ChallengeUseCase
-    public init() {
+    public var initialState: State
+    var challengeUseCase: ChallengeUseCase
+    public init(challengeUseCase: ChallengeUseCase) {
         self.initialState = State()
-        usecase = .init(repository: ChallengeRepositoryImplementation())
+        self.challengeUseCase = challengeUseCase
     }
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .fetchRank:
-            return usecase.getRank()
+            return challengeUseCase.getRank()
                 .map{ Mutation.setRank($0)}
         }
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation{
         case .setRank(let models):

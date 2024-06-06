@@ -1,25 +1,27 @@
 //
 //  Project.swift
-//  Config
+//  Packages
 //
-//  Created by 유현진 on 5/1/24.
+//  Created by 유현진 on 6/5/24.
 //
 
 import ProjectDescription
 
 let project = Project(
-    name: "Presentation",
+    name: "Coordinator",
     targets: [
         .target(
-            name: "Presentation",
+            name: "Coordinator",
             destinations: .iOS,
             product: .framework,
-            bundleId: "com.RunningHi.presentation",
+            bundleId: "com.RunningHi.coordinator",
             infoPlist: .default,
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
+                .project(target: "Presentation", path: .relativeToRoot("Projects/Presentation")),
                 .project(target: "Domain", path: .relativeToRoot("Projects/Domain")),
+                .project(target: "Data", path: .relativeToRoot("Projects/Data")),
                 .project(target: "Common", path: .relativeToRoot("Projects/Common")),
                 .external(name: "ReactorKit"),
                 .external(name: "RxSwift"),
