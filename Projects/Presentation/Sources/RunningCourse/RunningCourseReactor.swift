@@ -8,6 +8,7 @@
 import ReactorKit
 import RxSwift
 import CoreLocation
+import MapKit
 
 final class RunningCourseReactor: Reactor {
     
@@ -19,35 +20,42 @@ final class RunningCourseReactor: Reactor {
     }
     
     enum Mutation {
-        case setCoordinates([CLLocationCoordinate2D])
+        case setRouteInfo([RouteInfo])
         case setRunning(Bool)
         case setCurrentLocation(CLLocationCoordinate2D)
         case moveToCurrentLocation(CLLocationCoordinate2D)
+        case setStartLocation(CLLocationCoordinate2D)
+        case setStopLocation(CLLocationCoordinate2D)
+        case clearCourse
+        case setRegion(MKCoordinateRegion?)
     }
     
     struct State {
-        var coordinates: [CLLocationCoordinate2D] = []
+        var routeInfos: [RouteInfo] = []
         var isRunning: Bool = false
         var currentLocation: CLLocationCoordinate2D?
         var moveToLocation: CLLocationCoordinate2D?
+        var startLocation: CLLocationCoordinate2D?
+        var stopLocation: CLLocationCoordinate2D?
+        var region: MKCoordinateRegion?
     }
     
     let initialState = State()
     private let locationManager = LocationManager.shared
-    private let timer = Observable<Int>.interval(.seconds(5), scheduler: MainScheduler.instance)
     private let disposeBag = DisposeBag()
+    private var lastLocation: CLLocationCoordinate2D?
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .startRunningCourse:
-            return startRunningCourse()
+            return Observable.concat([
+                Observable.just(Mutation.clearCourse),
+                startRunningCourse()
+            ])
         case .stopRunningCourse:
-            locationManager.stopLocationUpdates()
-            return Observable.just(Mutation.setRunning(false))
+            return stopRunningCourse()
         case .moveToCurrentLocation:
-            guard let currentLocation = locationManager.location?.coordinate else {
-                return Observable.empty()
-            }
+            let currentLocation = LocationManager.routeInfo.coordinate
             return Observable.just(Mutation.moveToCurrentLocation(currentLocation))
         case .initializeLocation:
             return initializeLocation()
@@ -63,37 +71,77 @@ final class RunningCourseReactor: Reactor {
     }
     
     private func startRunningCourse() -> Observable<Mutation> {
+        locationManager.startMonitoringMotion()
         locationManager.startLocationUpdates()
-        
-        let locationObservable = locationManager.rx.didUpdateLocations
-            .map { $0.last?.coordinate }
+        lastLocation = nil
+        locationManager.isStartRunning = true
+        let locationObservable = locationManager.didUpdateLocationsSubject
+            .map { $0.last }
             .compactMap { $0 }
-            .map(Mutation.setCurrentLocation)
-        
-        let timerObservable = timer
-            .withLatestFrom(locationManager.rx.didUpdateLocations)
-            .map { $0.map { $0.coordinate } }
-            .distinctUntilChanged()
-            .map(Mutation.setCoordinates)
-        
+            .flatMapLatest { [currentState = self.currentState] newLocation -> Observable<Mutation> in
+                var updatedRouteInfos = currentState.routeInfos
+                let newRouteInfo = RouteInfo(latitude: newLocation.coordinate.latitude, longitude: newLocation.coordinate.longitude, timestamp: Date())
+                updatedRouteInfos.append(newRouteInfo)
+                self.lastLocation = newLocation.coordinate
+                let region = MKCoordinateRegion(coordinates: updatedRouteInfos.map { $0.coordinate })
+                return Observable.concat([
+                    Observable.just(Mutation.setRouteInfo(updatedRouteInfos)),
+                    Observable.just(Mutation.setRegion(region))
+                ])
+            }
+
+        let startLocationObservable = locationManager.didUpdateLocationsSubject
+            .map { $0.last }
+            .compactMap { $0 }
+            .take(1)
+            .map { location in
+                Mutation.setStartLocation(location.coordinate)
+            }
+
         return Observable.merge(
             Observable.just(Mutation.setRunning(true)),
-            locationObservable,
-            timerObservable
+            startLocationObservable,
+            locationObservable
         )
+    }
+    
+    private func stopRunningCourse() -> Observable<Mutation> {
+        locationManager.stopLocationUpdates()
+        locationManager.isStartRunning = false
+        
+        let lastLocation = LocationManager.routeInfo.coordinate
+        let stopLocationMutation = Observable.just(Mutation.setStopLocation(lastLocation))
+        let routeInfoMutation = Observable.just(Mutation.setRouteInfo(currentState.routeInfos))
+        
+        print("RouteInfos: \(currentState.routeInfos)")
+        return Observable.concat([
+            stopLocationMutation,
+            routeInfoMutation,
+            Observable.just(Mutation.setRunning(false))
+        ])
     }
     
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setCoordinates(let coordinates):
-            newState.coordinates.append(contentsOf: coordinates)
+        case .setRouteInfo(let routeInfos):
+            newState.routeInfos = routeInfos
         case .setRunning(let isRunning):
             newState.isRunning = isRunning
         case .setCurrentLocation(let location):
             newState.currentLocation = location
         case .moveToCurrentLocation(let location):
             newState.moveToLocation = location
+        case .setStartLocation(let location):
+            newState.startLocation = location
+        case .setStopLocation(let location):
+            newState.stopLocation = location
+        case .clearCourse:
+            newState.routeInfos = []
+            newState.startLocation = nil
+            newState.stopLocation = nil
+        case .setRegion(let region):
+            newState.region = region
         }
         return newState
     }
