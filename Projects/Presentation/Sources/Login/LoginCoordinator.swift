@@ -11,7 +11,7 @@ protocol LoginCoordinatorDelegate: AnyObject{
     func didLoggedIn(coordinator: LoginCoordinator)
 }
 
-class LoginCoordinator: Coordinator, LoginViewControllerDelegate{
+public class LoginCoordinator: Coordinator, LoginViewControllerDelegate{
     
     var delegate: LoginCoordinatorDelegate?
     
@@ -24,16 +24,16 @@ class LoginCoordinator: Coordinator, LoginViewControllerDelegate{
     }
     
     func start() {
-        let vc = LoginViewController()
-        vc.delegate = self
-        self.navigationController.viewControllers = [vc]
+//        let vc = LoginViewController()
+//        vc.delegate = self
+//        self.navigationController.viewControllers = [vc]
     }
     
     deinit{
         print("deinit LoginCoordinator")
     }
     
-    func login() {
+    public func login() {
         self.delegate?.didLoggedIn(coordinator: self)
     }
 }

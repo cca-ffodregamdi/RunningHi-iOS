@@ -12,9 +12,13 @@ import RxCocoa
 import ReactorKit
 import RxDataSources
 
-class MyViewController: UIViewController, View{
+final public class MyViewController: UIViewController, View{
+    
+    public var disposeBag: DisposeBag = DisposeBag()
     
     typealias DataSource = RxTableViewSectionedReloadDataSource<MyPageSection>
+    
+    public var coordinator: MyCoordinatorInterface?
     
     // MARK: Properties
     private lazy var scrollView: UIScrollView = {
@@ -35,16 +39,16 @@ class MyViewController: UIViewController, View{
         return tableView
     }()
     
-    var disposeBag: DisposeBag = DisposeBag()
+    
     
     // MARK: LifeCycle
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         initTableView()
     }
     
-    init() {
+    public init() {
         super.init(nibName: nil, bundle: nil)
         self.reactor = MyReactor()
     }
@@ -84,7 +88,7 @@ class MyViewController: UIViewController, View{
         }
     }
     
-    func bind(reactor: MyReactor) {
+    public func bind(reactor: MyReactor) {
         Observable.just(Reactor.Action.load)
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)

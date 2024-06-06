@@ -18,8 +18,8 @@ class ChallengeCoordinator: Coordinator{
     }
     
     func start() {
-        let vc = ChallengeViewController(coordinator: self)
-        navigationController.viewControllers = [vc]
+//        let vc = ChallengeViewController(coordinator: self)
+//        navigationController.viewControllers = [vc]
     }
     
     func showChallengeDetail(model: ChallengeModel){

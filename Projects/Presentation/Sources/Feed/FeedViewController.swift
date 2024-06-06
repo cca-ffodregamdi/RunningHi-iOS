@@ -14,10 +14,12 @@ import SnapKit
 import RxDataSources
 import Domain
 
-final class FeedViewController: UIViewController{
+final public class FeedViewController: UIViewController{
     
     // MARK: Properties
-    var disposeBag: DisposeBag = DisposeBag()
+    public var disposeBag: DisposeBag = DisposeBag()
+    
+    public var coordinator: FeedCoordinatorInterface?
     
     private lazy var filterButton: UIButton = {
         let button = UIButton()
@@ -52,7 +54,7 @@ final class FeedViewController: UIViewController{
     }()
     
     // MARK: LifeCycle
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
           
         configureUI()
@@ -89,9 +91,9 @@ final class FeedViewController: UIViewController{
         feedRefreshControl.endRefreshing()
     }
     
-    init(){
+    public init(reactor: FeedReactor){
         super.init(nibName: nil, bundle: nil)
-        self.reactor = FeedReactor() 
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -101,7 +103,7 @@ final class FeedViewController: UIViewController{
 
 extension FeedViewController: View{
     
-    func bind(reactor: FeedReactor) {
+    public func bind(reactor: FeedReactor) {
         Observable.just(Reactor.Action.fetchFeeds)
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
@@ -135,7 +137,7 @@ extension FeedViewController: View{
 }
 
 extension FeedViewController: UICollectionViewDelegateFlowLayout{
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.bounds.width, height: 400)
     }
 }

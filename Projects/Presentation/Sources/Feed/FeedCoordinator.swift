@@ -18,8 +18,8 @@ class FeedCoordinator: Coordinator{
     }
     
     func start() {
-        let vc = FeedViewController()
-        self.navigationController.viewControllers = [vc]
+//        let vc = FeedViewController()
+//        self.navigationController.viewControllers = [vc]
     }
     
     deinit{

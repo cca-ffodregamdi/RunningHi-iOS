@@ -8,6 +8,7 @@
 import UIKit
 import KakaoSDKAuth
 import Presentation
+import Coordinator
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -20,7 +21,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let navigationController = UINavigationController()
         navigationController.isNavigationBarHidden = true
-        let coordinator = AppCoordinator(navigationController: navigationController)
+//        let coordinator = AppCoordinator(navigationController: navigationController)
+        let coordinator = AppCoordinatorTest(navigationController: navigationController)
         coordinator.start()
         
         window?.rootViewController = navigationController

@@ -13,7 +13,7 @@ struct MyPageSection {
     var items: [MyPageItem]
 }
 
-enum MyPageItem: Int, CaseIterable {
+public enum MyPageItem: Int, CaseIterable {
     case myFeed
     case notices
     case feedback

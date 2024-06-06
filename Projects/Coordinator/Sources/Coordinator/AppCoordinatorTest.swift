@@ -1,15 +1,16 @@
 //
-//  AppCoorinator.swift
-//  Presentation
+//  AppCoordinatorTest.swift
+//  Coordinator
 //
-//  Created by 유현진 on 5/3/24.
+//  Created by 유현진 on 6/5/24.
 //
 
 import UIKit
 
-final public class AppCoordinator: Coordinator{
+public class AppCoordinatorTest: CoordinatorTest{
     
-    var childCoordinator: [Coordinator] = []
+    
+    var childCoordinator: [CoordinatorTest] = []
     
     private var navigationController: UINavigationController!
     
@@ -18,10 +19,7 @@ final public class AppCoordinator: Coordinator{
     }
     
     public func start() {
-        // TODO: 토큰 유효성 검증, 백엔드 API 추가되면 적용
-        // TODO: splash 에서 검증 후 start()에 매개변수로 전달?
-//        if let object = UserDefaults.standard.object(forKey: "accessToken"){
-        if true{
+        if false{
             self.showBaseTabBarController()
         }else{
             self.showLoginViewController()
@@ -30,23 +28,22 @@ final public class AppCoordinator: Coordinator{
     
     private func showBaseTabBarController(){
         self.navigationController.viewControllers.removeAll()
-        let coordinator = BaseTabBarCoordinator(navigationController: self.navigationController)
+        let coordinator = BaseTabBarCoordinatorTest(navigationController: self.navigationController)
         coordinator.start()
         self.childCoordinator.append(coordinator)
     }
     
     private func showLoginViewController(){
-        let coordinator = LoginCoordinator(navigationController: self.navigationController)
-        coordinator.delegate = self
+        let coordinator = LoginCoordinatorTest(navigationController: self.navigationController)
         coordinator.start()
+        coordinator.delegate = self
         self.childCoordinator.append(coordinator)
     }
 }
 
-extension AppCoordinator: LoginCoordinatorDelegate{
-    public func didLoggedIn(coordinator: LoginCoordinator) {
+extension AppCoordinatorTest: LoginCoordinatorDelegateTest{
+    func didLoggedIn(coordinator: LoginCoordinatorTest) {
         self.childCoordinator = self.childCoordinator.filter{$0 !== coordinator}
         self.showBaseTabBarController()
     }
 }
-
