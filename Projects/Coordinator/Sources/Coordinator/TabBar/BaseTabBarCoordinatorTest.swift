@@ -61,11 +61,10 @@ class BaseTabBarCoordinatorTest: TabBarCoordinatorTest{
             challengeCoordinator.start()
             tabNavigationController.viewControllers.first?.title = TabBarItemTypeTest.Challenge.getTitle()
         case .Course:
-            break
-//            let courseCoordinator: RunningCourseCoordinator = RunningCourseCoordinator(navigationController: tabNavigationController)
-//            self.childCoordinator.append(courseCoordinator)
-//            courseCoordinator.start()
-        case .Rank:
+            let courseCoordinator: RunningCourseCoordinatorTest = RunningCourseCoordinatorTest(navigationController: tabNavigationController)
+            self.childCoordinator.append(courseCoordinator)
+            courseCoordinator.start()
+        case .Record:
             return
         case .My:
             let myCoordinator: MyCoordinatorTest = MyCoordinatorTest(navigationController: tabNavigationController)

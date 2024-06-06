@@ -10,16 +10,16 @@ import RxSwift
 import CoreLocation
 import MapKit
 
-final class RunningCourseReactor: Reactor {
+final public class RunningCourseReactor: Reactor {
     
-    enum Action {
+    public enum Action {
         case startRunningCourse
         case stopRunningCourse
         case moveToCurrentLocation
         case initializeLocation
     }
     
-    enum Mutation {
+    public enum Mutation {
         case setRouteInfo([RouteInfo])
         case setRunning(Bool)
         case setCurrentLocation(CLLocationCoordinate2D)
@@ -30,7 +30,7 @@ final class RunningCourseReactor: Reactor {
         case setRegion(MKCoordinateRegion?)
     }
     
-    struct State {
+    public struct State {
         var routeInfos: [RouteInfo] = []
         var isRunning: Bool = false
         var currentLocation: CLLocationCoordinate2D?
@@ -40,12 +40,12 @@ final class RunningCourseReactor: Reactor {
         var region: MKCoordinateRegion?
     }
     
-    let initialState = State()
+    public let initialState = State()
     private let locationManager = LocationManager.shared
     private let disposeBag = DisposeBag()
     private var lastLocation: CLLocationCoordinate2D?
     
-    func mutate(action: Action) -> Observable<Mutation> {
+    public func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .startRunningCourse:
             return Observable.concat([
@@ -121,7 +121,7 @@ final class RunningCourseReactor: Reactor {
         ])
     }
     
-    func reduce(state: State, mutation: Mutation) -> State {
+    public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
         case .setRouteInfo(let routeInfos):
