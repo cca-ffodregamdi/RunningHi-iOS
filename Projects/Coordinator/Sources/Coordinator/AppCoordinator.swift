@@ -6,8 +6,12 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 public class AppCoordinator: Coordinator{
+    
+    var disposeBag: DisposeBag = DisposeBag()
     var childCoordinator: [Coordinator] = []
     
     private var navigationController: UINavigationController!
@@ -17,7 +21,16 @@ public class AppCoordinator: Coordinator{
     }
     
     public func start() {
-        if false{
+//        AuthManager.shared.isValidAccessToken()
+//            .bind{ bool in
+//                print(bool)
+//                if bool{
+//                    self.showBaseTabBarController()
+//                }else{
+//                    self.showLoginViewController()
+//                }
+//            }.disposed(by: self.disposeBag)
+        if true{
             self.showBaseTabBarController()
         }else{
             self.showLoginViewController()

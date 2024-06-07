@@ -75,7 +75,6 @@ extension LoginViewController: View{
             .distinctUntilChanged()
             .bind{ [weak self] isLogin in
                 if isLogin{
-//                    self?.delegate?.login()
                     self?.coordinator?.login()
                 }
             }.disposed(by: self.disposeBag)
@@ -90,6 +89,7 @@ extension LoginViewController: View{
         reactor.state
             .compactMap{$0.kakaoOAuthToken}
             .bind{ token in
+                print("!! accessToken : \(token.accessToken)")
                 UserDefaults.standard.setValue(token.accessToken, forKey: "accessToken")
                 UserDefaults.standard.setValue(token.refreshToken, forKey: "refreshToken")
             }.disposed(by: self.disposeBag)
