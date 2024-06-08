@@ -8,5 +8,5 @@
 import Foundation
 
 public protocol FeedCoordinatorInterface{
-    
+    func showFeedDetail(postId: Int)
 }

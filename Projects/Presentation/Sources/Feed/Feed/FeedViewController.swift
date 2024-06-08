@@ -133,6 +133,13 @@ extension FeedViewController: View{
             .bind{ _ in
                 self.feedRefreshControl.endRefreshing()
             }.disposed(by: self.disposeBag)
+        
+        self.feedCollectionView.rx.itemSelected
+            .bind{ [weak self] indexPath in
+                let model = dataSource[indexPath]
+                self?.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self?.coordinator?.showFeedDetail(postId: model.postNo)
+            }.disposed(by: self.disposeBag)
     }
 }
 

@@ -66,7 +66,6 @@ final public class ChallengeViewController: UIViewController{
     }
     
     public init(reactor: ChallengeReactor){
-//        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }

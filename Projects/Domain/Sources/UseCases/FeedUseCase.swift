@@ -16,7 +16,11 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         self.repository = repository
     }
     
-    public func fetchFeeds(page: Int, size: Int, keyword: [String]) -> Observable<[FeedModel]> {
-        return repository.fetchFeeds(page: page, size: size, keyword: keyword)
+    public func fetchFeeds(page: Int) -> Observable<[FeedModel]> {
+        return repository.fetchFeeds(page: page)
+    }
+    
+    public func fetchPost(postId: Int) -> Observable<FeedDetailModel> {
+        return repository.fetchPost(postId: postId)
     }
 }

@@ -38,12 +38,12 @@ final public class FeedReactor: Reactor{
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .fetchFeeds:
-            return self.feedUseCase.fetchFeeds(page: 0, size: 10, keyword: [])
+            return self.feedUseCase.fetchFeeds(page: 0)
                 .map{ Mutation.setFeeds($0)}
         case .refresh:
             return Observable.concat([
                 Observable.just(Mutation.setEndRefreshing(false)),
-                feedUseCase.fetchFeeds(page: 0, size: 10, keyword: [])
+                feedUseCase.fetchFeeds(page: 0)
                     .map{ Mutation.setFeeds($0)},
                 Observable.just(Mutation.setEndRefreshing(true)),
             ])

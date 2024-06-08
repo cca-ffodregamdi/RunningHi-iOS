@@ -10,5 +10,6 @@ import Moya
 import RxSwift
 
 public protocol FeedRepositoryProtocol{
-    func fetchFeeds(page: Int, size: Int, keyword: [String]) -> Observable<[FeedModel]>
+    func fetchFeeds(page: Int) -> Observable<[FeedModel]>
+    func fetchPost(postId: Int) -> Observable<FeedDetailModel>
 }

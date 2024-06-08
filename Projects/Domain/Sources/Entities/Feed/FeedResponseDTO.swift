@@ -35,14 +35,22 @@ public struct FeedModel: Decodable{
     public let createDate: String?
     public let postContent: String
     public let role: String
-    public let locationName: String
+    public let profileImageUrl: String?
+    public let kcal: Float
+    public let imageUrl: String?
+    public let bookmarkCount: Int
+    public let likeCount: Int
     
-    enum CodingKeys: CodingKey {
+    enum CodingKeys: String, CodingKey {
         case postNo
         case nickname
         case createDate
         case postContent
         case role
-        case locationName
+        case profileImageUrl
+        case kcal
+        case imageUrl
+        case bookmarkCount = "bookmarkCnt"
+        case likeCount = "likeCnt"
     }
 }
