@@ -26,7 +26,6 @@ class AuthManager{
     
     func isValidAccessToken() -> Observable<Bool>{
         return service.rx.request(.isValidAccessToken)
-            .debug()
             .asObservable()
             .flatMap{ [weak self] response -> Observable<Bool> in
                 let accessResponse = try JSONDecoder().decode(AccessTokenValidationResponseDTO.self, from: response.data)

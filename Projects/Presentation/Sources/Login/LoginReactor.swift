@@ -16,19 +16,19 @@ import KakaoSDKCommon
 import Domain
 
 final public class LoginReactor: Reactor{
+    
     public enum Action{
         case kakaoLogin
     }
     
     public enum Mutation{
-        case getKakaoToken(OAuthToken)
+        case signWithKakao(String, String)
         case setLoading(Bool)
     }
     
     public struct State{
         var isLoading: Bool
         var successed: Bool
-        var kakaoOAuthToken: OAuthToken?
         init() {
             isLoading = false
             successed = false
@@ -49,9 +49,11 @@ final public class LoginReactor: Reactor{
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
                 loginUseCase.login()
-                    .asObservable()
-                    .flatMap{ token -> Observable<Mutation> in
-                        return Observable.just( Mutation.getKakaoToken(token))
+                    .flatMap{ token -> Observable<(String, String)> in
+                        return self.loginUseCase.requestWithKakaoToken(kakaoAccessToken: token.accessToken)
+                    }
+                    .flatMap{ accessToken, refreshToken -> Observable<Mutation> in
+                        return Observable.just(Mutation.signWithKakao(accessToken, refreshToken))
                     }.catchAndReturn(Mutation.setLoading(false)),
                 Observable.just(Mutation.setLoading(false))
             ])
@@ -61,11 +63,10 @@ final public class LoginReactor: Reactor{
     public func reduce(state: State, mutation: Mutation) -> State {
         var state = state
         switch mutation{
-        case .getKakaoToken(let token):
-            state.kakaoOAuthToken = token
-            if state.kakaoOAuthToken != nil{
-                state.successed = true
-            }
+        case .signWithKakao(let accessToken, let refreshToken):
+            UserDefaults.standard.setValue(accessToken, forKey: "accessToken")
+            UserDefaults.standard.setValue(refreshToken, forKey: "refreshToken")
+            state.successed = true
         case .setLoading(let value):
             state.isLoading = value
         }

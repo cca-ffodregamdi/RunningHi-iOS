@@ -11,9 +11,13 @@ import KakaoSDKAuth
 import RxKakaoSDKUser
 import KakaoSDKUser
 import RxSwift
+import Moya
+import RxMoya
 
 public class LoginRepositoryImplementation: LoginRepositoryProtocol{
 
+    private let service = MoyaProvider<LoginService>()
+    
     public init(){
         
     }
@@ -46,6 +50,19 @@ public class LoginRepositoryImplementation: LoginRepositoryProtocol{
                 disposable.dispose()
             }
         }
+    }
+    
+    public func requestWithKakaoToken(kakaoAccessToken: String) -> Observable<(String, String)>{
+        return service.rx.request(.loginKakao(LoginKakaoRequest(kakaoToken: kakaoAccessToken)))
+            .filterSuccessfulStatusCodes()
+            .map{ response in
+                let accessToken = response.response?.allHeaderFields["Authorization"] as! String
+                let refreshToken = response.response?.allHeaderFields["Refresh-Token"] as! String
+                print("[Request]")
+                print("accessToken : \(accessToken)")
+                print("refreshToken: \(refreshToken)")
+                return (accessToken, refreshToken)
+            }.asObservable()
     }
 }
 
