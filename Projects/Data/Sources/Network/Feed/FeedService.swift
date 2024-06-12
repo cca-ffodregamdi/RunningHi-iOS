@@ -12,6 +12,7 @@ import RxSwift
 public enum FeedService{
     case fetchFeeds(page: Int)
     case fetchPost(postId: Int)
+    case fetchComment(postId: Int)
 }
 
 extension FeedService: TargetType{
@@ -30,13 +31,16 @@ extension FeedService: TargetType{
             return "/posts"
         case .fetchPost(let postId):
             return "/posts/\(postId)"
+        case .fetchComment(let postId):
+            return "/reply/\(postId)"
         }
     }
     
     public var method: Moya.Method {
         switch self{
         case .fetchFeeds,
-                .fetchPost:
+                .fetchPost,
+                .fetchComment:
             return .get
         }
     }
@@ -45,15 +49,18 @@ extension FeedService: TargetType{
         switch self{
         case .fetchFeeds(let page):
             return .requestParameters(parameters: ["page" : page], encoding: URLEncoding.queryString)
-        case .fetchPost:
+        case .fetchPost,
+                .fetchComment:
             return .requestPlain
+        
         }
     }
     
     public var headers: [String : String]? {
         switch self{
         case .fetchFeeds,
-                .fetchPost:
+                .fetchPost,
+                .fetchComment:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]
         

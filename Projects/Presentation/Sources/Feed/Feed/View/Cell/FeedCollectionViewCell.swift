@@ -218,6 +218,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
         if let createDate = model.createDate{
             self.createdDateLabel.text = Date().createDateToString(createDate: createDate)
         }
-        
+        self.likeCountLabel.text = "\(model.likeCount)"
+        self.bookMarkCountLable.text = "\(model.bookmarkCount)"
     }
 }

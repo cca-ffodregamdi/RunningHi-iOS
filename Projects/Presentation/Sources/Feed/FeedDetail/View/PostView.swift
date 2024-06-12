@@ -10,12 +10,12 @@ import Common
 import SnapKit
 import Domain
 
-class PostView: UIView {
+final class PostView: UIView {
     
     private lazy var infoStackView: UIStackView = {
         let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 10
+        stackView.axis = .vertical
+        stackView.spacing = 5
         stackView.distribution = .fillProportionally
         stackView.alignment = .fill
         return stackView
@@ -61,7 +61,7 @@ class PostView: UIView {
     private lazy var buttonStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 10
+        stackView.spacing = 5
         stackView.distribution = .fillEqually
         stackView.alignment = .fill
         return stackView
@@ -104,8 +104,10 @@ class PostView: UIView {
     }
     
     private func configureUI(){
+        self.backgroundColor = .systemBackground
+        self.addSubview(profileImageView)
         self.addSubview(infoStackView)
-        [profileImageView, nickNameLabel, levelLabel].forEach{
+        [nickNameLabel, levelLabel].forEach{
             self.infoStackView.addArrangedSubview($0)
         }
         self.addSubview(buttonStackView)
@@ -113,13 +115,19 @@ class PostView: UIView {
             self.buttonStackView.addArrangedSubview($0)
         }
         
-        
         self.addSubview(dateLabel)
         self.addSubview(contentLabel)
         
-        infoStackView.snp.makeConstraints { make in
+        profileImageView.snp.makeConstraints { make in
+            make.width.height.equalTo(40)
             make.top.equalToSuperview().offset(20)
             make.left.equalToSuperview().offset(20)
+        }
+        
+        infoStackView.snp.makeConstraints { make in
+            make.centerY.equalTo(profileImageView.snp.centerY)
+            make.left.equalTo(profileImageView.snp.right).offset(15)
+            
         }
         
         dateLabel.snp.makeConstraints { make in
@@ -129,7 +137,7 @@ class PostView: UIView {
         }
         
         contentLabel.snp.makeConstraints { make in
-            make.top.equalTo(infoStackView.snp.bottom).offset(20)
+            make.top.equalTo(profileImageView.snp.bottom).offset(20)
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
         }
@@ -144,9 +152,10 @@ class PostView: UIView {
     
     func configureModel(model: FeedDetailModel){
 //        profileImageView
-        nickNameLabel.text = model.nickname
+        nickNameLabel.text = model.nickname ?? "러닝하이"
         contentLabel.text = model.postContent
         levelLabel.text = "Lv\(model.level)"
-        
+        dateLabel.text = Date().createDateToString(createDate: model.createDate)
+        likeCountLabel.text = "\(model.likeCount)"
     }
 }

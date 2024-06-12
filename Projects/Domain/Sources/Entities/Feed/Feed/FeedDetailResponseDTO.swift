@@ -33,8 +33,10 @@ public struct FeedDetailModel: Decodable{
     public let meanPace: Float
     public let kcal: Float
     public let imageUrls: [String?]
+    public let createDate: String
 //    public let replyList:
     public let likeCount: Int
+    
     enum CodingKeys: String, CodingKey {
         case nickname
         case profileImagUrl
@@ -47,6 +49,7 @@ public struct FeedDetailModel: Decodable{
         case meanPace
         case kcal
         case imageUrls
+        case createDate
         case likeCount = "likeCnt"
     }
 }

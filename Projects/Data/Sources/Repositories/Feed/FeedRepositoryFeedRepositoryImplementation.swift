@@ -44,4 +44,17 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
                 return Observable.error(error)
             }
     }
+    
+    public func fetchComment(postId: Int) -> Observable<[CommentModel]> {
+        return service.rx.request(.fetchComment(postId: postId))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> [CommentModel] in
+                let commentReponse = try JSONDecoder().decode(CommentResponseDTO.self, from: response.data)
+                return commentReponse.data
+            }.asObservable()
+            .catch{ error in
+                print("FeedRepositoryImplementation fetchComment error = \(error)")
+                return Observable.error(error)
+            }
+    }
 }

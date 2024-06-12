@@ -87,3 +87,4 @@ class BaseTabBarCoordinator: TabBarCoordinator{
         self.navigationController.pushViewController(self.tabBarController, animated: true)
     }
 }
+

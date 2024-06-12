@@ -56,7 +56,6 @@ final public class FeedViewController: UIViewController{
     // MARK: LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
-          
         configureUI()
         configureNavigationBarItem()
         addRefreshControl()
@@ -66,6 +65,10 @@ final public class FeedViewController: UIViewController{
         print("deinit FeedViewController")
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = false
+    }
     private func configureUI(){
         self.view.backgroundColor = .systemBackground
         

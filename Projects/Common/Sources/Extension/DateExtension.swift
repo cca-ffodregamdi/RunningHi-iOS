@@ -29,6 +29,15 @@ public extension Date{
         }else{
             return "알 수 없음"
         }
+    }
+    
+    func formatSecondsToHHMMSS(seconds: Int) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute, .second]
+        formatter.unitsStyle = .positional
+        formatter.zeroFormattingBehavior = [.pad]
         
+        let formattedString = formatter.string(from: TimeInterval(seconds)) ?? "00:00:00"
+        return formattedString
     }
 }
