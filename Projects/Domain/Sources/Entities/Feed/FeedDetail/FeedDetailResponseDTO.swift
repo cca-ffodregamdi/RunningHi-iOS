@@ -32,10 +32,10 @@ public struct FeedDetailModel: Decodable{
     public let time: Float
     public let meanPace: Float
     public let kcal: Float
-    public let imageUrls: [String?]
+    public let imageUrl: String?
     public let createDate: String
-//    public let replyList:
-    public let likeCount: Int
+    public var commentCount: Int
+    public var likeCount: Int
     
     enum CodingKeys: String, CodingKey {
         case nickname
@@ -48,8 +48,9 @@ public struct FeedDetailModel: Decodable{
         case time
         case meanPace
         case kcal
-        case imageUrls
+        case imageUrl
         case createDate
         case likeCount = "likeCnt"
+        case commentCount = "replyCnt"
     }
 }

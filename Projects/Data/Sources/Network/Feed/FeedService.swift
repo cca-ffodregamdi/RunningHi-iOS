@@ -8,11 +8,13 @@
 import Foundation
 import Moya
 import RxSwift
+import Domain
 
 public enum FeedService{
     case fetchFeeds(page: Int)
     case fetchPost(postId: Int)
     case fetchComment(postId: Int)
+    case writeComment(commentModel: WriteCommentReqesutDTO)
 }
 
 extension FeedService: TargetType{
@@ -33,6 +35,8 @@ extension FeedService: TargetType{
             return "/posts/\(postId)"
         case .fetchComment(let postId):
             return "/reply/\(postId)"
+        case .writeComment:
+            return "/reply"
         }
     }
     
@@ -42,6 +46,8 @@ extension FeedService: TargetType{
                 .fetchPost,
                 .fetchComment:
             return .get
+        case .writeComment:
+            return .post
         }
     }
     
@@ -52,6 +58,8 @@ extension FeedService: TargetType{
         case .fetchPost,
                 .fetchComment:
             return .requestPlain
+        case .writeComment(let commentModel):
+            return .requestJSONEncodable(commentModel)
         
         }
     }
@@ -60,7 +68,8 @@ extension FeedService: TargetType{
         switch self{
         case .fetchFeeds,
                 .fetchPost,
-                .fetchComment:
+                .fetchComment,
+                .writeComment:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]
         

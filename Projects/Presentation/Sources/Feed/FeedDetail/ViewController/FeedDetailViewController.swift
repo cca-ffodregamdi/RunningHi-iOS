@@ -57,11 +57,16 @@ final public class FeedDetailViewController: UIViewController {
         return tableView
     }()
     
+    private lazy var commentInputView: CommentInputView = {
+        return CommentInputView()
+    }()
+    
     // MARK: LifeCyecle
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        hideKeyboardWhenTouchUpBackground()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -71,6 +76,10 @@ final public class FeedDetailViewController: UIViewController {
         self.tabBarController?.tabBar.isHidden = true
     }
     
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        commentInputView.resignResponderTextView()
+    }
     
     public init(reactor: FeedDetailReactor){
         super.init(nibName: nil, bundle: nil)
@@ -97,11 +106,12 @@ final public class FeedDetailViewController: UIViewController {
         self.scrollView.addSubview(postView)
         self.scrollView.addSubview(recordView)
         self.scrollView.addSubview(commentTableView)
+        self.view.addSubview(commentInputView)
         
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
             make.left.right.equalToSuperview()
-            make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
+            make.bottom.equalTo(commentInputView.snp.top)
         }
         
         postView.snp.makeConstraints { make in
@@ -118,6 +128,11 @@ final public class FeedDetailViewController: UIViewController {
             make.top.equalTo(recordView.snp.bottom).offset(8)
             make.left.right.width.equalToSuperview()
             make.bottom.equalToSuperview()
+        }
+        
+        commentInputView.snp.makeConstraints { make in
+            make.bottom.equalTo(self.view.keyboardLayoutGuide.snp.top)
+            make.left.right.equalToSuperview()
         }
     }
 }
@@ -139,7 +154,7 @@ extension FeedDetailViewController: View{
             cell.configureModel(model: item)
             return cell
         }, titleForHeaderInSection: { dataSource, indexPath in
-            return "댓글 \(dataSource.sectionModels.count)"
+            return "댓글 \(dataSource.sectionModels[indexPath].items.count)"
         })
         
         reactor.state
@@ -153,6 +168,26 @@ extension FeedDetailViewController: View{
                 self?.commentTableView.snp.updateConstraints({ make in
                     make.height.equalTo(size.height)
                 })
+            }.disposed(by: self.disposeBag)
+        
+        commentInputView.sendButton.rx
+            .tap
+            .map{ [unowned self] in
+                Reactor.Action.writeComment(WriteCommentReqesutDTO(postId: reactor.currentState.postId, content: commentInputView.getCommentText()))
+            }
+            .bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
+        
+        reactor.state
+            .map{ $0.isWroteComment }
+            .filter{ $0 }
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.commentInputView.resetTextViewAndSendButton()
+                self.commentInputView.resignResponderTextView()
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3) {
+                    self.scrollView.setContentOffset(.init(x: 0, y: self.scrollView.contentSize.height - self.scrollView.bounds.height), animated: true)
+                }
             }.disposed(by: self.disposeBag)
     }
 }

@@ -12,4 +12,5 @@ protocol FeedUseCaseProtocol{
     func fetchFeeds(page: Int) -> Observable<[FeedModel]>
     func fetchPost(postId: Int) -> Observable<FeedDetailModel>
     func fetchComment(postId: Int) -> Observable<[CommentModel]>
+    func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentResponseModel>
 }

@@ -86,7 +86,7 @@ final class PostView: UIView {
         return button
     }()
     
-    private lazy var commentLable: UILabel = {
+    private lazy var commentCountLabel: UILabel = {
         let label = UILabel()
         label.text = "0"
         label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
@@ -111,7 +111,7 @@ final class PostView: UIView {
             self.infoStackView.addArrangedSubview($0)
         }
         self.addSubview(buttonStackView)
-        [likeButton, likeCountLabel, commentButton, commentLable].forEach{
+        [likeButton, likeCountLabel, commentButton, commentCountLabel].forEach{
             self.buttonStackView.addArrangedSubview($0)
         }
         
@@ -157,5 +157,6 @@ final class PostView: UIView {
         levelLabel.text = "Lv\(model.level)"
         dateLabel.text = Date().createDateToString(createDate: model.createDate)
         likeCountLabel.text = "\(model.likeCount)"
+        commentCountLabel.text = "\(model.commentCount)"
     }
 }

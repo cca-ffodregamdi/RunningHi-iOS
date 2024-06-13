@@ -66,6 +66,8 @@ class CommentTableViewCell: UITableViewCell {
     }
     
     private func configureUI(){
+        self.selectionStyle = .none
+        
         self.addSubview(profileImageView)
         self.addSubview(nickNameDateStackView)
         [nickNameLabel, dateLabel].forEach{
@@ -96,14 +98,21 @@ class CommentTableViewCell: UITableViewCell {
             make.top.equalTo(nickNameDateStackView.snp.bottom).offset(10)
             make.left.equalTo(profileImageView.snp.right).offset(10)
             make.right.equalToSuperview().offset(-20)
-            make.bottom.equalToSuperview().offset(-10)
+            make.bottom.equalToSuperview().offset(-15)
         }
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        profileImageView.image = CommonAsset.defaultSmallProfile.image
+        nickNameLabel.text = nil
+        dateLabel.text = nil
+        commentLabel.text = nil
     }
     
     func configureModel(model: CommentModel){
         nickNameLabel.text = model.nickName ?? "러닝하이"
-        dateLabel.text = Date().createDateToString(createDate: model.content)
+        dateLabel.text = Date().createDateToString(createDate: model.createDate)
         commentLabel.text = model.content
-        layoutIfNeeded()
     }
 }

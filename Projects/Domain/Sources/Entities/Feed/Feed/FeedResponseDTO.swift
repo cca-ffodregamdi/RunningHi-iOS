@@ -51,6 +51,6 @@ public struct FeedModel: Decodable{
         case kcal
         case imageUrl
         case bookmarkCount = "bookmarkCnt"
-        case likeCount = "likeCnt"
+        case likeCount = "likeCnt"  
     }
 }
