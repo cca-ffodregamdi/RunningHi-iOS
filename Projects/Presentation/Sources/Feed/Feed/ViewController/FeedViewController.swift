@@ -43,8 +43,9 @@ final public class FeedViewController: UIViewController{
         var layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .systemBackground
+        collectionView.backgroundColor = .clear
         collectionView.register(FeedCollectionViewCell.self, forCellWithReuseIdentifier: "feedCell")
+        collectionView.register(BFeedCollectionViewCell.self, forCellWithReuseIdentifier: "BfeedCell")
         collectionView.alwaysBounceVertical = true
         return collectionView
     }()
@@ -70,8 +71,9 @@ final public class FeedViewController: UIViewController{
         self.tabBarController?.tabBar.isHidden = false
     }
     private func configureUI(){
-        self.view.backgroundColor = .systemBackground
-        
+        self.view.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
+        //background: var(--Secondary-Secondary100, rgba(231, 235, 239, 1));
+
         self.view.addSubview(feedCollectionView)
         
         feedCollectionView.snp.makeConstraints { make in
@@ -112,6 +114,7 @@ extension FeedViewController: View{
             .disposed(by: self.disposeBag)
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
+//            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "BfeedCell", for: indexPath) as! BFeedCollectionViewCell
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
             cell.configureModel(model: feed)
             return cell
@@ -148,6 +151,18 @@ extension FeedViewController: View{
 
 extension FeedViewController: UICollectionViewDelegateFlowLayout{
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: 400)
+        return CGSize(width: (collectionView.bounds.width - 38) / 2, height: (collectionView.bounds.height - 38) / 2.5)
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 8
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 8
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return .init(top: 15, left: 15, bottom: 15, right: 15)
     }
 }

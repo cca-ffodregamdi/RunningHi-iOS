@@ -55,6 +55,7 @@ class BaseTabBarCoordinator: TabBarCoordinator{
             let feedCoordinator: FeedCoordinator = FeedCoordinator(navigationController: tabNavigationController)
             self.childCoordinator.append(feedCoordinator)
             feedCoordinator.start()
+            tabNavigationController.viewControllers.first?.title = TabBarItemType.Feed.getTitle()
         case .Challenge:
             let challengeCoordinator: ChallengeCoordinator = ChallengeCoordinator(navigationController: tabNavigationController)
             self.childCoordinator.append(challengeCoordinator)
