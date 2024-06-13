@@ -189,5 +189,21 @@ extension FeedDetailViewController: View{
                     self.scrollView.setContentOffset(.init(x: 0, y: self.scrollView.contentSize.height - self.scrollView.bounds.height), animated: true)
                 }
             }.disposed(by: self.disposeBag)
+        
+        reactor.state
+            .map{$0.isBookmark}
+            .bind(to: self.bookmarkButton.rx.isSelected)
+            .disposed(by: self.disposeBag)
+        
+        bookmarkButton.rx
+            .tap
+            .map{ _ in
+                if reactor.currentState.isBookmark{
+                    return Reactor.Action.deleteBookmark(reactor.currentState.postId)
+                }else{
+                    return Reactor.Action.makeBookmark(BookmarkRequestDTO(postNo: reactor.currentState.postId))
+                }
+            }.bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
     }
 }

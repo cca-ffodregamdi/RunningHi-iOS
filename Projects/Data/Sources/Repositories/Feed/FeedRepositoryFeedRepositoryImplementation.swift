@@ -70,4 +70,21 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
                 return Observable.error(error)
             }
     }
+    
+    public func makeBookmark(post: BookmarkRequestDTO) -> Observable<Any> {
+        return service.rx.request(.makeBookmark(post: post))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }
+            .asObservable()
+    }
+    
+    public func deleteBookmark(postId: Int) -> Observable<Any> {
+        return service.rx.request(.deleteBookmark(postId: postId))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
 }

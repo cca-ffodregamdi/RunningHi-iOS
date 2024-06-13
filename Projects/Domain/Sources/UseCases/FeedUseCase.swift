@@ -31,4 +31,12 @@ public final class FeedUseCase: FeedUseCaseProtocol{
     public func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentResponseModel> {
         return repository.writeComment(commentModel: commentModel)
     }
+    
+    public func makeBookmark(post: BookmarkRequestDTO) -> Observable<Any> {
+        return repository.makeBookmark(post: post)
+    }
+    
+    public func deleteBookmark(postId: Int) -> Observable<Any> {
+        return repository.deleteBookmark(postId: postId)
+    }
 }
