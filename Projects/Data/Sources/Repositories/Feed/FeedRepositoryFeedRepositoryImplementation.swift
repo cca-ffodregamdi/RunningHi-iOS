@@ -17,19 +17,18 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
     
     public init(){ }
     
-    public func fetchFeeds(page: Int) -> Observable<[FeedModel]> {
+    public func fetchFeeds(page: Int) -> Observable<([FeedModel], Int)> {
         return service.rx.request(.fetchFeeds(page: page))
             .filterSuccessfulStatusCodes()
-            .map{ response -> [FeedModel] in
-                do{
-                    let feedResponse = try JSONDecoder().decode(FeedResponseDTO.self, from: response.data)
-                    return feedResponse.data.content
-                }catch let error{
-                    print("FeedRepositoryImplementation fetchFeeds error = \(error)")
-                    return []
-                }
+            .map{ response -> ([FeedModel], Int) in
+                let feedResponse = try JSONDecoder().decode(FeedResponseDTO.self, from: response.data)
+                return (feedResponse.data.content, feedResponse.data.totalPages)
             }
             .asObservable()
+            .catch{ error in
+                print("FeedRepositoryImplementation fetchFeeds error = \(error)")
+                return Observable.error(error)
+            }
     }
     
     public func fetchPost(postId: Int) -> Observable<FeedDetailModel> {

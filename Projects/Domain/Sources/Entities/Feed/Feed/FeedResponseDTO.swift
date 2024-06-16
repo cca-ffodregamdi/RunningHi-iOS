@@ -23,9 +23,10 @@ public struct FeedResponseDTO: Decodable{
 
 public struct FeedResponseData: Decodable{
     public let content: [FeedModel]
-    
+    public let totalPages: Int
     enum CodingKeys: CodingKey {
         case content
+        case totalPages
     }
 }
 

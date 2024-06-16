@@ -9,11 +9,13 @@ import UIKit
 import SnapKit
 import Common
 import Domain
+import Kingfisher
 
 class FeedCollectionViewCell: UICollectionViewCell {
     
     private lazy var thumbnailImageView: UIImageView = {
         let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     
@@ -109,6 +111,11 @@ class FeedCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        resetModelForReuse()
+    }
+    
     private func configureUI(){
         self.layer.cornerRadius = 10
         self.layer.masksToBounds = true
@@ -173,10 +180,54 @@ class FeedCollectionViewCell: UICollectionViewCell {
     }
     
     func configureModel(model: FeedModel){
+        if let url = model.imageUrl{
+            self.thumbnailImageView.setImage(urlString: url) { [weak self] image in
+                self?.updateTextColor(for: image)
+            }
+        }
+        
+        if let url = model.profileImageUrl{
+            self.profileImageView.setImage(urlString: url) { image in
+                
+            }
+        }
+        
         self.nickNameLabel.text = model.nickname ?? "러닝하이"
         self.contentLabel.text = model.postContent
         self.likeCountLabel.text = "\(model.likeCount)"
         self.bookmarkCountLable.text = "\(model.bookmarkCount)"
         self.kcalLabel.text = "\(Int(model.kcal))kcal"
+        
+    }
+    
+    private func updateTextColor(for image: UIImage?) {
+        guard let image = image else { return }
+        if image.isDark() {
+            nickNameLabel.textColor = .white
+            contentLabel.textColor = .white
+            kcalLabel.textColor = .white
+        } else {
+            nickNameLabel.textColor = .black
+            contentLabel.textColor = .black
+            kcalLabel.textColor = .black
+        }
+    }
+    
+    private func resetModelForReuse(){
+        self.thumbnailImageView.kf.cancelDownloadTask()
+        self.thumbnailImageView.image = nil
+        
+        self.profileImageView.kf.cancelDownloadTask()
+        self.profileImageView.image = CommonAsset.defaultSmallProfile.image
+
+        self.nickNameLabel.text = ""
+        self.contentLabel.text = ""
+        self.likeCountLabel.text = ""
+        self.bookmarkCountLable.text = ""
+        self.kcalLabel.text = ""
+        
+        nickNameLabel.textColor = .black
+        contentLabel.textColor = .black
+        kcalLabel.textColor = .black
     }
 }

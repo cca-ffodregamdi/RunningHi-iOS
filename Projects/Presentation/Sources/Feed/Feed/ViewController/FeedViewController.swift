@@ -114,7 +114,6 @@ extension FeedViewController: View{
             .disposed(by: self.disposeBag)
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
-//            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "BfeedCell", for: indexPath) as! BFeedCollectionViewCell
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
             cell.configureModel(model: feed)
             return cell
@@ -134,7 +133,7 @@ extension FeedViewController: View{
             .disposed(by: self.disposeBag)
             
         reactor.state
-            .map{$0.isEndRefreshing}
+            .map{$0.isRefreshing}
             .distinctUntilChanged()
             .bind{ _ in
                 self.feedRefreshControl.endRefreshing()
@@ -146,6 +145,16 @@ extension FeedViewController: View{
                 self?.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
                 self?.coordinator?.showFeedDetail(postId: model.postNo)
             }.disposed(by: self.disposeBag)
+        
+        self.feedCollectionView.rx.contentOffset
+            .map{$0.y}
+            .distinctUntilChanged()
+            .filter{ [weak self] offset in
+                guard let self = self else { return false }
+                return offset + self.feedCollectionView.frame.size.height + 100 > self.feedCollectionView.contentSize.height
+            }.map{ _ in Reactor.Action.fetchFeeds }
+            .bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
     }
 }
 
