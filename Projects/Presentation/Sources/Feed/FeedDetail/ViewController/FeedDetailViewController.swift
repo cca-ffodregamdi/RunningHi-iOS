@@ -51,9 +51,11 @@ final public class FeedDetailViewController: UIViewController {
         tableView.showsVerticalScrollIndicator = false
         tableView.showsHorizontalScrollIndicator = false
         tableView.register(CommentTableViewCell.self, forCellReuseIdentifier: "commentCell")
+        tableView.register(CommentHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: "commentHeader")
         tableView.separatorStyle = .none
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 75
+        tableView.estimatedRowHeight = UITableView.automaticDimension
+        tableView.sectionHeaderTopPadding = 0
         return tableView
     }()
     
@@ -153,10 +155,9 @@ extension FeedDetailViewController: View{
             let cell = tableView.dequeueReusableCell(withIdentifier: "commentCell", for: indexPath) as! CommentTableViewCell
             cell.configureModel(model: item)
             return cell
-        }, titleForHeaderInSection: { dataSource, indexPath in
-            return "댓글 \(dataSource.sectionModels[indexPath].items.count)"
         })
         
+    
         reactor.state
             .map{[SectionModel(model: "commentModel", items: $0.commentModels)]}
             .bind(to: commentTableView.rx.items(dataSource: dataSource))
@@ -215,5 +216,24 @@ extension FeedDetailViewController: View{
             }.map{ _ in Reactor.Action.fetchComment}
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
+    
+        
+        self.commentTableView.rx.setDelegate(self)
+            .disposed(by: self.disposeBag)
     }
 }
+
+extension FeedDetailViewController: UITableViewDelegate{
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: "commentHeader") as! CommentHeaderFooterView
+        guard let reactor = reactor else { return nil}
+        view.configureModel(title: "댓글 \(reactor.currentState.commentModels.count)")
+        return view
+    }
+    
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 60 // 충분히 큰 높이 설정
+    }
+    
+}
+

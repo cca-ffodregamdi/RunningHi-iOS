@@ -202,15 +202,42 @@ class FeedCollectionViewCell: UICollectionViewCell {
     
     private func updateTextColor(for image: UIImage?) {
         guard let image = image else { return }
-        if image.isDark() {
-            nickNameLabel.textColor = .white
-            contentLabel.textColor = .white
-            kcalLabel.textColor = .white
-        } else {
-            nickNameLabel.textColor = .black
-            contentLabel.textColor = .black
-            kcalLabel.textColor = .black
+        
+        let nickNameLabelRect = self.convert(self.nickNameLabel.frame, to: thumbnailImageView)
+        let contentLabelRect = self.convert(self.contentLabel.frame, to: thumbnailImageView)
+        let kcalLabelRect = self.convert(self.kcalLabel.frame, to: thumbnailImageView)
+        let verticalStackRect = self.convert(self.verticalStackView.frame, to: thumbnailImageView)
+        
+        if let averageColorForNickName = image.averageColor(in: nickNameLabelRect) {
+            nickNameLabel.textColor = averageColorForNickName.isDark ? .white : .black
         }
+        
+        if let averageColorForContent = image.averageColor(in: contentLabelRect){
+            contentLabel.textColor = averageColorForContent.isDark ? .white : .black
+        }
+        
+        if let averageColorForKcal = image.averageColor(in: kcalLabelRect){
+            kcalLabel.textColor = averageColorForKcal.isDark ? .white : .black
+        }
+        
+        if let averageColroForStack = image.averageColor(in: verticalStackRect){
+            likeImageView.tintColor = averageColroForStack.isDark ? .white : .black
+            likeCountLabel.textColor = averageColroForStack.isDark ? .white : .black
+            bookmarkImageView.tintColor = averageColroForStack.isDark ? .white : .black
+//            bookmarkCountLable.textColor = averageColroForStack.isDark ? .white : .black
+        }
+        
+        if let averageColorForBookmarkLabel = image.averageColor(in: self.convert(self.bookmarkCountLable.frame, to: thumbnailImageView)){
+            bookmarkCountLable.textColor = averageColorForBookmarkLabel.isDark ? .white : .black
+        }
+        
+//        if image.isDark() {
+//            kcalLabel.textColor = .white
+//        } else {
+//            nickNameLabel.textColor = .black
+//            contentLabel.textColor = .black
+//            kcalLabel.textColor = .black
+//        }
     }
     
     private func resetModelForReuse(){
@@ -229,5 +256,9 @@ class FeedCollectionViewCell: UICollectionViewCell {
         nickNameLabel.textColor = .black
         contentLabel.textColor = .black
         kcalLabel.textColor = .black
+        likeImageView.tintColor = .black
+        likeCountLabel.textColor = .black
+        bookmarkImageView.tintColor = .black
+        bookmarkCountLable.textColor = .black
     }
 }
