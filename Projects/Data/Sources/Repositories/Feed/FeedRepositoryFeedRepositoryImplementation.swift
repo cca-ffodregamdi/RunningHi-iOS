@@ -44,12 +44,12 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }
     }
     
-    public func fetchComment(postId: Int) -> Observable<[CommentModel]> {
-        return service.rx.request(.fetchComment(postId: postId))
+    public func fetchComment(postId: Int, page: Int, size: Int = 10) -> Observable<([CommentModel], Int)> {
+        return service.rx.request(.fetchComment(postId: postId, page: page))
             .filterSuccessfulStatusCodes()
-            .map{ response -> [CommentModel] in
+            .map{ response -> ([CommentModel], Int) in
                 let commentReponse = try JSONDecoder().decode(CommentsResponseDTO.self, from: response.data)
-                return commentReponse.data
+                return (commentReponse.data.content, commentReponse.data.totalPages)
             }.asObservable()
             .catch{ error in
                 print("FeedRepositoryImplementation fetchComment error = \(error)")

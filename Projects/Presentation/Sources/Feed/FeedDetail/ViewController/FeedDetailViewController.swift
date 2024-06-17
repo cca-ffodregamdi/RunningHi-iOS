@@ -205,5 +205,15 @@ extension FeedDetailViewController: View{
                 }
             }.bind(to: reactor.action)
             .disposed(by: self.disposeBag)
+        
+        scrollView.rx.contentOffset
+            .map{$0.y}
+            .distinctUntilChanged()
+            .filter{ [weak self] offset in
+                guard let self = self else { return false }
+                return offset + self.scrollView.frame.size.height + 100 > self.scrollView.contentSize.height
+            }.map{ _ in Reactor.Action.fetchComment}
+            .bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
     }
 }

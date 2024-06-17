@@ -22,21 +22,9 @@ public struct WriteCommentResponseDTO: Decodable{
 }
 
 public struct WriteCommentResponseModel: Decodable{
-    public let replyNo: Int
-    let memberName: String
-    let postNo: Int
-    let replyContent: String
-    let isDeleted: Bool
-    let createDate: String
-    let updateDate: String
+    public let likeCount: Int
     
-    enum CodingKeys: CodingKey {
-        case replyNo
-        case memberName
-        case postNo
-        case replyContent
-        case isDeleted
-        case createDate
-        case updateDate
+    enum CodingKeys: String, CodingKey {
+        case likeCount = "likeCnt"
     }
 }
