@@ -25,7 +25,6 @@ final class CommentInputView: UIView {
         let textView = UITextView()
         textView.font = UIFont.systemFont(ofSize: 14)
         textView.backgroundColor = .systemGray6
-//        textView.delegate = self
         textView.text = "댓글을 입력해 주세요."
         textView.textColor = .lightGray
         textView.contentInset = .init(top: 0, left: 8, bottom: 0, right: 8)
@@ -73,7 +72,7 @@ final class CommentInputView: UIView {
             make.bottom.equalToSuperview().offset(-8)
             make.left.equalToSuperview().offset(20)
             make.right.equalTo(sendButton.snp.left)
-            make.height.equalTo(50 - 16)
+            make.height.equalTo(33)
         }
         
         sendButton.snp.makeConstraints { make in
@@ -86,6 +85,10 @@ final class CommentInputView: UIView {
     func resetTextViewAndSendButton(){
         commentTextView.textColor = .lightGray
         commentTextView.text = "댓글을 입력해 주세요."
+        commentTextView.snp.updateConstraints { make in
+            make.height.equalTo(33)
+        }
+        self.layoutIfNeeded()
         self.sendButton.isEnabled = false
     }
     
@@ -94,7 +97,7 @@ final class CommentInputView: UIView {
     }
     
     func getCommentText() -> String{
-        return commentTextView.text
+        return commentTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     private func bind(){
@@ -128,9 +131,8 @@ final class CommentInputView: UIView {
                 
                 let size = CGSize(width: self.frame.width, height: .infinity)
                 let estimatedSize = commentTextView.sizeThatFits(size)
-                
+               
                 self.commentTextView.isScrollEnabled = estimatedSize.height >= 130
-                
                 if estimatedSize.height < 130 {
                     self.commentTextView.constraints.forEach { constraint in
                         if constraint.firstAttribute == .height {
