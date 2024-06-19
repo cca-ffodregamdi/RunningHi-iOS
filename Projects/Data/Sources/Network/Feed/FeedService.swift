@@ -64,7 +64,7 @@ extension FeedService: TargetType{
         case .fetchFeeds(let page):
             return .requestParameters(parameters: ["page" : page], encoding: URLEncoding.queryString)
         case .fetchComment(let postId, let page, let size):
-            return .requestParameters(parameters: ["page" : page, "size" : size, "postNo" : postId], encoding: URLEncoding.queryString)
+            return .requestParameters(parameters: ["page" : page + 1, "size" : size, "postNo" : postId], encoding: URLEncoding.queryString)
         case .fetchPost,
                 .deleteBookmark:
             return .requestPlain

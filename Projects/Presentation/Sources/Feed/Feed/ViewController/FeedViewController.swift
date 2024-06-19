@@ -21,6 +21,7 @@ final public class FeedViewController: UIViewController{
     
     public var coordinator: FeedCoordinatorInterface?
     
+    private var dataSource: RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>!
     private lazy var filterButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.adjustmentsOutline.image, for: .normal)
@@ -113,7 +114,7 @@ extension FeedViewController: View{
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
-        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
+        self.dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
             cell.configureModel(model: feed)
             return cell
@@ -121,7 +122,7 @@ extension FeedViewController: View{
         
         reactor.state
             .map{[SectionModel(model: "feeds", items: $0.feeds)]}
-            .bind(to: self.feedCollectionView.rx.items(dataSource: dataSource))
+            .bind(to: self.feedCollectionView.rx.items(dataSource: self.dataSource))
             .disposed(by: self.disposeBag)
         
         self.feedCollectionView.rx.setDelegate(self)
@@ -141,9 +142,10 @@ extension FeedViewController: View{
         
         self.feedCollectionView.rx.itemSelected
             .bind{ [weak self] indexPath in
-                let model = dataSource[indexPath]
-                self?.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self?.coordinator?.showFeedDetail(postId: model.postNo)
+                guard let self = self else { return }
+                let model = self.dataSource[indexPath]
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showFeedDetail(postId: model.postNo)
             }.disposed(by: self.disposeBag)
         
         self.feedCollectionView.rx.contentOffset
@@ -160,7 +162,13 @@ extension FeedViewController: View{
 
 extension FeedViewController: UICollectionViewDelegateFlowLayout{
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: (collectionView.bounds.width - 38) / 2, height: (collectionView.bounds.height - 38) / 2.5)
+        let model = self.dataSource[indexPath]
+        if model.imageUrl == nil{
+            return CGSize(width: (collectionView.bounds.width - 38) / 2, height: (collectionView.bounds.height - 38) / 3)
+        }else{
+            return CGSize(width: (collectionView.bounds.width - 38) / 2, height: (collectionView.bounds.height - 38) / 2)
+        }
+        
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
