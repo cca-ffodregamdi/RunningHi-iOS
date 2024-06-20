@@ -18,16 +18,18 @@ public class FeedDetailReactor: Reactor{
         case writeComment(WriteCommentReqesutDTO)
         case makeBookmark(BookmarkRequestDTO)
         case deleteBookmark(Int)
+        case deleteComment(CommentModel)
     }
     
     public enum Mutation{
         case setPost(FeedDetailModel)
         case setComment([CommentModel], Int)
         case addComment([CommentModel], Int)
-        case WriteComment(WriteCommentResponseModel)
+        case writeComment(WriteCommentResponseModel)
         case setWroteComment(Bool)
         case setBookmark(Bool)
         case setLoading(Bool)
+        case deleteComment
     }
     
     public struct State{
@@ -62,9 +64,10 @@ public class FeedDetailReactor: Reactor{
                 feedUseCase.fetchComment(postId: currentState.postId, page: currentState.pageNumber).map{ Mutation.addComment($0.0, $0.1) },
                 Observable.just(Mutation.setLoading(false))
             ])
-        case .writeComment(let commentModel): 
+            
+        case .writeComment(let commentModel):
             return Observable.concat([
-                feedUseCase.writeComment(commentModel: commentModel).map{ Mutation.WriteComment($0) },
+                feedUseCase.writeComment(commentModel: commentModel).map{ Mutation.writeComment($0) },
                 Observable.just(Mutation.setLoading(true)),
                 feedUseCase.fetchComment(postId: commentModel.postNo, page: 0).map{ Mutation.setComment($0.0, $0.1) },
                 Observable.just(Mutation.setLoading(false)),
@@ -76,6 +79,14 @@ public class FeedDetailReactor: Reactor{
             return feedUseCase.makeBookmark(post: bookmarkRequest).map{ _ in Mutation.setBookmark(true) }
         case .deleteBookmark(let postId):
             return feedUseCase.deleteBookmark(postId: postId).map{_ in Mutation.setBookmark(false)}
+            
+        case .deleteComment(let commentModel):
+            return Observable.concat([
+                feedUseCase.deleteComment(postId: commentModel.commentId).map { _ in Mutation.deleteComment },
+                Observable.just(Mutation.setLoading(true)),
+                feedUseCase.fetchComment(postId: commentModel.postId, page: 0).map{ Mutation.setComment($0.0, $0.1) },
+                Observable.just(Mutation.setLoading(false)),
+            ])
         }
     }
     
@@ -95,12 +106,14 @@ public class FeedDetailReactor: Reactor{
             newState.totalPages = totalPages
         case .setLoading(let value):
             newState.isLoading = value
-        case .WriteComment(let model):
+        case .writeComment(let model):
             newState.postModel?.likeCount = model.likeCount
         case .setWroteComment(let value):
             newState.isWroteComment = value
         case .setBookmark(let value):
             newState.isBookmark = value
+        case .deleteComment:
+            break
         }
         return newState
     }

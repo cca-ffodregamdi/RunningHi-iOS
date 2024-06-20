@@ -86,4 +86,12 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
                 return Observable.just(())
             }.asObservable()
     }
+    
+    public func deleteComment(postId: Int) -> Observable<Any> {
+        return service.rx.request(.deleteComment(postId: postId))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
 }

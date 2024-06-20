@@ -9,9 +9,12 @@ import UIKit
 import Common
 import SnapKit
 import Domain
+import RxSwift
 
 class CommentTableViewCell: UITableViewCell {
-
+    
+    var disposeBag: DisposeBag = DisposeBag()
+    
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = CommonAsset.defaultSmallProfile.image
@@ -49,13 +52,12 @@ class CommentTableViewCell: UITableViewCell {
         return label
     }()
     
-    private lazy var optionButton: UIButton = {
+    lazy var optionButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.dotsVerticalOutline.image, for: .normal)
         return button
     }()
     
-
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         configureUI()
@@ -68,13 +70,15 @@ class CommentTableViewCell: UITableViewCell {
     private func configureUI(){
         self.selectionStyle = .none
         
-        self.addSubview(profileImageView)
-        self.addSubview(nickNameDateStackView)
+        self.contentView.addSubview(profileImageView)
+        self.contentView.addSubview(nickNameDateStackView)
+        
         [nickNameLabel, dateLabel].forEach{
             self.nickNameDateStackView.addArrangedSubview($0)
         }
-        self.addSubview(commentLabel)
-        self.addSubview(optionButton)
+        
+        self.contentView.addSubview(commentLabel)
+        self.contentView.addSubview(optionButton)
         
         profileImageView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(10)
@@ -108,6 +112,7 @@ class CommentTableViewCell: UITableViewCell {
         nickNameLabel.text = nil
         dateLabel.text = nil
         commentLabel.text = nil
+        disposeBag = DisposeBag()
     }
     
     func configureModel(model: CommentModel){

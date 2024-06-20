@@ -34,7 +34,7 @@ public struct CommentsResponseData: Decodable{
 }
 
 public struct CommentModel: Decodable{
-    public let replyNo: Int
+    public let commentId: Int
     public let nickName: String?
     public let userId: Int
     public let postId: Int
@@ -48,7 +48,7 @@ public struct CommentModel: Decodable{
     //"children": [],
     
     enum CodingKeys: String, CodingKey {
-        case replyNo
+        case commentId = "replyNo"
         case userId = "memberNo"
         case nickName = "memberName"
         case postId = "postNo"

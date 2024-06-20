@@ -39,4 +39,8 @@ public final class FeedUseCase: FeedUseCaseProtocol{
     public func deleteBookmark(postId: Int) -> Observable<Any> {
         return repository.deleteBookmark(postId: postId)
     }
+    
+    public func deleteComment(postId: Int) -> Observable<Any> {
+        return repository.deleteComment(postId: postId)
+    }
 }

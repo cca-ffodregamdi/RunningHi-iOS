@@ -15,4 +15,5 @@ protocol FeedUseCaseProtocol{
     func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentResponseModel>
     func makeBookmark(post: BookmarkRequestDTO) -> Observable<Any>
     func deleteBookmark(postId: Int) -> Observable<Any>
+    func deleteComment(postId: Int) -> Observable<Any>
 }

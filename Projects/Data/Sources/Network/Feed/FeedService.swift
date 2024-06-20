@@ -17,6 +17,7 @@ public enum FeedService{
     case writeComment(commentModel: WriteCommentReqesutDTO)
     case makeBookmark(post: BookmarkRequestDTO)
     case deleteBookmark(postId: Int)
+    case deleteComment(postId: Int)
 }
 
 extension FeedService: TargetType{
@@ -42,6 +43,8 @@ extension FeedService: TargetType{
             return "/bookmark"
         case .deleteBookmark(let postId):
             return "/bookmark/\(postId)"
+        case .deleteComment(let postId):
+            return "/reply/delete/\(postId)"
         }
     }
     
@@ -56,6 +59,8 @@ extension FeedService: TargetType{
             return .post
         case .deleteBookmark:
             return .delete
+        case .deleteComment:
+            return .put
         }
     }
     
@@ -66,7 +71,8 @@ extension FeedService: TargetType{
         case .fetchComment(let postId, let page, let size):
             return .requestParameters(parameters: ["page" : page + 1, "size" : size, "postNo" : postId], encoding: URLEncoding.queryString)
         case .fetchPost,
-                .deleteBookmark:
+                .deleteBookmark,
+                .deleteComment:
             return .requestPlain
         case .writeComment(let commentModel):
             return .requestJSONEncodable(commentModel)
@@ -82,7 +88,8 @@ extension FeedService: TargetType{
                 .fetchComment,
                 .writeComment,
                 .makeBookmark,
-                .deleteBookmark:
+                .deleteBookmark,
+                .deleteComment:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]
         

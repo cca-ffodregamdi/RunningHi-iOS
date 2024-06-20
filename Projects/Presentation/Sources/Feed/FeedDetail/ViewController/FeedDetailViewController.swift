@@ -137,6 +137,38 @@ final public class FeedDetailViewController: UIViewController {
             make.left.right.equalToSuperview()
         }
     }
+    
+    private func touchUpCommentOptionButton(isOwner: Bool, commentModel: CommentModel){
+        guard let reactor = reactor else { return }
+        let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let editComment = UIAlertAction(title: "수정", style: .default)
+        
+        let deleteComment = UIAlertAction(title: "삭제", style: .default) { [weak self] _ in
+            let deleteAlertController = UIAlertController(title: "댓글 삭제", message: "정말 삭제하시겠습니까?", preferredStyle: .alert)
+            let deleteAction = UIAlertAction(title: "삭제", style: .destructive){ _ in
+                reactor.action.onNext(.deleteComment(commentModel))
+            }
+            let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+            
+            deleteAlertController.addAction(deleteAction)
+            deleteAlertController.addAction(cancelAction)
+            self?.present(deleteAlertController, animated: true)
+        }
+        
+        let reportComment = UIAlertAction(title: "신고", style: .destructive)
+        
+        let cancel = UIAlertAction(title: "취소", style: .cancel)
+        
+        if isOwner{
+            actionSheetController.addAction(editComment)
+            actionSheetController.addAction(deleteComment)
+        }else{
+            actionSheetController.addAction(reportComment)
+        }
+        actionSheetController.addAction(cancel)
+        self.present(actionSheetController, animated: true)
+    }
 }
 
 extension FeedDetailViewController: View{
@@ -154,10 +186,15 @@ extension FeedDetailViewController: View{
         let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, CommentModel>> (configureCell: { dataSource, tableView, indexPath, item in
             let cell = tableView.dequeueReusableCell(withIdentifier: "commentCell", for: indexPath) as! CommentTableViewCell
             cell.configureModel(model: item)
+            
+            cell.optionButton.rx.tap
+                .bind{ [weak self] _ in
+                    guard let self = self else { return }
+                    self.touchUpCommentOptionButton(isOwner: item.owner, commentModel: item)
+                }.disposed(by: cell.disposeBag)
             return cell
         })
         
-    
         reactor.state
             .map{[SectionModel(model: "commentModel", items: $0.commentModels)]}
             .bind(to: commentTableView.rx.items(dataSource: dataSource))
