@@ -73,7 +73,6 @@ final public class FeedViewController: UIViewController{
     }
     private func configureUI(){
         self.view.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
-        //background: var(--Secondary-Secondary100, rgba(231, 235, 239, 1));
 
         self.view.addSubview(feedCollectionView)
         

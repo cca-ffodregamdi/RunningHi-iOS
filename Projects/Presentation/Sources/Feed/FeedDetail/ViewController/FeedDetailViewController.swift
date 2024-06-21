@@ -156,7 +156,11 @@ final public class FeedDetailViewController: UIViewController {
             self?.present(deleteAlertController, animated: true)
         }
         
-        let reportComment = UIAlertAction(title: "신고", style: .destructive)
+        let reportComment = UIAlertAction(title: "신고", style: .destructive) { [weak self] _ in
+            guard let self = self else { return }
+            self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+            self.coordinator?.showReportComment(commentId: commentModel.commentId)
+        }
         
         let cancel = UIAlertAction(title: "취소", style: .cancel)
         
