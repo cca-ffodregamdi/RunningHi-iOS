@@ -42,8 +42,8 @@ public struct CommentModel: Decodable{
     public let reportedCount: Int
     public let isDeleted: Bool
     public let createDate: String
-    public let updateDate: String?
-    public let owner: Bool
+    public let isUpdated: Bool
+    public let isOwner: Bool?
     //"parentReplyNo": null,
     //"children": [],
     
@@ -54,9 +54,9 @@ public struct CommentModel: Decodable{
         case postId = "postNo"
         case content = "replyContent"
         case reportedCount
-        case isDeleted = "deleted"
+        case isDeleted
         case createDate
-        case updateDate
-        case owner
+        case isUpdated
+        case isOwner
     }
 }

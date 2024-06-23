@@ -165,7 +165,7 @@ final public class FeedDetailViewController: UIViewController {
         
         let cancel = UIAlertAction(title: "취소", style: .cancel)
         
-        if isOwner{
+        if isOwner != nil{
             actionSheetController.addAction(editComment)
             actionSheetController.addAction(deleteComment)
         }else{

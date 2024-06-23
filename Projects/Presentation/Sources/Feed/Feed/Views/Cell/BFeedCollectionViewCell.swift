@@ -214,11 +214,10 @@ class BFeedCollectionViewCell: UICollectionViewCell {
     func configureModel(model: FeedModel){
         self.nickNameLabel.text = model.nickname
         self.contentLabel.text = model.postContent
-//        self.locationLabel.text = model.locationName
         if let createDate = model.createDate{
             self.createdDateLabel.text = Date().createDateToString(createDate: createDate)
         }
         self.likeCountLabel.text = "\(model.likeCount)"
-        self.bookMarkCountLable.text = "\(model.bookmarkCount)"
+        self.bookMarkCountLable.text = "\(model.commentCount)"
     }
 }

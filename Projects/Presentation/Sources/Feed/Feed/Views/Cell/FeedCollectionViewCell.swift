@@ -83,7 +83,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    private lazy var kcalLabel: UILabel = {
+    private lazy var mainContentLabel: UILabel = {
         let label = UILabel()
         label.text = "0kcal"
         label.font = UIFont.systemFont(ofSize: 36, weight: .bold)
@@ -128,7 +128,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
         }
         
         self.addSubview(buttonStackView)
-        self.addSubview(kcalLabel)
+        self.addSubview(mainContentLabel)
         self.addSubview(contentLabel)
         
         thumbnailImageView.snp.makeConstraints { make in
@@ -171,7 +171,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
             make.right.equalToSuperview().offset(-40)
         }
         
-        kcalLabel.snp.makeConstraints { make in
+        mainContentLabel.snp.makeConstraints { make in
             make.bottom.equalTo(contentLabel.snp.top).offset(-10)
             make.left.equalToSuperview().offset(15)
             make.right.equalToSuperview().offset(-10)
@@ -190,8 +190,9 @@ class FeedCollectionViewCell: UICollectionViewCell {
         self.nickNameLabel.text = model.nickname ?? "러닝하이"
         self.contentLabel.text = model.postContent
         self.likeCountLabel.text = "\(model.likeCount)"
-        self.commentCountLabel.text = "\(model.bookmarkCount)"
-        self.kcalLabel.text = "\(Int(model.kcal))kcal"
+        self.commentCountLabel.text = "\(model.commentCount)"
+        self.mainContentLabel.text = model.mainData
+        self.bookmarkButton.isSelected = model.isBookmarked
     }
     
     private func bindForColor() {
@@ -203,7 +204,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
                 
                 let nickNameLabelRect = self.convert(self.nickNameLabel.frame, to: self.thumbnailImageView)
                 let contentLabelRect = self.convert(self.contentLabel.frame, to: self.thumbnailImageView)
-                let kcalLabelRect = self.convert(self.kcalLabel.frame, to: self.thumbnailImageView)
+                let kcalLabelRect = self.convert(self.mainContentLabel.frame, to: self.thumbnailImageView)
                 let likeCountLabelRect = self.convert(self.likeCountLabel.frame, to: self.thumbnailImageView)
                 let likeImageViewRect = self.convert(self.likeImageView.frame, to: self.thumbnailImageView)
                 let commentCountLabelRect = self.convert(self.commentCountLabel.frame, to: self.thumbnailImageView)
@@ -240,7 +241,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
             DispatchQueue.main.async {
                 self.nickNameLabel.textColor = averageColorForNickName?.isDark ?? false ? .white : .black
                 self.contentLabel.textColor = averageColorForContent?.isDark ?? false ? .white : .black
-                self.kcalLabel.textColor = averageColorForKcal?.isDark ?? false ? .white : .black
+                self.mainContentLabel.textColor = averageColorForKcal?.isDark ?? false ? .white : .black
                 self.likeCountLabel.textColor = averageColorForLikeCountLabel?.isDark ?? false ? .white : .black
                 self.likeImageView.tintColor = averageColorForLikeImageView?.isDark ?? false ? .white : .black
                 self.commentImageView.tintColor = averageColorForCommentImageView?.isDark ?? false ? .white : .black
@@ -260,11 +261,11 @@ class FeedCollectionViewCell: UICollectionViewCell {
         self.contentLabel.text = ""
         self.likeCountLabel.text = ""
         self.commentCountLabel.text = ""
-        self.kcalLabel.text = ""
+        self.mainContentLabel.text = ""
         
         nickNameLabel.textColor = .black
         contentLabel.textColor = .black
-        kcalLabel.textColor = .black
+        mainContentLabel.textColor = .black
         likeImageView.tintColor = .black
         likeCountLabel.textColor = .black
         commentImageView.tintColor = .black
