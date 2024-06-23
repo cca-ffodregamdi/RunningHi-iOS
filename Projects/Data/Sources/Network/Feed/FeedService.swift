@@ -58,8 +58,8 @@ extension FeedService: TargetType{
                 .fetchComment:
             return .get
         case .writeComment,
-            .makeBookmark:
-            .reportComment:
+                .makeBookmark,
+                .reportComment:
             return .post
         case .deleteBookmark:
             return .delete
