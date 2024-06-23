@@ -95,7 +95,7 @@ extension FeedService: TargetType{
                 .writeComment,
                 .makeBookmark,
                 .deleteBookmark,
-                .deleteComment:
+                .deleteComment,
                 .reportComment:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]

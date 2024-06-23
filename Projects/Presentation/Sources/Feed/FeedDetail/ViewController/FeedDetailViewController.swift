@@ -195,7 +195,7 @@ extension FeedDetailViewController: View{
             cell.optionButton.rx.tap
                 .bind{ [weak self] _ in
                     guard let self = self else { return }
-                    self.touchUpCommentOptionButton(isOwner: item.owner, commentModel: item)
+                    self.touchUpCommentOptionButton(isOwner: item.isOwner, commentModel: item)
                 }.disposed(by: cell.disposeBag)
             return cell
         })
