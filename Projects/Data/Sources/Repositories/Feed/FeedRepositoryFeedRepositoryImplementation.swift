@@ -94,4 +94,12 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
                 return Observable.just(())
             }.asObservable()
     }
+    
+    public func reportComment(reportCommentModel: ReportCommentRequestDTO) -> Observable<Any> {
+        return service.rx.request(.reportComment(reportCommentModel: reportCommentModel))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
 }

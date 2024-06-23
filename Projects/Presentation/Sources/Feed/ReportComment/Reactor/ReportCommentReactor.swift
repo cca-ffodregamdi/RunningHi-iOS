@@ -14,17 +14,21 @@ public class ReportCommentReactor: Reactor{
     public enum Action{
         case fetchCell
         case selectedType(Int)
+        case reportComment(ReportCommentRequestDTO)
     }
     
     public enum Mutation{
         case setItems([ReportCommentType])
         case setSelectedTypeIndex(Int)
+        case isCompletedReport(Bool)
     }
     
     public struct State{
         var commentId: Int
         var seletedTypeIndex: Int = -1
         var items: [ReportCommentType] = []
+        var isCompletedReport = false
+        var reason: String = ""
     }
     
     public var initialState: State
@@ -50,6 +54,10 @@ public class ReportCommentReactor: Reactor{
             
         case .selectedType(let index):
             return .just(Mutation.setSelectedTypeIndex(index))
+            
+        case .reportComment(let reportCommentModel):
+            return feedUsecase.reportComment(reportCommentModel: reportCommentModel).map{ _ in Mutation.isCompletedReport(true) }
+            
         }
     }
     
@@ -60,7 +68,8 @@ public class ReportCommentReactor: Reactor{
             newState.items = items
         case .setSelectedTypeIndex(let index):
             newState.seletedTypeIndex = index
-            print(index)
+        case .isCompletedReport(let value):
+            newState.isCompletedReport = value
         }
         return newState
     }

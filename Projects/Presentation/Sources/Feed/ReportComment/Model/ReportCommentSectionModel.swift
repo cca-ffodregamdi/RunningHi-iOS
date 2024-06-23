@@ -41,4 +41,15 @@ public enum ReportCommentType: Int, CaseIterable{
         case .other: "기타"
         }
     }
+    
+    var category: String{
+        switch self{
+        case .spam: return "SPAM"
+        case .illegal: return "ILLEGAL"
+        case .adultContent: return "ADULT_CONTENT"
+        case .abuse: return "ABUSE"
+        case .privacy: return "PRIVACY"
+        case .other: return "OTHER"
+        }
+    }
 }

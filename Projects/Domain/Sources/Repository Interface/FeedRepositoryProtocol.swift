@@ -17,4 +17,5 @@ public protocol FeedRepositoryProtocol{
     func makeBookmark(post: BookmarkRequestDTO) -> Observable<Any>
     func deleteBookmark(postId: Int) -> Observable<Any>
     func deleteComment(postId: Int) -> Observable<Any>
+    func reportComment(reportCommentModel: ReportCommentRequestDTO) -> Observable<Any>
 }

@@ -10,6 +10,7 @@ import SnapKit
 import Common
 import RxDataSources
 import ReactorKit
+import Domain
 
 public class ReportCommentViewController: UIViewController {
     
@@ -20,29 +21,14 @@ public class ReportCommentViewController: UIViewController {
         return scrollView
     }()
     
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "신고 사유 선택"
-        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
-        return label
-    }()
-    
     private lazy var reportTableView: UITableView = {
         let tableView = UITableView()
         tableView.register(ReportTableViewCell.self, forCellReuseIdentifier: "reportCell")
+        tableView.register(ReportTableHeaderView.self, forHeaderFooterViewReuseIdentifier: "headerCell")
         tableView.separatorStyle = .none
         tableView.isScrollEnabled = false
         tableView.isUserInteractionEnabled = true
         return tableView
-    }()
-    
-    private lazy var bottomButtonStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.distribution = .fillEqually
-        stackView.alignment = .fill
-        stackView.spacing = 10
-        return stackView
     }()
     
     private lazy var reportTextField: UITextField = {
@@ -52,8 +38,6 @@ public class ReportCommentViewController: UIViewController {
         textField.isHidden = true
         textField.placeholder = "신고 사유 직접 입력"
         textField.returnKeyType = .done
-        //        textField.layer.borderWidth = 1
-        //        textField.layer.borderColor = UIColor.colorWithRGB(r: 130, g: 143, b: 155).cgColor
         return textField
     }()
     
@@ -64,6 +48,15 @@ public class ReportCommentViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
         label.textColor = UIColor.colorWithRGB(r: 130, g: 143, b: 155)
         return label
+    }()
+    
+    private lazy var bottomButtonStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.distribution = .fillEqually
+        stackView.alignment = .fill
+        stackView.spacing = 10
+        return stackView
     }()
     
     private lazy var cancelButton: UIButton = {
@@ -79,7 +72,9 @@ public class ReportCommentViewController: UIViewController {
     private lazy var confirmButton: UIButton = {
         let button = UIButton()
         button.setTitle("확인", for: .normal)
+        button.setTitleColor(.white, for: .normal)
         button.backgroundColor = UIColor.colorWithRGB(r: 34, g: 101, b: 201)
+        
         return button
     }()
     
@@ -106,28 +101,21 @@ public class ReportCommentViewController: UIViewController {
     
     private func configureUI(){
         self.view.addSubview(scrollView)
-        self.scrollView.addSubview(titleLabel)
         self.scrollView.addSubview(reportTableView)
         self.scrollView.addSubview(reportTextField)
         [cancelButton, confirmButton].forEach{
             bottomButtonStackView.addArrangedSubview($0)
         }
-        self.scrollView.addSubview(warningLabel)
-        self.scrollView.addSubview(bottomButtonStackView)
+        self.view.addSubview(warningLabel)
+        self.view.addSubview(bottomButtonStackView)
         
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
             make.left.right.equalToSuperview()
-            make.bottom.equalTo(self.view.keyboardLayoutGuide.snp.top)
-        }
-        
-        titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(20)
-            make.left.equalToSuperview().offset(20)
         }
         
         reportTableView.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(15)
+            make.top.equalToSuperview()
             make.left.right.equalToSuperview()
             make.width.equalToSuperview()
         }
@@ -136,18 +124,20 @@ public class ReportCommentViewController: UIViewController {
             make.top.equalTo(reportTableView.snp.bottom).offset(10)
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
+            make.width.equalToSuperview().offset(-40)
             make.height.equalTo(40)
+            make.bottom.lessThanOrEqualTo(self.view.keyboardLayoutGuide.snp.top).offset(-20)
         }
         
         warningLabel.snp.makeConstraints { make in
-            make.top.greaterThanOrEqualTo(reportTextField.snp.bottom).offset(20).priority(.high)
+            make.top.equalTo(scrollView.snp.bottom).offset(20)
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
             make.bottom.equalTo(bottomButtonStackView.snp.top).offset(-20)
         }
         
         bottomButtonStackView.snp.makeConstraints { make in
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
             make.left.equalToSuperview().offset(20)
             make.height.equalTo(54)
             make.right.equalToSuperview().offset(-20)
@@ -185,9 +175,28 @@ extension ReportCommentViewController: View{
                 }
             }.disposed(by: self.disposeBag)
             
-        reactor.state
-            .map{$0.seletedTypeIndex >= 0}
+        
+        let stateObservable = Observable.combineLatest(
+                    reactor.state.map { $0.seletedTypeIndex },
+                    reportTextField.rx.text.orEmpty.map { !$0.isEmpty }
+                ) { (value, isTextFieldNotEmpty) -> Bool in
+                    if value >= 0 {
+                        if value == 5 {
+                            return isTextFieldNotEmpty
+                        } else {
+                            return true
+                        }
+                    } else {
+                        return false
+                    }
+                }
+        stateObservable
             .bind(to: self.confirmButton.rx.isEnabled)
+            .disposed(by: self.disposeBag)
+        
+        stateObservable
+            .map{ $0 ? UIColor.colorWithRGB(r: 34, g: 101, b: 201) : UIColor.lightGray }
+            .bind(to: self.confirmButton.rx.backgroundColor)
             .disposed(by: self.disposeBag)
         
         self.reportTableView.rx.itemSelected
@@ -221,17 +230,51 @@ extension ReportCommentViewController: View{
             }.disposed(by: self.disposeBag)
         
         self.confirmButton.rx.tap
-            .bind{ [weak self] _ in
-                print("confirm")
-            }.disposed(by: self.disposeBag)
+            .map{ [weak self] _ in
+                if self?.reportTextField.text?.isEmpty ?? true{
+                    return Reactor.Action.reportComment(
+                        ReportCommentRequestDTO(category: reactor.currentState.items[reactor.currentState.seletedTypeIndex].category,
+                                                commentId: reactor.currentState.commentId))
+                }else{
+                    return Reactor.Action.reportComment(
+                        ReportCommentRequestDTO(category: reactor.currentState.items[reactor.currentState.seletedTypeIndex].category,
+                                                content: self?.reportTextField.text,
+                                                commentId: reactor.currentState.commentId))
+                }
+            }.bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
         
         reportTextField.rx.controlEvent(.editingDidEndOnExit)
             .bind{ [weak self] _ in
                 guard let self = self else { return }
                 self.reportTextField.resignFirstResponder()
-                self.reportTextField.text = ""
+            }.disposed(by: self.disposeBag)
+        
+        reportTableView.rx.setDelegate(self)
+            .disposed(by: self.disposeBag)
+        
+        reactor.state
+            .map{$0.isCompletedReport}
+            .filter{$0}
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                let noticeAlert = UIAlertController(
+                    title: "댓글 신고를 접수하였습니다.",
+                    message: "안전한 커뮤니티를 위한 노력에 동참해 주신 것에 진심으로 감사드립니다.",
+                    preferredStyle: .alert)
+                let confirmAction = UIAlertAction(title: "확인", style: .default) { _ in
+                    self.navigationController?.popViewController(animated: true)
+                }
+                
+                noticeAlert.addAction(confirmAction)
+                self.present(noticeAlert, animated: true)
             }.disposed(by: self.disposeBag)
     }
-    // TODO: confirm button isEnable 색 변경
-    // TODO: TextField 처리
+}
+
+extension ReportCommentViewController: UITableViewDelegate{
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: "headerCell")
+        return view
+    }
 }
