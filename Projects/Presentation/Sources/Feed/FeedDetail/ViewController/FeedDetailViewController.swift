@@ -52,13 +52,14 @@ final public class FeedDetailViewController: UIViewController {
         tableView.showsHorizontalScrollIndicator = false
         tableView.register(CommentTableViewCell.self, forCellReuseIdentifier: "commentCell")
         tableView.register(CommentHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: "commentHeader")
+        tableView.register(EmptyCommentFooterView.self, forHeaderFooterViewReuseIdentifier: "commentFooter")
         tableView.separatorStyle = .none
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = UITableView.automaticDimension
         tableView.sectionHeaderTopPadding = 0
         return tableView
     }()
-    
+
     private lazy var commentInputView: CommentInputView = {
         return CommentInputView()
     }()
@@ -131,14 +132,14 @@ final public class FeedDetailViewController: UIViewController {
             make.left.right.width.equalToSuperview()
             make.bottom.equalToSuperview()
         }
-        
+
         commentInputView.snp.makeConstraints { make in
             make.bottom.equalTo(self.view.keyboardLayoutGuide.snp.top)
             make.left.right.equalToSuperview()
         }
     }
     
-    private func touchUpCommentOptionButton(isOwner: Bool, commentModel: CommentModel){
+    private func touchUpCommentOptionButton(isOwner: Bool?, commentModel: CommentModel){
         guard let reactor = reactor else { return }
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
@@ -204,6 +205,7 @@ extension FeedDetailViewController: View{
             .bind(to: commentTableView.rx.items(dataSource: dataSource))
             .disposed(by: self.disposeBag)
         
+        
         commentTableView.rx.observe(CGSize.self, "contentSize")
             .bind{ [weak self] size in
                 guard let size = size else {return}
@@ -267,14 +269,26 @@ extension FeedDetailViewController: View{
 extension FeedDetailViewController: UITableViewDelegate{
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: "commentHeader") as! CommentHeaderFooterView
-        guard let reactor = reactor else { return nil}
+        guard let reactor = reactor else { return nil }
         view.configureModel(title: "댓글 \(reactor.currentState.commentModels.count)")
         return view
     }
-    
+
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 60 // 충분히 큰 높이 설정
     }
     
+    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: "commentFooter")
+        guard let reactor = reactor else {return nil}
+        if reactor.currentState.commentModels.count != 0 { return nil }
+        return view
+    }
+    
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        guard let reactor = reactor else { return 0 }
+        if reactor.currentState.commentModels.count != 0 { return 0 }
+        return 90
+    }
 }
 
