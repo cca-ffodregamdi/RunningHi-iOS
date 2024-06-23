@@ -8,5 +8,6 @@
 import Foundation
 
 public protocol FeedCoordinatorInterface{
-    
+    func showFeedDetail(postId: Int)
+    func showReportComment(commentId: Int)
 }

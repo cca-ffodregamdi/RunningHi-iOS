@@ -23,9 +23,10 @@ public struct FeedResponseDTO: Decodable{
 
 public struct FeedResponseData: Decodable{
     public let content: [FeedModel]
-    
+    public let totalPages: Int
     enum CodingKeys: CodingKey {
         case content
+        case totalPages
     }
 }
 
@@ -35,14 +36,24 @@ public struct FeedModel: Decodable{
     public let createDate: String?
     public let postContent: String
     public let role: String
-    public let locationName: String
+    public let profileImageUrl: String?
+    public let mainData: String
+    public let imageUrl: String?
+    public let commentCount: Int
+    public let likeCount: Int
+    public let isBookmarked: Bool
     
-    enum CodingKeys: CodingKey {
+    enum CodingKeys: String, CodingKey {
         case postNo
         case nickname
         case createDate
         case postContent
         case role
-        case locationName
+        case profileImageUrl
+        case mainData
+        case imageUrl
+        case commentCount = "replyCnt"
+        case likeCount = "likeCnt"
+        case isBookmarked
     }
 }

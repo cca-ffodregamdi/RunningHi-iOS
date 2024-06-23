@@ -21,6 +21,7 @@ final public class FeedViewController: UIViewController{
     
     public var coordinator: FeedCoordinatorInterface?
     
+    private var dataSource: RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>!
     private lazy var filterButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.adjustmentsOutline.image, for: .normal)
@@ -43,8 +44,9 @@ final public class FeedViewController: UIViewController{
         var layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .systemBackground
+        collectionView.backgroundColor = .clear
         collectionView.register(FeedCollectionViewCell.self, forCellWithReuseIdentifier: "feedCell")
+        collectionView.register(BFeedCollectionViewCell.self, forCellWithReuseIdentifier: "BfeedCell")
         collectionView.alwaysBounceVertical = true
         return collectionView
     }()
@@ -56,7 +58,6 @@ final public class FeedViewController: UIViewController{
     // MARK: LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
-          
         configureUI()
         configureNavigationBarItem()
         addRefreshControl()
@@ -66,9 +67,13 @@ final public class FeedViewController: UIViewController{
         print("deinit FeedViewController")
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = false
+    }
     private func configureUI(){
-        self.view.backgroundColor = .systemBackground
-        
+        self.view.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
+
         self.view.addSubview(feedCollectionView)
         
         feedCollectionView.snp.makeConstraints { make in
@@ -108,7 +113,7 @@ extension FeedViewController: View{
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
-        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
+        self.dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
             cell.configureModel(model: feed)
             return cell
@@ -116,7 +121,7 @@ extension FeedViewController: View{
         
         reactor.state
             .map{[SectionModel(model: "feeds", items: $0.feeds)]}
-            .bind(to: self.feedCollectionView.rx.items(dataSource: dataSource))
+            .bind(to: self.feedCollectionView.rx.items(dataSource: self.dataSource))
             .disposed(by: self.disposeBag)
         
         self.feedCollectionView.rx.setDelegate(self)
@@ -128,16 +133,52 @@ extension FeedViewController: View{
             .disposed(by: self.disposeBag)
             
         reactor.state
-            .map{$0.isEndRefreshing}
+            .map{$0.isRefreshing}
             .distinctUntilChanged()
             .bind{ _ in
                 self.feedRefreshControl.endRefreshing()
             }.disposed(by: self.disposeBag)
+        
+        self.feedCollectionView.rx.itemSelected
+            .bind{ [weak self] indexPath in
+                guard let self = self else { return }
+                let model = self.dataSource[indexPath]
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showFeedDetail(postId: model.postNo)
+            }.disposed(by: self.disposeBag)
+        
+        self.feedCollectionView.rx.contentOffset
+            .map{$0.y}
+            .distinctUntilChanged()
+            .filter{ [weak self] offset in
+                guard let self = self else { return false }
+                return offset + self.feedCollectionView.frame.size.height + 100 > self.feedCollectionView.contentSize.height
+            }.map{ _ in Reactor.Action.fetchFeeds }
+            .bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
     }
 }
 
 extension FeedViewController: UICollectionViewDelegateFlowLayout{
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: 400)
+        let model = self.dataSource[indexPath]
+        if model.imageUrl == nil{
+            return CGSize(width: (collectionView.bounds.width - 38) / 2, height: (collectionView.bounds.height - 38) / 3)
+        }else{
+            return CGSize(width: (collectionView.bounds.width - 38) / 2, height: (collectionView.bounds.height - 38) / 2)
+        }
+        
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 8
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 8
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return .init(top: 15, left: 15, bottom: 15, right: 15)
     }
 }

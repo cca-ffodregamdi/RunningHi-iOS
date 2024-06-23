@@ -25,4 +25,18 @@ class FeedDIContainer{
         vc.coordinator = coordinator
         return vc
     }
+    
+    func makeFeedDetailViewController(postId: Int, coordinator: FeedCoordinator) -> FeedDetailViewController{
+        let feedUseCase = feedUseCase
+        let vc = FeedDetailViewController(reactor: FeedDetailReactor(feedUseCase: feedUseCase, postId: postId))
+        vc.coordinator = coordinator
+        return vc
+    }
+    
+    func makeReportCommentViewController(commentId: Int, coordinator: FeedCoordinator) -> ReportCommentViewController{
+        let feedUseCase = feedUseCase
+        let vc = ReportCommentViewController(reactor: ReportCommentReactor(feedUsecase: feedUseCase, commentId: commentId))
+        
+        return vc
+    }
 }

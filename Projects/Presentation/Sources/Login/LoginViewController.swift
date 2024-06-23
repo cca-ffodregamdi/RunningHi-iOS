@@ -85,13 +85,5 @@ extension LoginViewController: View{
             .bind{ isLoading in
                 // TODO: activityIndicator
             }.disposed(by: self.disposeBag)
-        
-        reactor.state
-            .compactMap{$0.kakaoOAuthToken}
-            .bind{ token in
-                print("!! accessToken : \(token.accessToken)")
-                UserDefaults.standard.setValue(token.accessToken, forKey: "accessToken")
-                UserDefaults.standard.setValue(token.refreshToken, forKey: "refreshToken")
-            }.disposed(by: self.disposeBag)
     }
 }

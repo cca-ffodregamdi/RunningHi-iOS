@@ -18,7 +18,6 @@ final public class ChallengeViewController: UIViewController{
     
     // MARK: Properties
     public var disposeBag: DisposeBag = DisposeBag()
-//    var coordinator: ChallengeCoordinator
     public var coordinator: ChallengeCoordinatorInterface?
     
     private var dataSource: RxTableViewSectionedReloadDataSource<ChallengeSection>!
@@ -32,6 +31,7 @@ final public class ChallengeViewController: UIViewController{
         button.setImage(CommonAsset.bellOutline.image, for: .normal)
         return button
     }()
+    
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.showsHorizontalScrollIndicator = false
@@ -66,7 +66,6 @@ final public class ChallengeViewController: UIViewController{
     }
     
     public init(reactor: ChallengeReactor){
-//        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }

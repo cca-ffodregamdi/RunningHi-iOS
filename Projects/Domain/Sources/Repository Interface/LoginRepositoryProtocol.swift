@@ -11,4 +11,5 @@ import KakaoSDKAuth
 
 public protocol LoginRepositoryProtocol{
     func login() -> Observable<OAuthToken>
+    func requestWithKakaoToken(kakaoAccessToken: String) -> Observable<(String, String)>
 }

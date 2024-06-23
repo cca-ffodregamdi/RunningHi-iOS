@@ -1,5 +1,5 @@
 //
-//  FeedCollectionViewCell.swift
+//  BFeedCollectionViewCell.swift
 //  Presentation
 //
 //  Created by 유현진 on 5/21/24.
@@ -10,12 +10,11 @@ import SnapKit
 import Domain
 import Common
 
-class FeedCollectionViewCell: UICollectionViewCell {
+class BFeedCollectionViewCell: UICollectionViewCell {
     
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "person.circle.fill")
-        imageView.tintColor = UIColor.colorWithRGB(r: 100, g: 112, b: 125)
+        imageView.image = CommonAsset.defaultSmallProfile.image
         return imageView
     }()
     
@@ -215,10 +214,10 @@ class FeedCollectionViewCell: UICollectionViewCell {
     func configureModel(model: FeedModel){
         self.nickNameLabel.text = model.nickname
         self.contentLabel.text = model.postContent
-        self.locationLabel.text = model.locationName
         if let createDate = model.createDate{
             self.createdDateLabel.text = Date().createDateToString(createDate: createDate)
         }
-        
+        self.likeCountLabel.text = "\(model.likeCount)"
+        self.bookMarkCountLable.text = "\(model.commentCount)"
     }
 }

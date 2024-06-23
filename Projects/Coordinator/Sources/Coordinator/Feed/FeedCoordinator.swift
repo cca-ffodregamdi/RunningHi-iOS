@@ -27,5 +27,13 @@ class FeedCoordinator: Coordinator{
 }
 
 extension FeedCoordinator: FeedCoordinatorInterface{
+    func showFeedDetail(postId: Int) {
+        let vc = feedDIContainer.makeFeedDetailViewController(postId: postId, coordinator: self)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
     
+    func showReportComment(commentId: Int) {
+        let vc = feedDIContainer.makeReportCommentViewController(commentId: commentId, coordinator: self)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
 }

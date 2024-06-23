@@ -33,4 +33,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         LocationManager.shared.startLocationUpdates()
     }
 }
-

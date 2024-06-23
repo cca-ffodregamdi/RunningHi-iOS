@@ -27,17 +27,11 @@ class ChallengeDIContainer{
         return vc
     }
     
-    
-    
-    
     func makeChallengeDetailViewController(model: ChallengeModel, coordinator: ChallengeCoordinator) -> ChallengeDetailViewController{
         let challengeUseCase = challengeUseCase
         let vc = ChallengeDetailViewController(challengeModel: model, reactor: ChallengeDetailReactor(challengeUseCase: challengeUseCase))
         vc.coordinator = coordinator
         return vc
     }
-    
-    
-    
-    
+
 }

@@ -57,7 +57,6 @@ final public class ChallengeDetailViewController: UIViewController{
     // MARK: LifeCyecle
     public override func viewDidLoad() {
         super.viewDidLoad()
-        configureNavigationBar()
         configureUI()
     }
     

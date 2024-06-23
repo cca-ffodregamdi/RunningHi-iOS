@@ -21,20 +21,14 @@ public class AppCoordinator: Coordinator{
     }
     
     public func start() {
-//        AuthManager.shared.isValidAccessToken()
-//            .bind{ bool in
-//                print(bool)
-//                if bool{
-//                    self.showBaseTabBarController()
-//                }else{
-//                    self.showLoginViewController()
-//                }
-//            }.disposed(by: self.disposeBag)
-        if true{
-            self.showBaseTabBarController()
-        }else{
-            self.showLoginViewController()
-        }
+        AuthManager.shared.isValidAccessToken()
+            .bind{ bool in
+                if bool{
+                    self.showBaseTabBarController()
+                }else{
+                    self.showLoginViewController()
+                }
+            }.disposed(by: self.disposeBag)
     }
     
     private func showBaseTabBarController(){
