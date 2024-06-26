@@ -47,4 +47,12 @@ public final class FeedUseCase: FeedUseCaseProtocol{
     public func reportComment(reportCommentModel: ReportCommentRequestDTO) -> Observable<Any> {
         return repository.reportComment(reportCommentModel: reportCommentModel)
     }
+    
+    public func deletePost(postId: Int) -> Observable<Any> {
+        return repository.deletePost(postId: postId)
+    }
+    
+    public func editPost(postId: Int, editPostModel: EditFeedRequestDTO) -> Observable<Any> {
+        return repository.editPost(postId: postId, editPostModel: editPostModel)
+    }
 }

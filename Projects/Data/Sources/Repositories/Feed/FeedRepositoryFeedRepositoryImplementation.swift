@@ -102,4 +102,20 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
                 return Observable.just(())
             }.asObservable()
     }
+    
+    public func deletePost(postId: Int) -> Observable<Any> {
+        return service.rx.request(.deletePost(postId: postId))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
+    
+    public func editPost(postId: Int, editPostModel: EditFeedRequestDTO) -> Observable<Any> {
+        return service.rx.request(.editPost(postId: postId, editPostModel: editPostModel))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
 }

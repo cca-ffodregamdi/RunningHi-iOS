@@ -76,12 +76,10 @@ final public class FeedReactor: Reactor{
         var newState = state
         switch mutation{
         case .setFeeds(let feeds, let totalPages):
-            print("set feed")
             newState.feeds = feeds
             newState.pageNumber = 1
             newState.totalPages = totalPages
         case .addFeeds(let feeds, let totalPages):
-            print("add feed")
             newState.feeds += feeds
             newState.pageNumber += 1
             newState.totalPages = totalPages

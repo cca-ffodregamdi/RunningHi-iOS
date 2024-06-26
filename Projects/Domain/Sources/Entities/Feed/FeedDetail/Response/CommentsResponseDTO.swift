@@ -43,7 +43,7 @@ public struct CommentModel: Decodable{
     public let isDeleted: Bool
     public let createDate: String
     public let isUpdated: Bool
-    public let isOwner: Bool?
+    public let isOwner: Bool
     //"parentReplyNo": null,
     //"children": [],
     

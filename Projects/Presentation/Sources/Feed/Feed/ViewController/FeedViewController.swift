@@ -157,7 +157,7 @@ extension FeedViewController: View{
                 guard let self = self else { return }
                 let model = self.dataSource[indexPath]
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self.coordinator?.showFeedDetail(postId: model.postId)
+                self.coordinator?.showFeedDetail(viewController: self, postId: model.postId)
             }.disposed(by: self.disposeBag)
         
         self.feedCollectionView.rx.contentOffset
@@ -193,5 +193,11 @@ extension FeedViewController: UICollectionViewDelegateFlowLayout{
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return .init(top: 15, left: 15, bottom: 15, right: 15)
+    }
+}
+
+extension FeedViewController: FeedDetailViewControllerDelegate{
+    public func deleteFeed() {
+        reactor?.action.onNext(.refresh)
     }
 }

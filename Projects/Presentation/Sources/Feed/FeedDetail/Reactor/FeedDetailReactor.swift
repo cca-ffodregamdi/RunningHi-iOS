@@ -19,6 +19,7 @@ public class FeedDetailReactor: Reactor{
         case makeBookmark(BookmarkRequestDTO)
         case deleteBookmark(Int)
         case deleteComment(CommentModel)
+        case deletePost(Int)
     }
     
     public enum Mutation{
@@ -30,6 +31,7 @@ public class FeedDetailReactor: Reactor{
         case setBookmark(Bool)
         case setLoading(Bool)
         case deleteComment
+        case deletePost
     }
     
     public struct State{
@@ -42,6 +44,7 @@ public class FeedDetailReactor: Reactor{
         var isLike: Bool = false
         var isBookmark: Bool = false
         var isLoading: Bool = false
+        var deletedPost: Bool = false
     }
     
     public var initialState: State
@@ -87,6 +90,8 @@ public class FeedDetailReactor: Reactor{
                 feedUseCase.fetchComment(postId: commentModel.postId, page: 0).map{ Mutation.setComment($0.0, $0.1) },
                 Observable.just(Mutation.setLoading(false)),
             ])
+        case .deletePost(let postId):
+            return feedUseCase.deletePost(postId: postId).map{ _ in Mutation.deletePost }
         }
     }
     
@@ -114,6 +119,9 @@ public class FeedDetailReactor: Reactor{
             newState.isBookmark = value
         case .deleteComment:
             break
+        case .deletePost:
+            newState.deletedPost = true
+            
         }
         return newState
     }

@@ -36,6 +36,7 @@ public struct FeedDetailModel: Decodable{
     public let createDate: String
     public var commentCount: Int
     public var likeCount: Int
+    public let isOwner: Bool
     
     enum CodingKeys: String, CodingKey {
         case nickname
@@ -52,5 +53,6 @@ public struct FeedDetailModel: Decodable{
         case createDate
         case likeCount = "likeCnt"
         case commentCount = "replyCnt"
+        case isOwner = "owner"
     }
 }

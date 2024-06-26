@@ -14,6 +14,10 @@ import Domain
 import RxSwift
 import RxCocoa
 
+public protocol FeedDetailViewControllerDelegate: AnyObject{
+    func deleteFeed()
+}
+
 final public class FeedDetailViewController: UIViewController {
     
     // MARK: Properties
@@ -21,10 +25,18 @@ final public class FeedDetailViewController: UIViewController {
     
     public var coordinator: FeedCoordinatorInterface?
     
+    public weak var delegate: FeedDetailViewControllerDelegate?
+    
     private lazy var bookmarkButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bookmarkOutline.image, for: .normal)
         button.setImage(CommonAsset.bookmarkFilled.image, for: .selected)
+        return button
+    }()
+    
+    private lazy var optionButton: UIButton = {
+        let button = UIButton()
+        button.setImage(CommonAsset.dotsVerticalOutline.image, for: .normal)
         return button
     }()
     
@@ -72,10 +84,14 @@ final public class FeedDetailViewController: UIViewController {
         hideKeyboardWhenTouchUpBackground()
     }
     
+    deinit{
+        print("deinit FeedDetailViewController")
+    }
+    
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigationBar()
-        configureNavigationBarItem()
+//        configureNavigationBarItem()
         self.tabBarController?.tabBar.isHidden = true
     }
     
@@ -93,9 +109,15 @@ final public class FeedDetailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configureNavigationBarItem(){
+    private func configureNavigationBarItemWithBookmarkButton(){
         var barButtonItems: [UIBarButtonItem] = []
         barButtonItems.append(UIBarButtonItem(customView: bookmarkButton))
+        self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
+    }
+    
+    private func configureNavigationBarItemWithOptionButton(){
+        var barButtonItems: [UIBarButtonItem] = []
+        barButtonItems.append(UIBarButtonItem(customView: optionButton))
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
     
@@ -139,14 +161,14 @@ final public class FeedDetailViewController: UIViewController {
         }
     }
     
-    private func touchUpCommentOptionButton(isOwner: Bool?, commentModel: CommentModel){
+    private func touchUpCommentOptionButton(isOwner: Bool, commentModel: CommentModel){
         guard let reactor = reactor else { return }
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let editComment = UIAlertAction(title: "수정", style: .default)
         
-        let deleteComment = UIAlertAction(title: "삭제", style: .default) { [weak self] _ in
-            let deleteAlertController = UIAlertController(title: "댓글 삭제", message: "정말 삭제하시겠습니까?", preferredStyle: .alert)
+        let deleteComment = UIAlertAction(title: "삭제", style: .destructive) { [weak self] _ in
+            let deleteAlertController = UIAlertController(title: "댓글을 삭제하시겠습니까?", message: nil, preferredStyle: .alert)
             let deleteAction = UIAlertAction(title: "삭제", style: .destructive){ _ in
                 reactor.action.onNext(.deleteComment(commentModel))
             }
@@ -165,12 +187,42 @@ final public class FeedDetailViewController: UIViewController {
         
         let cancel = UIAlertAction(title: "취소", style: .cancel)
         
-        if isOwner != nil{
+        if isOwner {
             actionSheetController.addAction(editComment)
             actionSheetController.addAction(deleteComment)
         }else{
             actionSheetController.addAction(reportComment)
         }
+        actionSheetController.addAction(cancel)
+        self.present(actionSheetController, animated: true)
+    }
+    
+    private func touchUpNavigationBarOptionButton(){
+        guard let reactor = reactor else { return }
+        let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let editComment = UIAlertAction(title: "수정", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+            self.coordinator?.showEditPost(viewController: self, postId: reactor.currentState.postId)
+        }
+        
+        let deleteComment = UIAlertAction(title: "삭제", style: .destructive) { [weak self] _ in
+            let deleteAlertController = UIAlertController(title: "게시글 삭제", message: "게시글을 삭제하시겠습니까?", preferredStyle: .alert)
+            let deleteAction = UIAlertAction(title: "삭제", style: .destructive){ _ in
+                reactor.action.onNext(.deletePost(reactor.currentState.postId))
+            }
+            let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+            
+            deleteAlertController.addAction(deleteAction)
+            deleteAlertController.addAction(cancelAction)
+            self?.present(deleteAlertController, animated: true)
+        }
+    
+        
+        let cancel = UIAlertAction(title: "취소", style: .cancel)
+        actionSheetController.addAction(editComment)
+        actionSheetController.addAction(deleteComment)
         actionSheetController.addAction(cancel)
         self.present(actionSheetController, animated: true)
     }
@@ -184,8 +236,14 @@ extension FeedDetailViewController: View{
         
         reactor.state.compactMap{$0.postModel}
             .bind{ [weak self] model in
-                self?.postView.configureModel(model: model)
-                self?.recordView.configureModel(time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
+                guard let self = self else { return }
+                self.postView.configureModel(model: model)
+                self.recordView.configureModel(time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
+                if model.isOwner{
+                    self.configureNavigationBarItemWithOptionButton()
+                }else{
+                    self.configureNavigationBarItemWithBookmarkButton()
+                }
             }.disposed(by: self.disposeBag)
         
         let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, CommentModel>> (configureCell: { dataSource, tableView, indexPath, item in
@@ -208,16 +266,16 @@ extension FeedDetailViewController: View{
         
         commentTableView.rx.observe(CGSize.self, "contentSize")
             .bind{ [weak self] size in
-                guard let size = size else {return}
-                self?.commentTableView.snp.updateConstraints({ make in
+                guard let size = size, let self = self else {return}
+                self.commentTableView.snp.updateConstraints({ make in
                     make.height.equalTo(size.height)
                 })
             }.disposed(by: self.disposeBag)
         
         commentInputView.sendButton.rx
             .tap
-            .map{ [unowned self] in
-                Reactor.Action.writeComment(WriteCommentReqesutDTO(postId: reactor.currentState.postId, content: commentInputView.getCommentText()))
+            .map{ [weak self] in
+                Reactor.Action.writeComment(WriteCommentReqesutDTO(postId: reactor.currentState.postId, content: self?.commentInputView.getCommentText() ?? ""))
             }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
@@ -250,6 +308,12 @@ extension FeedDetailViewController: View{
             }.bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
+        optionButton.rx
+            .tap
+            .bind{ [weak self] _ in
+                self?.touchUpNavigationBarOptionButton()
+            }.disposed(by: self.disposeBag)
+        
         scrollView.rx.contentOffset
             .map{$0.y}
             .distinctUntilChanged()
@@ -263,6 +327,17 @@ extension FeedDetailViewController: View{
         
         self.commentTableView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
+        
+        reactor.state
+            .map{$0.deletedPost}
+            .filter{$0}
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.delegate?.deleteFeed()
+                self.navigationController?.popViewController(animated: true)
+            }.disposed(by: self.disposeBag)
+        
+        
     }
 }
 
@@ -292,3 +367,8 @@ extension FeedDetailViewController: UITableViewDelegate{
     }
 }
 
+extension FeedDetailViewController: EditFeedViewControllerDelegate{
+    public func editedFeed() {
+        reactor?.action.onNext(.fetchPost)
+    }
+}
