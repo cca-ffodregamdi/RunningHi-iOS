@@ -77,7 +77,7 @@ final public class FeedDetailViewController: UIViewController {
     }()
     
     // MARK: LifeCyecle
-    
+
     public override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
@@ -91,7 +91,6 @@ final public class FeedDetailViewController: UIViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigationBar()
-//        configureNavigationBarItem()
         self.tabBarController?.tabBar.isHidden = true
     }
     
@@ -336,8 +335,6 @@ extension FeedDetailViewController: View{
                 self.delegate?.deleteFeed()
                 self.navigationController?.popViewController(animated: true)
             }.disposed(by: self.disposeBag)
-        
-        
     }
 }
 

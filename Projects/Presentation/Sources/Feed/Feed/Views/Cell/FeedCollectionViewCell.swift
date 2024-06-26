@@ -86,6 +86,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
     private lazy var mainContentLabel: UILabel = {
         let label = UILabel()
         label.text = "0kcal"
+        label.adjustsFontSizeToFitWidth = true
         label.font = UIFont.systemFont(ofSize: 36, weight: .bold)
         label.textColor = UIColor.colorWithRGB(r: 0, g: 0, b: 0)
         return label
@@ -172,7 +173,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
         
         mainContentLabel.snp.makeConstraints { make in
             make.bottom.equalTo(contentLabel.snp.top).offset(-10)
-            make.left.equalToSuperview().offset(15)
+            make.left.equalToSuperview().offset(10)
             make.right.equalToSuperview().offset(-10)
         }
     }
