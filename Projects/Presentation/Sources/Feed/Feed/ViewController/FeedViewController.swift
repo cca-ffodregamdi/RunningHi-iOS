@@ -21,7 +21,7 @@ final public class FeedViewController: UIViewController{
     
     public var coordinator: FeedCoordinatorInterface?
     
-    private var dataSource: RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>!
+    private var dataSource: RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>!
     private lazy var filterButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.adjustmentsOutline.image, for: .normal)
@@ -113,16 +113,29 @@ extension FeedViewController: View{
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
-        self.dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
+        self.dataSource = RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
+            
             cell.configureModel(model: feed)
+            
+            cell.bookmarkButton.rx
+                .tap
+                .map{ _ in
+                    if cell.bookmarkButton.isSelected{
+                        return Reactor.Action.deleteBookmark(feed.postId, indexPath.item)
+                    }else{
+                        return Reactor.Action.makeBookmark(BookmarkRequestDTO(postNo: feed.postId), indexPath.item)
+                    }
+                }.bind(to: reactor.action)
+                .disposed(by: cell.disposeBag)
             return cell
         })
         
         reactor.state
-            .map{[SectionModel(model: "feeds", items: $0.feeds)]}
+            .map{[AnimatableSectionModel(model: "feedModel", items: $0.feeds)]}
             .bind(to: self.feedCollectionView.rx.items(dataSource: self.dataSource))
             .disposed(by: self.disposeBag)
+        
         
         self.feedCollectionView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
@@ -144,7 +157,7 @@ extension FeedViewController: View{
                 guard let self = self else { return }
                 let model = self.dataSource[indexPath]
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self.coordinator?.showFeedDetail(postId: model.postNo)
+                self.coordinator?.showFeedDetail(postId: model.postId)
             }.disposed(by: self.disposeBag)
         
         self.feedCollectionView.rx.contentOffset

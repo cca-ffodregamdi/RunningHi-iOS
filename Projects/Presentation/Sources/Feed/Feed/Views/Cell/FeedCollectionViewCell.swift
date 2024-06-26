@@ -36,7 +36,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    private lazy var bookmarkButton: UIButton = {
+    lazy var bookmarkButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bookmarkOutline.image, for: .normal)
         button.setImage(CommonAsset.bookmarkFilled.image, for: .selected)
@@ -102,7 +102,6 @@ class FeedCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureUI()
-        bindForColor()
     }
     
     required init?(coder: NSCoder) {
@@ -193,6 +192,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
         self.commentCountLabel.text = "\(model.commentCount)"
         self.mainContentLabel.text = model.mainData
         self.bookmarkButton.isSelected = model.isBookmarked
+        bindForColor()
     }
     
     private func bindForColor() {
@@ -251,6 +251,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
     }
     
     private func resetModelForReuse(){
+        disposeBag = DisposeBag()
         self.thumbnailImageView.kf.cancelDownloadTask()
         self.thumbnailImageView.image = nil
         
@@ -270,7 +271,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
         likeCountLabel.textColor = .black
         commentImageView.tintColor = .black
         commentCountLabel.textColor = .black
-        bookmarkButton.isEnabled = false
+        bookmarkButton.isSelected = false
     }
     
     override func layoutSubviews() {

@@ -31,7 +31,7 @@ public struct FeedResponseData: Decodable{
 }
 
 public struct FeedModel: Decodable{
-    public let postNo: Int
+    public let postId: Int
     public let nickname: String?
     public let createDate: String?
     public let postContent: String
@@ -41,10 +41,10 @@ public struct FeedModel: Decodable{
     public let imageUrl: String?
     public let commentCount: Int
     public let likeCount: Int
-    public let isBookmarked: Bool
+    public var isBookmarked: Bool
     
     enum CodingKeys: String, CodingKey {
-        case postNo
+        case postId = "postNo"
         case nickname
         case createDate
         case postContent
