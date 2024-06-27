@@ -27,6 +27,8 @@ final public class FeedDetailViewController: UIViewController {
     
     public weak var delegate: FeedDetailViewControllerDelegate?
     
+    private var stickyViewHeight: NSLayoutConstraint?
+    
     private lazy var bookmarkButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bookmarkOutline.image, for: .normal)
@@ -42,11 +44,16 @@ final public class FeedDetailViewController: UIViewController {
     
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
+        scrollView.clipsToBounds = true
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
-        scrollView.alwaysBounceVertical = true
+        scrollView.alwaysBounceVertical = false
         scrollView.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
         return scrollView
+    }()
+    
+    private lazy var stickyImageView: StickyImageView = {
+        return StickyImageView(frame: .zero)
     }()
     
     private lazy var postView: PostView = {
@@ -71,13 +78,13 @@ final public class FeedDetailViewController: UIViewController {
         tableView.sectionHeaderTopPadding = 0
         return tableView
     }()
-
+    
     private lazy var commentInputView: CommentInputView = {
         return CommentInputView()
     }()
     
     // MARK: LifeCyecle
-
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
@@ -153,7 +160,7 @@ final public class FeedDetailViewController: UIViewController {
             make.left.right.width.equalToSuperview()
             make.bottom.equalToSuperview()
         }
-
+        
         commentInputView.snp.makeConstraints { make in
             make.bottom.equalTo(self.view.keyboardLayoutGuide.snp.top)
             make.left.right.equalToSuperview()
@@ -217,13 +224,34 @@ final public class FeedDetailViewController: UIViewController {
             deleteAlertController.addAction(cancelAction)
             self?.present(deleteAlertController, animated: true)
         }
-    
         
         let cancel = UIAlertAction(title: "취소", style: .cancel)
         actionSheetController.addAction(editComment)
         actionSheetController.addAction(deleteComment)
         actionSheetController.addAction(cancel)
         self.present(actionSheetController, animated: true)
+    }
+    
+    private func updateStickyImageView(offsetY: CGFloat){
+        guard let constraint = stickyViewHeight else { return }
+        let remainingTopSpacing = abs(scrollView.contentOffset.y)
+        let lowerThanTop = scrollView.contentOffset.y < 0
+        let stopExpandHeaderHeight = scrollView.contentOffset.y > -260
+    
+        if stopExpandHeaderHeight, lowerThanTop {
+            // 1) 초기 상태: UIImageView가 지정한 크기만큼 커졌고, 스크롤뷰의 시작점이 최상단보다 아래 존재
+            scrollView.contentInset = .init(top: remainingTopSpacing, left: 0, bottom: 0, right: 0)
+            constraint.constant = remainingTopSpacing
+            
+            view.layoutIfNeeded()
+        } else if !lowerThanTop {
+            // 2) 스크롤 뷰의 시작점이 최상단보다 위에 존재
+            scrollView.contentInset = .zero
+            constraint.constant = 0
+        } else {
+            // 3) 스크롤 뷰의 시작점이 최상단보다 밑에 있고, 스크롤뷰 상단 contentInset이 미리 지정한 UIImageView 높이인, Metric.headerHeight보다 큰 경우
+            constraint.constant = remainingTopSpacing
+        }
     }
 }
 
@@ -242,6 +270,20 @@ extension FeedDetailViewController: View{
                     self.configureNavigationBarItemWithOptionButton()
                 }else{
                     self.configureNavigationBarItemWithBookmarkButton()
+                }
+                
+                if let url = model.imageUrl{
+                    self.scrollView.contentInset = .init(top: 260, left: 0, bottom: 0, right: 0)
+                    self.scrollView.contentOffset = .init(x: 0, y: -260)
+                    self.view.addSubview(stickyImageView)
+                    self.stickyImageView.setImage(urlString: url)
+                    
+                    stickyImageView.snp.makeConstraints { make in
+                        make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+                        make.left.right.equalToSuperview()
+                    }
+                    stickyViewHeight = stickyImageView.heightAnchor.constraint(equalToConstant: 260)
+                    stickyViewHeight?.isActive = true
                 }
             }.disposed(by: self.disposeBag)
         
@@ -318,11 +360,13 @@ extension FeedDetailViewController: View{
             .distinctUntilChanged()
             .filter{ [weak self] offset in
                 guard let self = self else { return false }
+                
+                self.updateStickyImageView(offsetY: offset)
                 return offset + self.scrollView.frame.size.height + 100 > self.scrollView.contentSize.height
             }.map{ _ in Reactor.Action.fetchComment}
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
-    
+        
         
         self.commentTableView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
@@ -345,7 +389,7 @@ extension FeedDetailViewController: UITableViewDelegate{
         view.configureModel(title: "댓글 \(reactor.currentState.commentModels.count)")
         return view
     }
-
+    
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 60 // 충분히 큰 높이 설정
     }
