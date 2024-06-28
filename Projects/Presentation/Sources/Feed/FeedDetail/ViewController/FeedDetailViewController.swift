@@ -29,6 +29,8 @@ final public class FeedDetailViewController: UIViewController {
     
     private var stickyViewHeight: NSLayoutConstraint?
     
+    private let stickViewDefaultHeight: CGFloat = UIScreen.main.bounds.height / 3
+    
     private lazy var bookmarkButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bookmarkOutline.image, for: .normal)
@@ -48,7 +50,7 @@ final public class FeedDetailViewController: UIViewController {
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = false
-        scrollView.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
+        scrollView.backgroundColor = .clear
         return scrollView
     }()
     
@@ -98,6 +100,7 @@ final public class FeedDetailViewController: UIViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigationBar()
+        setTransparentNavigationBar()
         self.tabBarController?.tabBar.isHidden = true
     }
     
@@ -234,24 +237,42 @@ final public class FeedDetailViewController: UIViewController {
     
     private func updateStickyImageView(offsetY: CGFloat){
         guard let constraint = stickyViewHeight else { return }
-        let remainingTopSpacing = abs(scrollView.contentOffset.y)
-        let lowerThanTop = scrollView.contentOffset.y < 0
-        let stopExpandHeaderHeight = scrollView.contentOffset.y > -260
-    
+        
+        let remainingTopSpacing = abs(offsetY)
+        let lowerThanTop = offsetY < 0
+        let stopExpandHeaderHeight = offsetY > -stickViewDefaultHeight
+        
         if stopExpandHeaderHeight, lowerThanTop {
-            // 1) 초기 상태: UIImageView가 지정한 크기만큼 커졌고, 스크롤뷰의 시작점이 최상단보다 아래 존재
+            // 초기 상태, UIImageView가 지정한 크기만큼 커졌고, 스크롤뷰의 시작점이 최상단보다 아래 존재
             scrollView.contentInset = .init(top: remainingTopSpacing, left: 0, bottom: 0, right: 0)
             constraint.constant = remainingTopSpacing
-            
             view.layoutIfNeeded()
         } else if !lowerThanTop {
-            // 2) 스크롤 뷰의 시작점이 최상단보다 위에 존재
+            // 스크롤 뷰의 시작점이 최상단보다 위에 존재
             scrollView.contentInset = .zero
             constraint.constant = 0
         } else {
             // 3) 스크롤 뷰의 시작점이 최상단보다 밑에 있고, 스크롤뷰 상단 contentInset이 미리 지정한 UIImageView 높이인, Metric.headerHeight보다 큰 경우
             constraint.constant = remainingTopSpacing
         }
+    }
+    
+    private func setTransparentNavigationBar(){
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .clear
+        appearance.shadowColor = .clear
+        
+        let scrollAppearance = UINavigationBarAppearance()
+        scrollAppearance.configureWithTransparentBackground()
+        scrollAppearance.configureWithTransparentBackground()
+        scrollAppearance.backgroundColor = .systemBackground
+        scrollAppearance.shadowColor = .clear
+        
+        navigationController?.navigationBar.standardAppearance = scrollAppearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
 }
 
@@ -261,9 +282,12 @@ extension FeedDetailViewController: View{
         reactor.action.onNext(.fetchPost)
         reactor.action.onNext(.fetchComment)
         
-        reactor.state.compactMap{$0.postModel}
-            .bind{ [weak self] model in
-                guard let self = self else { return }
+        reactor.state
+            .map{$0.isFetchedPost}
+            .distinctUntilChanged()
+            .filter{$0}
+            .bind{ [weak self] _ in
+                guard let self = self, let model = reactor.currentState.postModel else { return }
                 self.postView.configureModel(model: model)
                 self.recordView.configureModel(time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
                 if model.isOwner{
@@ -273,16 +297,22 @@ extension FeedDetailViewController: View{
                 }
                 
                 if let url = model.imageUrl{
-                    self.scrollView.contentInset = .init(top: 260, left: 0, bottom: 0, right: 0)
-                    self.scrollView.contentOffset = .init(x: 0, y: -260)
+                    self.scrollView.contentInset = .init(top: stickViewDefaultHeight, left: 0, bottom: 0, right: 0)
+                    self.scrollView.contentOffset = .init(x: 0, y: -stickViewDefaultHeight)
                     self.view.addSubview(stickyImageView)
                     self.stickyImageView.setImage(urlString: url)
                     
                     stickyImageView.snp.makeConstraints { make in
-                        make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+                        make.top.equalToSuperview()
                         make.left.right.equalToSuperview()
                     }
-                    stickyViewHeight = stickyImageView.heightAnchor.constraint(equalToConstant: 260)
+                    
+                    scrollView.snp.remakeConstraints { make in
+                        make.top.equalToSuperview()
+                        make.left.right.equalToSuperview()
+                        make.bottom.equalTo(self.commentInputView.snp.top)
+                    }
+                    stickyViewHeight = stickyImageView.heightAnchor.constraint(equalToConstant: stickViewDefaultHeight)
                     stickyViewHeight?.isActive = true
                 }
             }.disposed(by: self.disposeBag)
@@ -355,18 +385,25 @@ extension FeedDetailViewController: View{
                 self?.touchUpNavigationBarOptionButton()
             }.disposed(by: self.disposeBag)
         
-        scrollView.rx.contentOffset
-            .map{$0.y}
+        let scrollViewContentOffsetYObserver = scrollView.rx.contentOffset.map{$0.y}.asObservable()
+        
+        scrollViewContentOffsetYObserver
             .distinctUntilChanged()
             .filter{ [weak self] offset in
                 guard let self = self else { return false }
-                
-                self.updateStickyImageView(offsetY: offset)
                 return offset + self.scrollView.frame.size.height + 100 > self.scrollView.contentSize.height
             }.map{ _ in Reactor.Action.fetchComment}
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
+        scrollViewContentOffsetYObserver
+            .distinctUntilChanged()
+            .bind{ [weak self] offset in
+                guard let self = self else { return }
+                let isAtBottom = offset + self.scrollView.frame.size.height >= self.scrollView.contentSize.height
+                guard !isAtBottom else { return }
+                self.updateStickyImageView(offsetY: offset)
+            }.disposed(by: self.disposeBag)
         
         self.commentTableView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)

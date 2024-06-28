@@ -37,6 +37,7 @@ public class FeedDetailReactor: Reactor{
     public struct State{
         var postId: Int
         var postModel: FeedDetailModel?
+        var isFetchedPost: Bool = false
         var commentModels: [CommentModel] = []
         var totalPages: Int = 1
         var pageNumber: Int = 0
@@ -58,7 +59,7 @@ public class FeedDetailReactor: Reactor{
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .fetchPost: return feedUseCase.fetchPost(postId: currentState.postId).map{ Mutation.setPost($0) }
-            
+    
         case .fetchComment:
             guard !currentState.isLoading else { return .empty()}
             guard currentState.pageNumber < currentState.totalPages else { return .empty()}
@@ -100,6 +101,7 @@ public class FeedDetailReactor: Reactor{
         switch mutation{
         case .setPost(let model):
             newState.postModel = model
+            newState.isFetchedPost = true
         case .setComment(let models, let totalPages):
             newState.commentModels = models
             newState.postModel?.commentCount = models.count
@@ -121,7 +123,6 @@ public class FeedDetailReactor: Reactor{
             break
         case .deletePost:
             newState.deletedPost = true
-            
         }
         return newState
     }
