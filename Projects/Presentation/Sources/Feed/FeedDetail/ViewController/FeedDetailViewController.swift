@@ -118,15 +118,13 @@ final public class FeedDetailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configureNavigationBarItemWithBookmarkButton(){
+    private func setNavigationBarButton(isOwner: Bool){
         var barButtonItems: [UIBarButtonItem] = []
-        barButtonItems.append(UIBarButtonItem(customView: bookmarkButton))
-        self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
-    }
-    
-    private func configureNavigationBarItemWithOptionButton(){
-        var barButtonItems: [UIBarButtonItem] = []
-        barButtonItems.append(UIBarButtonItem(customView: optionButton))
+        if isOwner{
+            barButtonItems.append(UIBarButtonItem(customView: bookmarkButton))
+        }else{
+            barButtonItems.append(UIBarButtonItem(customView: optionButton))
+        }
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
     
@@ -252,7 +250,7 @@ final public class FeedDetailViewController: UIViewController {
             scrollView.contentInset = .zero
             constraint.constant = 0
         } else {
-            // 3) 스크롤 뷰의 시작점이 최상단보다 밑에 있고, 스크롤뷰 상단 contentInset이 미리 지정한 UIImageView 높이인, Metric.headerHeight보다 큰 경우
+            // 3) 스크롤 뷰의 시작점이 최상단보다 밑에 있고, 스크롤뷰 상단 contentInset이 미리 지정한 stickViewDefaultHeight 보다 큰 경우
             constraint.constant = remainingTopSpacing
         }
     }
@@ -274,6 +272,27 @@ final public class FeedDetailViewController: UIViewController {
         navigationController?.navigationBar.compactAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
+    
+    private func configureStickyView(imageUrl: String?){
+        guard let url = imageUrl else { return }
+        self.scrollView.contentInset = .init(top: stickViewDefaultHeight, left: 0, bottom: 0, right: 0)
+        self.scrollView.contentOffset = .init(x: 0, y: -stickViewDefaultHeight)
+        self.view.addSubview(stickyImageView)
+        self.stickyImageView.setImage(urlString: url)
+        
+        stickyImageView.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.left.right.equalToSuperview()
+        }
+        
+        scrollView.snp.remakeConstraints { make in
+            make.top.equalToSuperview()
+            make.left.right.equalToSuperview()
+            make.bottom.equalTo(self.commentInputView.snp.top)
+        }
+        stickyViewHeight = stickyImageView.heightAnchor.constraint(equalToConstant: stickViewDefaultHeight)
+        stickyViewHeight?.isActive = true
+    }
 }
 
 extension FeedDetailViewController: View{
@@ -290,31 +309,8 @@ extension FeedDetailViewController: View{
                 guard let self = self, let model = reactor.currentState.postModel else { return }
                 self.postView.configureModel(model: model)
                 self.recordView.configureModel(time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
-                if model.isOwner{
-                    self.configureNavigationBarItemWithOptionButton()
-                }else{
-                    self.configureNavigationBarItemWithBookmarkButton()
-                }
-                
-                if let url = model.imageUrl{
-                    self.scrollView.contentInset = .init(top: stickViewDefaultHeight, left: 0, bottom: 0, right: 0)
-                    self.scrollView.contentOffset = .init(x: 0, y: -stickViewDefaultHeight)
-                    self.view.addSubview(stickyImageView)
-                    self.stickyImageView.setImage(urlString: url)
-                    
-                    stickyImageView.snp.makeConstraints { make in
-                        make.top.equalToSuperview()
-                        make.left.right.equalToSuperview()
-                    }
-                    
-                    scrollView.snp.remakeConstraints { make in
-                        make.top.equalToSuperview()
-                        make.left.right.equalToSuperview()
-                        make.bottom.equalTo(self.commentInputView.snp.top)
-                    }
-                    stickyViewHeight = stickyImageView.heightAnchor.constraint(equalToConstant: stickViewDefaultHeight)
-                    stickyViewHeight?.isActive = true
-                }
+                self.setNavigationBarButton(isOwner: model.isOwner)
+                self.configureStickyView(imageUrl: model.imageUrl)
             }.disposed(by: self.disposeBag)
         
         let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, CommentModel>> (configureCell: { dataSource, tableView, indexPath, item in
