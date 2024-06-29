@@ -62,8 +62,20 @@ final public class FeedDetailViewController: UIViewController {
         return PostView()
     }()
     
+    private lazy var postRecordBreakLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
+        return view
+    }()
+    
     private lazy var recordView: FeedDetailRecordView = {
         return FeedDetailRecordView()
+    }()
+    
+    private lazy var recordCommentBreakLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
+        return view
     }()
     
     private lazy var commentTableView: UITableView = {
@@ -136,7 +148,9 @@ final public class FeedDetailViewController: UIViewController {
         self.view.backgroundColor = .systemBackground
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(postView)
+        self.scrollView.addSubview(postRecordBreakLine)
         self.scrollView.addSubview(recordView)
+        self.scrollView.addSubview(recordCommentBreakLine)
         self.scrollView.addSubview(commentTableView)
         self.view.addSubview(commentInputView)
         
@@ -151,13 +165,25 @@ final public class FeedDetailViewController: UIViewController {
             make.width.equalToSuperview()
         }
         
+        postRecordBreakLine.snp.makeConstraints { make in
+            make.top.equalTo(postView.snp.bottom)
+            make.left.right.equalToSuperview()
+            make.height.equalTo(8)
+        }
+        
         recordView.snp.makeConstraints { make in
-            make.top.equalTo(postView.snp.bottom).offset(8)
+            make.top.equalTo(postRecordBreakLine.snp.bottom)
             make.left.right.width.equalToSuperview()
         }
         
+        recordCommentBreakLine.snp.makeConstraints { make in
+            make.top.equalTo(recordView.snp.bottom)
+            make.left.right.equalToSuperview()
+            make.height.equalTo(8)
+        }
+        
         commentTableView.snp.makeConstraints { make in
-            make.top.equalTo(recordView.snp.bottom).offset(8)
+            make.top.equalTo(recordCommentBreakLine.snp.bottom)
             make.left.right.width.equalToSuperview()
             make.bottom.equalToSuperview()
         }

@@ -29,9 +29,9 @@ public struct FeedDetailModel: Decodable{
     public let role: String
     public let loactionName: String?
     public let distance: Float
-    public let time: Float
-    public let meanPace: Float
-    public let kcal: Float
+    public let time: Int
+    public let meanPace: Int
+    public let kcal: Int
     public let imageUrl: String?
     public let createDate: String
     public var commentCount: Int

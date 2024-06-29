@@ -119,10 +119,22 @@ final class FeedDetailRecordView: UIView {
         }
     }
     
-    func configureModel(time: Float, distance: Float, meanPace: Float, kcal: Float){
-        timeElementView.configureModel(title: "시간", value: Date().formatSecondsToHHMMSS(seconds: Int(time)))
+    func configureModel(time: Int, distance: Float, meanPace: Int, kcal: Int){
+        timeElementView.configureModel(title: "시간", value: Date().formatSecondsToHHMMSS(seconds: time))
         distanceElementView.configureModel(title: "거리", value: "\(distance) km")
-        meanPaceElementView.configureModel(title: "평균 페이스", value: "\(meanPace)")
-        kcalElementView.configureModel(title: "소모 칼로리", value: "\(Int(kcal)) kcal")
+        var meanPaceMin: String {
+            return meanPace / 60 != 0 ? "\(meanPace / 60)’ " : ""
+        }
+        var meanPaceSec: String {
+            if meanPace % 60 == 0 {
+                return "00”"
+            }else if meanPace % 60 < 10{
+                return "0\(meanPace % 60)”"
+            }else{
+                return "\(meanPace % 60)”"
+            }
+        }
+        meanPaceElementView.configureModel(title: "평균 페이스", value: "\(meanPaceMin)\(meanPaceSec)")
+        kcalElementView.configureModel(title: "소모 칼로리", value: "\(kcal) kcal")
     }
 }
