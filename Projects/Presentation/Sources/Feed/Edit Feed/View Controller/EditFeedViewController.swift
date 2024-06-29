@@ -26,8 +26,6 @@ public class EditFeedViewController: UIViewController {
         let button = UIButton()
         button.setTitle("완료", for: .normal)
         button.setTitleColor(.black, for: .normal)
-//        button.setTitleColor(.lightGray, for: .disabled)
-//        button.isEnabled = false
         return button
     }()
     
@@ -94,7 +92,7 @@ extension EditFeedViewController: View{
         confirmButton.rx.tap
             .map{ [weak self] _ in
                 self?.contentTextView.resignFirstResponder()
-                return Reactor.Action.editfeed(EditFeedRequestDTO(postContent: self?.contentTextView.text ?? "", dataType: 1, difficulty: "HARD"))
+                return Reactor.Action.editfeed(EditFeedRequestDTO(postContent: self?.contentTextView.text ?? "", dataType: 1, imageUrl: "")) // TODO: imageUrl 수정
             }.bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         

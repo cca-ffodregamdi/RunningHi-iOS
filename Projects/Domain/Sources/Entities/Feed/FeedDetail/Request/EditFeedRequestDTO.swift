@@ -13,11 +13,11 @@ import Foundation
 public struct EditFeedRequestDTO: Codable{
     let postContent: String
     let mainData: Int
-    let difficulty: String
+    let imageUrl: String
     
-    public init(postContent: String, dataType: Int, difficulty: String) {
+    public init(postContent: String, dataType: Int, imageUrl: String) {
         self.postContent = postContent
         self.mainData = dataType
-        self.difficulty = difficulty
+        self.imageUrl = imageUrl
     }
 }
