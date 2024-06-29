@@ -407,18 +407,8 @@ extension FeedDetailViewController: View{
                 self?.touchUpNavigationBarOptionButton()
             }.disposed(by: self.disposeBag)
         
-        let scrollViewContentOffsetYObserver = scrollView.rx.contentOffset.map{$0.y}.asObservable()
-        
-        scrollViewContentOffsetYObserver
-            .distinctUntilChanged()
-            .filter{ [weak self] offset in
-                guard let self = self else { return false }
-                return offset + self.scrollView.frame.size.height + 100 > self.scrollView.contentSize.height
-            }.map{ _ in Reactor.Action.fetchComment}
-            .bind(to: reactor.action)
-            .disposed(by: self.disposeBag)
-        
-        scrollViewContentOffsetYObserver
+        scrollView.rx.contentOffset
+            .map{$0.y}
             .distinctUntilChanged()
             .bind{ [weak self] offset in
                 guard let self = self else { return }

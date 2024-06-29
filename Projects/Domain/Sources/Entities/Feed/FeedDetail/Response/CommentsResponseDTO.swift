@@ -23,13 +23,9 @@ public struct CommentsResponseDTO: Decodable{
 
 public struct CommentsResponseData: Decodable{
     public let content: [CommentModel]
-    public let pageNumber: Int
-    public let totalPages: Int
     
     enum CodingKeys: CodingKey {
         case content
-        case pageNumber
-        case totalPages
     }
 }
 
@@ -44,8 +40,6 @@ public struct CommentModel: Decodable{
     public let createDate: String
     public let isUpdated: Bool
     public let isOwner: Bool
-    //"parentReplyNo": null,
-    //"children": [],
     
     enum CodingKeys: String, CodingKey {
         case commentId = "replyNo"
