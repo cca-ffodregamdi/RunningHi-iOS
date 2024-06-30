@@ -318,6 +318,17 @@ final public class FeedDetailViewController: UIViewController {
         }
         stickyViewHeight = stickyImageView.heightAnchor.constraint(equalToConstant: stickViewDefaultHeight)
         stickyViewHeight?.isActive = true
+        
+        let tapGesture = UITapGestureRecognizer()
+        stickyImageView.addGestureRecognizer(tapGesture)
+        stickyImageView.isUserInteractionEnabled = true
+        tapGesture.rx.event
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                let vc = ThumbnailImageViewController(imageUrl: url)
+                vc.modalPresentationStyle = .fullScreen
+                self.present(vc, animated: true)
+            }.disposed(by: self.disposeBag)
     }
 }
 
