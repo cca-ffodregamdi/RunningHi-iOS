@@ -23,7 +23,7 @@ public struct FeedDetailResponseDTO: Decodable{
 
 public struct FeedDetailModel: Decodable{
     public let nickname: String?
-    public let profileImagUrl: String?
+    public let profileImageUrl: String?
     public let level: Int
     public let postContent: String
     public let role: String
@@ -40,7 +40,7 @@ public struct FeedDetailModel: Decodable{
     
     enum CodingKeys: String, CodingKey {
         case nickname
-        case profileImagUrl
+        case profileImageUrl
         case level
         case postContent
         case role
