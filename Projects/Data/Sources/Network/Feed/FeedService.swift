@@ -13,12 +13,14 @@ import Domain
 public enum FeedService{
     case fetchFeeds(page: Int, size: Int = 10)
     case fetchPost(postId: Int)
-    case fetchComment(postId: Int, page: Int, size: Int = 10)
+    case fetchComment(postId: Int)
     case writeComment(commentModel: WriteCommentReqesutDTO)
     case makeBookmark(post: BookmarkRequestDTO)
     case deleteBookmark(postId: Int)
     case deleteComment(postId: Int)
     case reportComment(reportCommentModel: ReportCommentRequestDTO)
+    case deletePost(postId: Int)
+    case editPost(postId: Int, editPostModel: EditFeedRequestDTO)
 }
 
 extension FeedService: TargetType{
@@ -48,6 +50,10 @@ extension FeedService: TargetType{
             return "/reply/delete/\(postId)"
         case .reportComment:
             return "/reply-reports"
+        case .deletePost(let postId):
+            return "/posts/\(postId)"
+        case .editPost(let postId, _):
+            return "/posts/\(postId)"
         }
     }
     
@@ -61,9 +67,11 @@ extension FeedService: TargetType{
                 .makeBookmark,
                 .reportComment:
             return .post
-        case .deleteBookmark:
+        case .deleteBookmark,
+                .deletePost:
             return .delete
-        case .deleteComment:
+        case .deleteComment,
+                .editPost:
             return .put
         }
     }
@@ -72,14 +80,16 @@ extension FeedService: TargetType{
         switch self{
         case .fetchFeeds(let page, let size):
             return .requestParameters(parameters: ["page" : page + 1, "size" : size, "sort" : "recommended", "distance" : 100], encoding: URLEncoding.queryString)
-        case .fetchComment(let postId, let page, let size):
-            return .requestParameters(parameters: ["page" : page + 1, "size" : size, "postNo" : postId], encoding: URLEncoding.queryString)
+        case .fetchComment(let postId):
+            return .requestParameters(parameters: ["postNo" : postId], encoding: URLEncoding.queryString)
         case .reportComment(let reportCommentModel):
             return .requestJSONEncodable(reportCommentModel)
-            
+        case .editPost(_, let editPostModel):
+            return .requestJSONEncodable(editPostModel)
         case .fetchPost,
                 .deleteBookmark,
-                .deleteComment:
+                .deleteComment,
+                .deletePost:
             return .requestPlain
         case .writeComment(let commentModel):
             return .requestJSONEncodable(commentModel)
@@ -97,10 +107,11 @@ extension FeedService: TargetType{
                 .makeBookmark,
                 .deleteBookmark,
                 .deleteComment,
-                .reportComment:
+                .reportComment,
+                .deletePost,
+                .editPost:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]
-        
         }
     }
 }

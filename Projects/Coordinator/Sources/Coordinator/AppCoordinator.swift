@@ -23,6 +23,7 @@ public class AppCoordinator: Coordinator{
     public func start() {
         AuthManager.shared.isValidAccessToken()
             .bind{ bool in
+                print(UserDefaults.standard.object(forKey: "accessToken"))
                 if bool{
                     self.showBaseTabBarController()
                 }else{

@@ -151,10 +151,12 @@ final class PostView: UIView {
     }
     
     func configureModel(model: FeedDetailModel){
-//        profileImageView
+        if let profileImageUrl = model.profileImageUrl{
+            profileImageView.setImage(urlString: profileImageUrl)
+        }
         nickNameLabel.text = model.nickname ?? "러닝하이"
         contentLabel.text = model.postContent
-        levelLabel.text = "Lv\(model.level)"
+        levelLabel.text = "Lv.\(model.level)"
         dateLabel.text = Date().createDateToString(createDate: model.createDate)
         likeCountLabel.text = "\(model.likeCount)"
         commentCountLabel.text = "\(model.commentCount)"

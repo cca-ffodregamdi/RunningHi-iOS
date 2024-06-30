@@ -12,10 +12,12 @@ import RxSwift
 public protocol FeedRepositoryProtocol{
     func fetchFeeds(page: Int) -> Observable<([FeedModel], Int)>
     func fetchPost(postId: Int) -> Observable<FeedDetailModel>
-    func fetchComment(postId: Int, page: Int, size: Int) -> Observable<([CommentModel], Int)>
+    func fetchComment(postId: Int) -> Observable<[CommentModel]>
     func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentResponseModel>
     func makeBookmark(post: BookmarkRequestDTO) -> Observable<Any>
     func deleteBookmark(postId: Int) -> Observable<Any>
     func deleteComment(postId: Int) -> Observable<Any>
     func reportComment(reportCommentModel: ReportCommentRequestDTO) -> Observable<Any>
+    func deletePost(postId: Int) -> Observable<Any>
+    func editPost(postId: Int, editPostModel: EditFeedRequestDTO) -> Observable<Any>
 }

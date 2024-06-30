@@ -8,6 +8,7 @@
 import Foundation
 
 public protocol FeedCoordinatorInterface{
-    func showFeedDetail(postId: Int)
+    func showFeedDetail(viewController: FeedViewController, postId: Int)
     func showReportComment(commentId: Int)
+    func showEditPost(viewController: FeedDetailViewController, postId: Int)
 }

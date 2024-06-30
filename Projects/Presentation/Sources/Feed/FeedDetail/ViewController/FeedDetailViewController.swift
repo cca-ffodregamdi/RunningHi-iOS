@@ -14,12 +14,22 @@ import Domain
 import RxSwift
 import RxCocoa
 
+public protocol FeedDetailViewControllerDelegate: AnyObject{
+    func deleteFeed()
+}
+
 final public class FeedDetailViewController: UIViewController {
     
     // MARK: Properties
     public var disposeBag: DisposeBag = DisposeBag()
     
     public var coordinator: FeedCoordinatorInterface?
+    
+    public weak var delegate: FeedDetailViewControllerDelegate?
+    
+    private var stickyViewHeight: NSLayoutConstraint?
+    
+    private let stickViewDefaultHeight: CGFloat = UIScreen.main.bounds.height / 3
     
     private lazy var bookmarkButton: UIButton = {
         let button = UIButton()
@@ -28,21 +38,44 @@ final public class FeedDetailViewController: UIViewController {
         return button
     }()
     
+    private lazy var optionButton: UIButton = {
+        let button = UIButton()
+        button.setImage(CommonAsset.dotsVerticalOutline.image, for: .normal)
+        return button
+    }()
+    
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
+        scrollView.clipsToBounds = true
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
-        scrollView.alwaysBounceVertical = true
-        scrollView.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
+        scrollView.alwaysBounceVertical = false
+        scrollView.backgroundColor = .clear
         return scrollView
+    }()
+    
+    private lazy var stickyImageView: StickyImageView = {
+        return StickyImageView(frame: .zero)
     }()
     
     private lazy var postView: PostView = {
         return PostView()
     }()
     
+    private lazy var postRecordBreakLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
+        return view
+    }()
+    
     private lazy var recordView: FeedDetailRecordView = {
         return FeedDetailRecordView()
+    }()
+    
+    private lazy var recordCommentBreakLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
+        return view
     }()
     
     private lazy var commentTableView: UITableView = {
@@ -59,7 +92,7 @@ final public class FeedDetailViewController: UIViewController {
         tableView.sectionHeaderTopPadding = 0
         return tableView
     }()
-
+    
     private lazy var commentInputView: CommentInputView = {
         return CommentInputView()
     }()
@@ -72,10 +105,14 @@ final public class FeedDetailViewController: UIViewController {
         hideKeyboardWhenTouchUpBackground()
     }
     
+    deinit{
+        print("deinit FeedDetailViewController")
+    }
+    
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigationBar()
-        configureNavigationBarItem()
+        setTransparentNavigationBar()
         self.tabBarController?.tabBar.isHidden = true
     }
     
@@ -93,9 +130,13 @@ final public class FeedDetailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configureNavigationBarItem(){
+    private func setNavigationBarButton(isOwner: Bool){
         var barButtonItems: [UIBarButtonItem] = []
-        barButtonItems.append(UIBarButtonItem(customView: bookmarkButton))
+        if isOwner{
+            barButtonItems.append(UIBarButtonItem(customView: bookmarkButton))
+        }else{
+            barButtonItems.append(UIBarButtonItem(customView: optionButton))
+        }
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
     
@@ -107,7 +148,9 @@ final public class FeedDetailViewController: UIViewController {
         self.view.backgroundColor = .systemBackground
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(postView)
+        self.scrollView.addSubview(postRecordBreakLine)
         self.scrollView.addSubview(recordView)
+        self.scrollView.addSubview(recordCommentBreakLine)
         self.scrollView.addSubview(commentTableView)
         self.view.addSubview(commentInputView)
         
@@ -122,31 +165,43 @@ final public class FeedDetailViewController: UIViewController {
             make.width.equalToSuperview()
         }
         
+        postRecordBreakLine.snp.makeConstraints { make in
+            make.top.equalTo(postView.snp.bottom)
+            make.left.right.equalToSuperview()
+            make.height.equalTo(8)
+        }
+        
         recordView.snp.makeConstraints { make in
-            make.top.equalTo(postView.snp.bottom).offset(8)
+            make.top.equalTo(postRecordBreakLine.snp.bottom)
             make.left.right.width.equalToSuperview()
         }
         
+        recordCommentBreakLine.snp.makeConstraints { make in
+            make.top.equalTo(recordView.snp.bottom)
+            make.left.right.equalToSuperview()
+            make.height.equalTo(8)
+        }
+        
         commentTableView.snp.makeConstraints { make in
-            make.top.equalTo(recordView.snp.bottom).offset(8)
+            make.top.equalTo(recordCommentBreakLine.snp.bottom)
             make.left.right.width.equalToSuperview()
             make.bottom.equalToSuperview()
         }
-
+        
         commentInputView.snp.makeConstraints { make in
             make.bottom.equalTo(self.view.keyboardLayoutGuide.snp.top)
             make.left.right.equalToSuperview()
         }
     }
     
-    private func touchUpCommentOptionButton(isOwner: Bool?, commentModel: CommentModel){
+    private func touchUpCommentOptionButton(isOwner: Bool, commentModel: CommentModel){
         guard let reactor = reactor else { return }
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let editComment = UIAlertAction(title: "수정", style: .default)
         
-        let deleteComment = UIAlertAction(title: "삭제", style: .default) { [weak self] _ in
-            let deleteAlertController = UIAlertController(title: "댓글 삭제", message: "정말 삭제하시겠습니까?", preferredStyle: .alert)
+        let deleteComment = UIAlertAction(title: "삭제", style: .destructive) { [weak self] _ in
+            let deleteAlertController = UIAlertController(title: "댓글을 삭제하시겠습니까?", message: nil, preferredStyle: .alert)
             let deleteAction = UIAlertAction(title: "삭제", style: .destructive){ _ in
                 reactor.action.onNext(.deleteComment(commentModel))
             }
@@ -165,7 +220,7 @@ final public class FeedDetailViewController: UIViewController {
         
         let cancel = UIAlertAction(title: "취소", style: .cancel)
         
-        if isOwner != nil{
+        if isOwner {
             actionSheetController.addAction(editComment)
             actionSheetController.addAction(deleteComment)
         }else{
@@ -173,6 +228,107 @@ final public class FeedDetailViewController: UIViewController {
         }
         actionSheetController.addAction(cancel)
         self.present(actionSheetController, animated: true)
+    }
+    
+    private func touchUpNavigationBarOptionButton(){
+        guard let reactor = reactor else { return }
+        let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let editComment = UIAlertAction(title: "수정", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+            self.coordinator?.showEditPost(viewController: self, postId: reactor.currentState.postId)
+        }
+        
+        let deleteComment = UIAlertAction(title: "삭제", style: .destructive) { [weak self] _ in
+            let deleteAlertController = UIAlertController(title: "게시글 삭제", message: "게시글을 삭제하시겠습니까?", preferredStyle: .alert)
+            let deleteAction = UIAlertAction(title: "삭제", style: .destructive){ _ in
+                reactor.action.onNext(.deletePost(reactor.currentState.postId))
+            }
+            let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+            
+            deleteAlertController.addAction(deleteAction)
+            deleteAlertController.addAction(cancelAction)
+            self?.present(deleteAlertController, animated: true)
+        }
+        
+        let cancel = UIAlertAction(title: "취소", style: .cancel)
+        actionSheetController.addAction(editComment)
+        actionSheetController.addAction(deleteComment)
+        actionSheetController.addAction(cancel)
+        self.present(actionSheetController, animated: true)
+    }
+    
+    private func updateStickyImageView(offsetY: CGFloat){
+        guard let constraint = stickyViewHeight else { return }
+        
+        let remainingTopSpacing = abs(offsetY)
+        let lowerThanTop = offsetY < 0
+        let stopExpandHeaderHeight = offsetY > -stickViewDefaultHeight
+        
+        if stopExpandHeaderHeight, lowerThanTop {
+            // 초기 상태, UIImageView가 지정한 크기만큼 커졌고, 스크롤뷰의 시작점이 최상단보다 아래 존재
+            scrollView.contentInset = .init(top: remainingTopSpacing, left: 0, bottom: 0, right: 0)
+            constraint.constant = remainingTopSpacing
+            view.layoutIfNeeded()
+        } else if !lowerThanTop {
+            // 스크롤 뷰의 시작점이 최상단보다 위에 존재
+            scrollView.contentInset = .zero
+            constraint.constant = 0
+        } else {
+            // 3) 스크롤 뷰의 시작점이 최상단보다 밑에 있고, 스크롤뷰 상단 contentInset이 미리 지정한 stickViewDefaultHeight 보다 큰 경우
+            constraint.constant = remainingTopSpacing
+        }
+    }
+    
+    private func setTransparentNavigationBar(){
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .clear
+        appearance.shadowColor = .clear
+        
+        let scrollAppearance = UINavigationBarAppearance()
+        scrollAppearance.configureWithTransparentBackground()
+        scrollAppearance.configureWithTransparentBackground()
+        scrollAppearance.backgroundColor = .systemBackground
+        scrollAppearance.shadowColor = .clear
+        
+        navigationController?.navigationBar.standardAppearance = scrollAppearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+    }
+    
+    private func configureStickyView(imageUrl: String?){
+        guard let url = imageUrl else { return }
+        self.scrollView.contentInset = .init(top: stickViewDefaultHeight, left: 0, bottom: 0, right: 0)
+        self.scrollView.contentOffset = .init(x: 0, y: -stickViewDefaultHeight)
+        self.view.addSubview(stickyImageView)
+        self.stickyImageView.setImage(urlString: url)
+        
+        stickyImageView.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.left.right.equalToSuperview()
+        }
+        
+        scrollView.snp.remakeConstraints { make in
+            make.top.equalToSuperview()
+            make.left.right.equalToSuperview()
+            make.bottom.equalTo(self.commentInputView.snp.top)
+        }
+        stickyViewHeight = stickyImageView.heightAnchor.constraint(equalToConstant: stickViewDefaultHeight)
+        stickyViewHeight?.isActive = true
+        
+        let tapGesture = UITapGestureRecognizer()
+        stickyImageView.addGestureRecognizer(tapGesture)
+        stickyImageView.isUserInteractionEnabled = true
+        tapGesture.rx.event
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                let vc = ThumbnailImageViewController(imageUrl: url)
+                vc.modalPresentationStyle = .fullScreen
+                self.present(vc, animated: true)
+            }.disposed(by: self.disposeBag)
     }
 }
 
@@ -182,10 +338,16 @@ extension FeedDetailViewController: View{
         reactor.action.onNext(.fetchPost)
         reactor.action.onNext(.fetchComment)
         
-        reactor.state.compactMap{$0.postModel}
-            .bind{ [weak self] model in
-                self?.postView.configureModel(model: model)
-                self?.recordView.configureModel(time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
+        reactor.state
+            .map{$0.isFetchedPost}
+            .distinctUntilChanged()
+            .filter{$0}
+            .bind{ [weak self] _ in
+                guard let self = self, let model = reactor.currentState.postModel else { return }
+                self.postView.configureModel(model: model)
+                self.recordView.configureModel(time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
+                self.setNavigationBarButton(isOwner: model.isOwner)
+                self.configureStickyView(imageUrl: model.imageUrl)
             }.disposed(by: self.disposeBag)
         
         let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, CommentModel>> (configureCell: { dataSource, tableView, indexPath, item in
@@ -208,16 +370,16 @@ extension FeedDetailViewController: View{
         
         commentTableView.rx.observe(CGSize.self, "contentSize")
             .bind{ [weak self] size in
-                guard let size = size else {return}
-                self?.commentTableView.snp.updateConstraints({ make in
+                guard let size = size, let self = self else {return}
+                self.commentTableView.snp.updateConstraints({ make in
                     make.height.equalTo(size.height)
                 })
             }.disposed(by: self.disposeBag)
         
         commentInputView.sendButton.rx
             .tap
-            .map{ [unowned self] in
-                Reactor.Action.writeComment(WriteCommentReqesutDTO(postId: reactor.currentState.postId, content: commentInputView.getCommentText()))
+            .map{ [weak self] in
+                Reactor.Action.writeComment(WriteCommentReqesutDTO(postId: reactor.currentState.postId, content: self?.commentInputView.getCommentText() ?? ""))
             }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
@@ -250,19 +412,33 @@ extension FeedDetailViewController: View{
             }.bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
+        optionButton.rx
+            .tap
+            .bind{ [weak self] _ in
+                self?.touchUpNavigationBarOptionButton()
+            }.disposed(by: self.disposeBag)
+        
         scrollView.rx.contentOffset
             .map{$0.y}
             .distinctUntilChanged()
-            .filter{ [weak self] offset in
-                guard let self = self else { return false }
-                return offset + self.scrollView.frame.size.height + 100 > self.scrollView.contentSize.height
-            }.map{ _ in Reactor.Action.fetchComment}
-            .bind(to: reactor.action)
-            .disposed(by: self.disposeBag)
-    
+            .bind{ [weak self] offset in
+                guard let self = self else { return }
+                let isAtBottom = offset + self.scrollView.frame.size.height >= self.scrollView.contentSize.height
+                guard !isAtBottom else { return }
+                self.updateStickyImageView(offsetY: offset)
+            }.disposed(by: self.disposeBag)
         
         self.commentTableView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
+        
+        reactor.state
+            .map{$0.deletedPost}
+            .filter{$0}
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.delegate?.deleteFeed()
+                self.navigationController?.popViewController(animated: true)
+            }.disposed(by: self.disposeBag)
     }
 }
 
@@ -273,7 +449,7 @@ extension FeedDetailViewController: UITableViewDelegate{
         view.configureModel(title: "댓글 \(reactor.currentState.commentModels.count)")
         return view
     }
-
+    
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 60 // 충분히 큰 높이 설정
     }
@@ -292,3 +468,8 @@ extension FeedDetailViewController: UITableViewDelegate{
     }
 }
 
+extension FeedDetailViewController: EditFeedViewControllerDelegate{
+    public func editedFeed() {
+        reactor?.action.onNext(.fetchPost)
+    }
+}

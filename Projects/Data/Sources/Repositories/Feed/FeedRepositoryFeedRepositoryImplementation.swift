@@ -44,12 +44,12 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }
     }
     
-    public func fetchComment(postId: Int, page: Int, size: Int = 10) -> Observable<([CommentModel], Int)> {
-        return service.rx.request(.fetchComment(postId: postId, page: page))
+    public func fetchComment(postId: Int) -> Observable<[CommentModel]> {
+        return service.rx.request(.fetchComment(postId: postId))
             .filterSuccessfulStatusCodes()
-            .map{ response -> ([CommentModel], Int) in
+            .map{ response -> [CommentModel] in
                 let commentReponse = try JSONDecoder().decode(CommentsResponseDTO.self, from: response.data)
-                return (commentReponse.data.content, commentReponse.data.totalPages)
+                return commentReponse.data.content
             }.asObservable()
             .catch{ error in
                 print("FeedRepositoryImplementation fetchComment error = \(error)")
@@ -97,6 +97,22 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
     
     public func reportComment(reportCommentModel: ReportCommentRequestDTO) -> Observable<Any> {
         return service.rx.request(.reportComment(reportCommentModel: reportCommentModel))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
+    
+    public func deletePost(postId: Int) -> Observable<Any> {
+        return service.rx.request(.deletePost(postId: postId))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
+    
+    public func editPost(postId: Int, editPostModel: EditFeedRequestDTO) -> Observable<Any> {
+        return service.rx.request(.editPost(postId: postId, editPostModel: editPostModel))
             .filterSuccessfulStatusCodes()
             .map{ _ in
                 return Observable.just(())

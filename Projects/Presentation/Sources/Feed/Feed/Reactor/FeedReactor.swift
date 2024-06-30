@@ -15,6 +15,8 @@ final public class FeedReactor: Reactor{
     public enum Action{
         case fetchFeeds
         case refresh
+        case makeBookmark(BookmarkRequestDTO, Int)
+        case deleteBookmark(Int, Int)
     }
     
     public enum Mutation{
@@ -22,6 +24,7 @@ final public class FeedReactor: Reactor{
         case addFeeds([FeedModel], Int)
         case setRefreshing(Bool)
         case setLoading(Bool)
+        case updateBookmarked(Int, Bool)
     }
     
     public struct State{
@@ -45,7 +48,6 @@ final public class FeedReactor: Reactor{
         case .fetchFeeds:
             guard !currentState.isLoading else { return .empty()}
             guard currentState.pageNumber < currentState.totalPages else { return .empty()}
-            
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
                 self.feedUseCase.fetchFeeds(page: currentState.pageNumber)
@@ -63,6 +65,10 @@ final public class FeedReactor: Reactor{
                 Observable.just(Mutation.setLoading(false)),
                 Observable.just(Mutation.setRefreshing(false)),
             ])
+        case .makeBookmark(let bookmarkRequest, let index):
+            return feedUseCase.makeBookmark(post: bookmarkRequest).map{ _ in Mutation.updateBookmarked(index, true) }
+        case .deleteBookmark(let postId, let index):
+            return feedUseCase.deleteBookmark(postId: postId).map{_ in Mutation.updateBookmarked(index, false) }
         }
     }
     
@@ -81,6 +87,8 @@ final public class FeedReactor: Reactor{
             newState.isRefreshing = value
         case .setLoading(let value):
             newState.isLoading = value
+        case .updateBookmarked(let index, let isBookmarked):
+            newState.feeds[index].isBookmarked = isBookmarked
         }
         return newState
     }

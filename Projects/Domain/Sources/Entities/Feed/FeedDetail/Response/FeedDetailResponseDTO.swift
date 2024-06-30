@@ -23,23 +23,24 @@ public struct FeedDetailResponseDTO: Decodable{
 
 public struct FeedDetailModel: Decodable{
     public let nickname: String?
-    public let profileImagUrl: String?
+    public let profileImageUrl: String?
     public let level: Int
     public let postContent: String
     public let role: String
     public let loactionName: String?
     public let distance: Float
-    public let time: Float
-    public let meanPace: Float
-    public let kcal: Float
+    public let time: Int
+    public let meanPace: Int
+    public let kcal: Int
     public let imageUrl: String?
     public let createDate: String
     public var commentCount: Int
     public var likeCount: Int
+    public let isOwner: Bool
     
     enum CodingKeys: String, CodingKey {
         case nickname
-        case profileImagUrl
+        case profileImageUrl
         case level
         case postContent
         case role
@@ -52,5 +53,6 @@ public struct FeedDetailModel: Decodable{
         case createDate
         case likeCount = "likeCnt"
         case commentCount = "replyCnt"
+        case isOwner = "owner"
     }
 }

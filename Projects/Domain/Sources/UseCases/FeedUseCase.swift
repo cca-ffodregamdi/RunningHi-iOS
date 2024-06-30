@@ -24,8 +24,8 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         return repository.fetchPost(postId: postId)
     }
     
-    public func fetchComment(postId: Int, page: Int, size: Int = 10) -> Observable<([CommentModel], Int)> {
-        return  repository.fetchComment(postId: postId, page: page, size: size)
+    public func fetchComment(postId: Int) -> Observable<[CommentModel]> {
+        return  repository.fetchComment(postId: postId)
     }
     
     public func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentResponseModel> {
@@ -46,5 +46,13 @@ public final class FeedUseCase: FeedUseCaseProtocol{
     
     public func reportComment(reportCommentModel: ReportCommentRequestDTO) -> Observable<Any> {
         return repository.reportComment(reportCommentModel: reportCommentModel)
+    }
+    
+    public func deletePost(postId: Int) -> Observable<Any> {
+        return repository.deletePost(postId: postId)
+    }
+    
+    public func editPost(postId: Int, editPostModel: EditFeedRequestDTO) -> Observable<Any> {
+        return repository.editPost(postId: postId, editPostModel: editPostModel)
     }
 }

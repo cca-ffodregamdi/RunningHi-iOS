@@ -19,29 +19,30 @@ public class FeedDetailReactor: Reactor{
         case makeBookmark(BookmarkRequestDTO)
         case deleteBookmark(Int)
         case deleteComment(CommentModel)
+        case deletePost(Int)
     }
     
     public enum Mutation{
         case setPost(FeedDetailModel)
-        case setComment([CommentModel], Int)
-        case addComment([CommentModel], Int)
+        case setComment([CommentModel])
         case writeComment(WriteCommentResponseModel)
         case setWroteComment(Bool)
         case setBookmark(Bool)
         case setLoading(Bool)
         case deleteComment
+        case deletePost
     }
     
     public struct State{
         var postId: Int
         var postModel: FeedDetailModel?
+        var isFetchedPost: Bool = false
         var commentModels: [CommentModel] = []
-        var totalPages: Int = 1
-        var pageNumber: Int = 0
         var isWroteComment: Bool = false
         var isLike: Bool = false
         var isBookmark: Bool = false
         var isLoading: Bool = false
+        var deletedPost: Bool = false
     }
     
     public var initialState: State
@@ -55,13 +56,12 @@ public class FeedDetailReactor: Reactor{
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .fetchPost: return feedUseCase.fetchPost(postId: currentState.postId).map{ Mutation.setPost($0) }
-            
+    
         case .fetchComment:
             guard !currentState.isLoading else { return .empty()}
-            guard currentState.pageNumber < currentState.totalPages else { return .empty()}
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                feedUseCase.fetchComment(postId: currentState.postId, page: currentState.pageNumber).map{ Mutation.addComment($0.0, $0.1) },
+                feedUseCase.fetchComment(postId: currentState.postId).map{ Mutation.setComment($0)},
                 Observable.just(Mutation.setLoading(false))
             ])
             
@@ -69,7 +69,7 @@ public class FeedDetailReactor: Reactor{
             return Observable.concat([
                 feedUseCase.writeComment(commentModel: commentModel).map{ Mutation.writeComment($0) },
                 Observable.just(Mutation.setLoading(true)),
-                feedUseCase.fetchComment(postId: commentModel.postNo, page: 0).map{ Mutation.setComment($0.0, $0.1) },
+                feedUseCase.fetchComment(postId: commentModel.postNo).map{ Mutation.setComment($0) },
                 Observable.just(Mutation.setLoading(false)),
                 Observable.just(Mutation.setWroteComment(true)),
                 Observable.just(Mutation.setWroteComment(false))
@@ -84,9 +84,11 @@ public class FeedDetailReactor: Reactor{
             return Observable.concat([
                 feedUseCase.deleteComment(postId: commentModel.commentId).map { _ in Mutation.deleteComment },
                 Observable.just(Mutation.setLoading(true)),
-                feedUseCase.fetchComment(postId: commentModel.postId, page: 0).map{ Mutation.setComment($0.0, $0.1) },
+                feedUseCase.fetchComment(postId: commentModel.postId).map{ Mutation.setComment($0) },
                 Observable.just(Mutation.setLoading(false)),
             ])
+        case .deletePost(let postId):
+            return feedUseCase.deletePost(postId: postId).map{ _ in Mutation.deletePost }
         }
     }
     
@@ -95,15 +97,10 @@ public class FeedDetailReactor: Reactor{
         switch mutation{
         case .setPost(let model):
             newState.postModel = model
-        case .setComment(let models, let totalPages):
+            newState.isFetchedPost = true
+        case .setComment(let models):
             newState.commentModels = models
             newState.postModel?.commentCount = models.count
-            newState.pageNumber = 1
-            newState.totalPages = totalPages
-        case .addComment(let models, let totalPages):
-            newState.commentModels += models
-            newState.pageNumber += 1
-            newState.totalPages = totalPages
         case .setLoading(let value):
             newState.isLoading = value
         case .writeComment(let model):
@@ -114,6 +111,8 @@ public class FeedDetailReactor: Reactor{
             newState.isBookmark = value
         case .deleteComment:
             break
+        case .deletePost:
+            newState.deletedPost = true
         }
         return newState
     }

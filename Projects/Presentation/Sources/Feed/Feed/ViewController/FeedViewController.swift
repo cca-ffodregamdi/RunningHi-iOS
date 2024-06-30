@@ -21,7 +21,7 @@ final public class FeedViewController: UIViewController{
     
     public var coordinator: FeedCoordinatorInterface?
     
-    private var dataSource: RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>!
+    private var dataSource: RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>!
     private lazy var filterButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.adjustmentsOutline.image, for: .normal)
@@ -41,12 +41,12 @@ final public class FeedViewController: UIViewController{
     }()
     
     private lazy var feedCollectionView: UICollectionView = {
-        var layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
+        let layout = PinterestLayout()
+        layout.delegate = self
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.contentInset = UIEdgeInsets(top: 9, left: 9, bottom: 9, right: 9)
         collectionView.backgroundColor = .clear
         collectionView.register(FeedCollectionViewCell.self, forCellWithReuseIdentifier: "feedCell")
-        collectionView.register(BFeedCollectionViewCell.self, forCellWithReuseIdentifier: "BfeedCell")
         collectionView.alwaysBounceVertical = true
         return collectionView
     }()
@@ -73,7 +73,7 @@ final public class FeedViewController: UIViewController{
     }
     private func configureUI(){
         self.view.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
-
+        
         self.view.addSubview(feedCollectionView)
         
         feedCollectionView.snp.makeConstraints { make in
@@ -113,25 +113,34 @@ extension FeedViewController: View{
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
-        self.dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
+        self.dataSource = RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
+            
             cell.configureModel(model: feed)
+            
+            cell.bookmarkButton.rx
+                .tap
+                .map{ _ in
+                    if cell.bookmarkButton.isSelected{
+                        return Reactor.Action.deleteBookmark(feed.postId, indexPath.item)
+                    }else{
+                        return Reactor.Action.makeBookmark(BookmarkRequestDTO(postNo: feed.postId), indexPath.item)
+                    }
+                }.bind(to: reactor.action)
+                .disposed(by: cell.disposeBag)
             return cell
         })
-        
+
         reactor.state
-            .map{[SectionModel(model: "feeds", items: $0.feeds)]}
+            .map{[AnimatableSectionModel(model: "feedModel", items: $0.feeds)]}
             .bind(to: self.feedCollectionView.rx.items(dataSource: self.dataSource))
-            .disposed(by: self.disposeBag)
-        
-        self.feedCollectionView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
         
         feedRefreshControl.rx.controlEvent(.valueChanged)
             .map{Reactor.Action.refresh}
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
-            
+        
         reactor.state
             .map{$0.isRefreshing}
             .distinctUntilChanged()
@@ -144,7 +153,7 @@ extension FeedViewController: View{
                 guard let self = self else { return }
                 let model = self.dataSource[indexPath]
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self.coordinator?.showFeedDetail(postId: model.postNo)
+                self.coordinator?.showFeedDetail(viewController: self, postId: model.postId)
             }.disposed(by: self.disposeBag)
         
         self.feedCollectionView.rx.contentOffset
@@ -159,26 +168,15 @@ extension FeedViewController: View{
     }
 }
 
-extension FeedViewController: UICollectionViewDelegateFlowLayout{
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+extension FeedViewController: FeedDetailViewControllerDelegate{
+    public func deleteFeed() {
+        reactor?.action.onNext(.refresh)
+    }
+}
+
+extension FeedViewController: PinterestLayoutDelegate {
+    func collectionView(_ collectionView: UICollectionView, heightForPhotoAtIndexPath indexPath: IndexPath) -> CGFloat {
         let model = self.dataSource[indexPath]
-        if model.imageUrl == nil{
-            return CGSize(width: (collectionView.bounds.width - 38) / 2, height: (collectionView.bounds.height - 38) / 3)
-        }else{
-            return CGSize(width: (collectionView.bounds.width - 38) / 2, height: (collectionView.bounds.height - 38) / 2)
-        }
-        
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 8
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 8
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return .init(top: 15, left: 15, bottom: 15, right: 15)
+        return model.imageUrl == nil ? collectionView.bounds.height / 3 : collectionView.bounds.height / 2
     }
 }
