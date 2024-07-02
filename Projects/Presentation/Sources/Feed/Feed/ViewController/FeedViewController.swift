@@ -177,7 +177,7 @@ extension FeedViewController: FeedDetailViewControllerDelegate{
 }
 
 extension FeedViewController: PinterestLayoutDelegate {
-    func collectionView(_ collectionView: UICollectionView, heightForPhotoAtIndexPath indexPath: IndexPath) -> CGFloat {
+    public func collectionView(_ collectionView: UICollectionView, heightForPhotoAtIndexPath indexPath: IndexPath) -> CGFloat {
         let model = self.dataSource[indexPath]
         return model.imageUrl == nil ? collectionView.bounds.height / 3 : collectionView.bounds.height / 2
     }

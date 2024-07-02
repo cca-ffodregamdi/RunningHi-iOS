@@ -7,12 +7,12 @@
 
 import UIKit
 
-protocol PinterestLayoutDelegate: AnyObject {
+public protocol PinterestLayoutDelegate: AnyObject {
     func collectionView(_ collectionView: UICollectionView, heightForPhotoAtIndexPath indexPath: IndexPath) -> CGFloat
 }
 
-class PinterestLayout: UICollectionViewLayout {
-    weak var delegate: PinterestLayoutDelegate?
+public class PinterestLayout: UICollectionViewLayout {
+    public weak var delegate: PinterestLayoutDelegate?
 
     private var numberOfColumns = 2
     private var cellPadding: CGFloat = 5.0
@@ -28,11 +28,11 @@ class PinterestLayout: UICollectionViewLayout {
         return collectionView.bounds.width - (insets.left + insets.right)
     }
     
-    override var collectionViewContentSize: CGSize {
+    public override var collectionViewContentSize: CGSize {
         return CGSize(width: contentWidth, height: contentHeight)
     }
 
-    override func prepare() {
+    public override func prepare() {
         guard cache.isEmpty, let collectionView = collectionView else {
             return
         }
@@ -63,7 +63,7 @@ class PinterestLayout: UICollectionViewLayout {
         }
     }
 
-    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+    public override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         var visibleLayoutAttributes: [UICollectionViewLayoutAttributes] = []
         for attributes in cache {
             if attributes.frame.intersects(rect) {
@@ -73,7 +73,7 @@ class PinterestLayout: UICollectionViewLayout {
         return visibleLayoutAttributes
     }
 
-    override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    public override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return cache[indexPath.item]
     }
 }
