@@ -21,6 +21,8 @@ public enum FeedService{
     case reportComment(reportCommentModel: ReportCommentRequestDTO)
     case deletePost(postId: Int)
     case editPost(postId: Int, editPostModel: EditFeedRequestDTO)
+    case likePost(likePost: FeedLikeRequestDTO)
+    case unLikePost(postId: Int)
 }
 
 extension FeedService: TargetType{
@@ -54,6 +56,10 @@ extension FeedService: TargetType{
             return "/posts/\(postId)"
         case .editPost(let postId, _):
             return "/posts/\(postId)"
+        case .likePost:
+            return "/like"
+        case.unLikePost(let postId):
+            return "/like/\(postId)"
         }
     }
     
@@ -65,10 +71,12 @@ extension FeedService: TargetType{
             return .get
         case .writeComment,
                 .makeBookmark,
-                .reportComment:
+                .reportComment,
+                .likePost:
             return .post
         case .deleteBookmark,
-                .deletePost:
+                .deletePost,
+                .unLikePost:
             return .delete
         case .deleteComment,
                 .editPost:
@@ -89,12 +97,15 @@ extension FeedService: TargetType{
         case .fetchPost,
                 .deleteBookmark,
                 .deleteComment,
-                .deletePost:
+                .deletePost,
+                .unLikePost:
             return .requestPlain
         case .writeComment(let commentModel):
             return .requestJSONEncodable(commentModel)
         case .makeBookmark(let postModel):
             return .requestJSONEncodable(postModel)
+        case .likePost(let likePost):
+            return .requestJSONEncodable(likePost)
         }
     }
     
@@ -109,7 +120,9 @@ extension FeedService: TargetType{
                 .deleteComment,
                 .reportComment,
                 .deletePost,
-                .editPost:
+                .editPost,
+                .likePost,
+                .unLikePost:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]
         }

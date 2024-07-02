@@ -19,4 +19,6 @@ protocol FeedUseCaseProtocol{
     func reportComment(reportCommentModel: ReportCommentRequestDTO) -> Observable<Any>
     func deletePost(postId: Int) -> Observable<Any>
     func editPost(postId: Int, editPostModel: EditFeedRequestDTO) -> Observable<Any>
+    func likePost(likePost: FeedLikeRequestDTO) -> Observable<Any>
+    func unLikePost(postId: Int) -> Observable<Any>
 }

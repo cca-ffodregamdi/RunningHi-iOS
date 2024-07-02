@@ -439,6 +439,23 @@ extension FeedDetailViewController: View{
                 self.delegate?.deleteFeed()
                 self.navigationController?.popViewController(animated: true)
             }.disposed(by: self.disposeBag)
+        
+        reactor.state
+            .map{$0.isLike}
+            .bind(to: postView.likeButton.rx.isSelected)
+            .disposed(by: self.disposeBag)
+        
+        postView.likeButton.rx
+            .tap
+            .map{ _ in
+                if reactor.currentState.isLike{
+                    return Reactor.Action.unLikePost(reactor.currentState.postId)
+                }else{
+                    return Reactor.Action.likePost(FeedLikeRequestDTO(postNo: reactor.currentState.postId))
+                }
+            }.bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
+            
     }
 }
 

@@ -66,7 +66,8 @@ final class PostView: UIView {
         stackView.alignment = .fill
         return stackView
     }()
-    private lazy var likeButton: UIButton = {
+    
+    lazy var likeButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.thumbUpOutline.image, for: .normal)
         button.setImage(CommonAsset.thumbUpFilled.image, for: .selected)
@@ -107,9 +108,11 @@ final class PostView: UIView {
         self.backgroundColor = .systemBackground
         self.addSubview(profileImageView)
         self.addSubview(infoStackView)
+        
         [nickNameLabel, levelLabel].forEach{
             self.infoStackView.addArrangedSubview($0)
         }
+        
         self.addSubview(buttonStackView)
         [likeButton, likeCountLabel, commentButton, commentCountLabel].forEach{
             self.buttonStackView.addArrangedSubview($0)
