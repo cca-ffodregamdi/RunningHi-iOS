@@ -55,4 +55,12 @@ public final class FeedUseCase: FeedUseCaseProtocol{
     public func editPost(postId: Int, editPostModel: EditFeedRequestDTO) -> Observable<Any> {
         return repository.editPost(postId: postId, editPostModel: editPostModel)
     }
+    
+    public func likePost(likePost: FeedLikeRequestDTO) -> Observable<Any> {
+        return repository.likePost(likePost: likePost)
+    }
+    
+    public func unLikePost(postId: Int) -> Observable<Any> {
+        return repository.unLikePost(postId: postId)
+    }
 }

@@ -22,6 +22,7 @@ final public class FeedViewController: UIViewController{
     public var coordinator: FeedCoordinatorInterface?
     
     private var dataSource: RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>!
+    
     private lazy var filterButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.adjustmentsOutline.image, for: .normal)
@@ -71,6 +72,7 @@ final public class FeedViewController: UIViewController{
         super.viewWillAppear(animated)
         self.tabBarController?.tabBar.isHidden = false
     }
+    
     private func configureUI(){
         self.view.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
         
@@ -175,7 +177,7 @@ extension FeedViewController: FeedDetailViewControllerDelegate{
 }
 
 extension FeedViewController: PinterestLayoutDelegate {
-    func collectionView(_ collectionView: UICollectionView, heightForPhotoAtIndexPath indexPath: IndexPath) -> CGFloat {
+    public func collectionView(_ collectionView: UICollectionView, heightForPhotoAtIndexPath indexPath: IndexPath) -> CGFloat {
         let model = self.dataSource[indexPath]
         return model.imageUrl == nil ? collectionView.bounds.height / 3 : collectionView.bounds.height / 2
     }

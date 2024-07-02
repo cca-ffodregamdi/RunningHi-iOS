@@ -20,6 +20,8 @@ public class FeedDetailReactor: Reactor{
         case deleteBookmark(Int)
         case deleteComment(CommentModel)
         case deletePost(Int)
+        case likePost(FeedLikeRequestDTO)
+        case unLikePost(Int)
     }
     
     public enum Mutation{
@@ -31,6 +33,7 @@ public class FeedDetailReactor: Reactor{
         case setLoading(Bool)
         case deleteComment
         case deletePost
+        case setLike(Bool)
     }
     
     public struct State{
@@ -89,6 +92,10 @@ public class FeedDetailReactor: Reactor{
             ])
         case .deletePost(let postId):
             return feedUseCase.deletePost(postId: postId).map{ _ in Mutation.deletePost }
+        case .likePost(let likePost):
+            return feedUseCase.likePost(likePost: likePost).map{ _ in Mutation.setLike(true)}
+        case .unLikePost(let postId):
+            return feedUseCase.unLikePost(postId: postId).map{ _ in Mutation.setLike(false) }
         }
     }
     
@@ -98,6 +105,7 @@ public class FeedDetailReactor: Reactor{
         case .setPost(let model):
             newState.postModel = model
             newState.isFetchedPost = true
+            // 좋아요 유무 업데이트
         case .setComment(let models):
             newState.commentModels = models
             newState.postModel?.commentCount = models.count
@@ -113,6 +121,9 @@ public class FeedDetailReactor: Reactor{
             break
         case .deletePost:
             newState.deletedPost = true
+        case .setLike(let value):
+            newState.isLike = value
+            // 좋아요 갯수 업데이트
         }
         return newState
     }

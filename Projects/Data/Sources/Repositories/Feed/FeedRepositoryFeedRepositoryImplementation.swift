@@ -118,4 +118,20 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
                 return Observable.just(())
             }.asObservable()
     }
+    
+    public func likePost(likePost: FeedLikeRequestDTO) -> Observable<Any> {
+        return service.rx.request(.likePost(likePost: likePost))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
+    
+    public func unLikePost(postId: Int) -> Observable<Any> {
+        return service.rx.request(.unLikePost(postId: postId))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
 }
