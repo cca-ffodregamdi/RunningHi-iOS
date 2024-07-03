@@ -26,7 +26,7 @@ public class LoginRepositoryImplementation: LoginRepositoryProtocol{
         print("deinit LoginRepositoryImplementation")
     }
     
-    public func login() -> Observable<OAuthToken>{
+    public func kakaoLogin() -> Observable<OAuthToken>{
         return Observable.create{ emitter in
             let kakaoLoginObservable: Observable<OAuthToken>
             
@@ -51,6 +51,8 @@ public class LoginRepositoryImplementation: LoginRepositoryProtocol{
             }
         }
     }
+    
+    
     
     public func requestWithKakaoToken(kakaoAccessToken: String) -> Observable<(String, String)>{
         return service.rx.request(.loginKakao(LoginKakaoRequest(kakaoToken: kakaoAccessToken)))

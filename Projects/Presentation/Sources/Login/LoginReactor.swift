@@ -19,10 +19,12 @@ final public class LoginReactor: Reactor{
     
     public enum Action{
         case kakaoLogin
+        case appleLogin
     }
     
     public enum Mutation{
         case signWithKakao(String, String)
+        case signWithApple
         case setLoading(Bool)
     }
     
@@ -48,7 +50,7 @@ final public class LoginReactor: Reactor{
         case .kakaoLogin:
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                loginUseCase.login()
+                loginUseCase.kakaoLogin()
                     .flatMap{ token -> Observable<(String, String)> in
                         return self.loginUseCase.requestWithKakaoToken(kakaoAccessToken: token.accessToken)
                     }
@@ -57,6 +59,8 @@ final public class LoginReactor: Reactor{
                     }.catchAndReturn(Mutation.setLoading(false)),
                 Observable.just(Mutation.setLoading(false))
             ])
+        case .appleLogin:
+            return Observable.just(Mutation.signWithApple)
         }
     }
     
@@ -69,6 +73,8 @@ final public class LoginReactor: Reactor{
             state.successed = true
         case .setLoading(let value):
             state.isLoading = value
+        case .signWithApple:
+            print("appleLogin")
         }
         return state
     }

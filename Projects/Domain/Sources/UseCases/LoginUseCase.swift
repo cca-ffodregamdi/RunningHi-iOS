@@ -16,8 +16,8 @@ final public class LoginUseCase: LoginUseCaseProtocol{
         self.loginRepository = loginRepository
     }
     
-    public func login() -> Observable<OAuthToken>{
-        return loginRepository.login()
+    public func kakaoLogin() -> Observable<OAuthToken>{
+        return loginRepository.kakaoLogin()
     }
     
     public func requestWithKakaoToken(kakaoAccessToken: String) -> Observable<(String, String)>{
