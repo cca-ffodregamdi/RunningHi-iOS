@@ -8,6 +8,8 @@
 import Foundation
 import RxSwift
 protocol ChallengeUseCaseProtocol{
+    func fetchChallenge(status: Bool) -> Observable<[ChallengeModel]>
+    func fetchMyChallenge(status: Bool) -> Observable<[MyChallengeModel]>
     func getChallengeList() -> Observable<[ChallengeModel]>
     func getRank() -> Observable<[RankModel]>
 }

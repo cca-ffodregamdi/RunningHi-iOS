@@ -16,6 +16,14 @@ public class ChallengeUseCase: ChallengeUseCaseProtocol{
         self.repository = repository
     }
     
+    public func fetchChallenge(status: Bool) -> Observable<[ChallengeModel]> {
+        return repository.fetchChallenge(status: status)
+    }
+    
+    public func fetchMyChallenge(status: Bool) -> Observable<[MyChallengeModel]> {
+        return repository.fetchMyChallenge(status: status)
+    }
+    
     public func getChallengeList() -> Observable<[ChallengeModel]> {
         return repository.getChallengeList()
     }

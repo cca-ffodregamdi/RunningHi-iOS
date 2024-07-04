@@ -8,19 +8,44 @@
 import Foundation
 import Domain
 import RxSwift
+import Moya
+import RxMoya
 
 public final class ChallengeRepositoryImplementation: ChallengeRepositoryProtocol{
     
+    private let service = MoyaProvider<ChallengeService>()
+    
     public init() { }
     
+    public func fetchChallenge(status: Bool) -> Observable<[ChallengeModel]> {
+        return service.rx.request(.fetchChallenge(status: status))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> [ChallengeModel] in
+                let challengeResponse = try JSONDecoder().decode(ChallengeResponseDTO.self, from: response.data)
+                return challengeResponse.data
+            }.asObservable()
+            .catch{ error in
+                print("ChallengeRepositoryImplementation fetchChallenge decoding error: \(error)")
+                return Observable.error(error)
+            }
+            
+    }
+    
+    public func fetchMyChallenge(status: Bool) -> Observable<[MyChallengeModel]> {
+        return service.rx.request(.fetchMyChallenge(status: status))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> [MyChallengeModel] in
+                let myChallengeResponse = try JSONDecoder().decode(MyChallengeResponseDTO.self, from: response.data)
+                return myChallengeResponse.data
+            }.asObservable()
+            .catch{ error in
+                print("ChallengeRepositoryImplementation fetchMyChallenge decoding error: \(error)")
+                return Observable.error(error)
+            }
+    }
+    
     public func getChallengeList() -> Observable<[ChallengeModel]> {
-        return Observable.just([
-            ChallengeModel(title: "첫번째 챌린지", distance: 10, memberCount: 100, isParticipating: true),
-            ChallengeModel(title: "두번째 챌린지", distance: 10, memberCount: 100, isParticipating: false),
-            ChallengeModel(title: "세번째 챌린지", distance: 10, memberCount: 100, isParticipating: true),
-            ChallengeModel(title: "네번째 챌린지", distance: 10, memberCount: 100, isParticipating: false),
-            ChallengeModel(title: "다섯번째 챌린지", distance: 10, memberCount: 100, isParticipating: true),
-            ChallengeModel(title: "여섯번째 챌린지", distance: 10, memberCount: 100, isParticipating: false)])
+        return Observable.just([])
     }
     
     public func getRank() -> Observable<[RankModel]> {

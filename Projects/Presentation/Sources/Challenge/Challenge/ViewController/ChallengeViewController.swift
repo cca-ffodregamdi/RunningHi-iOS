@@ -20,7 +20,7 @@ final public class ChallengeViewController: UIViewController{
     public var disposeBag: DisposeBag = DisposeBag()
     public var coordinator: ChallengeCoordinatorInterface?
     
-    private var dataSource: RxTableViewSectionedReloadDataSource<ChallengeSection>!
+    private var dataSource: RxTableViewSectionedReloadDataSource<ChallengeSectionModel>!
     
     private lazy var challengeHeaderView: ChallengeHeaderView = {
         return ChallengeHeaderView()
@@ -40,9 +40,8 @@ final public class ChallengeViewController: UIViewController{
     }()
     
     private lazy var challengeTableView: UITableView = {
-//                let tableView = UITableView(frame: .zero, style: .insetGrouped)
         let tableView = UITableView(frame: .zero, style: .plain)
-//                tableView.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
+        tableView.separatorStyle = .none
         tableView.isScrollEnabled = false
         tableView.rowHeight = 84
         tableView.sectionHeaderTopPadding = 0
@@ -102,10 +101,7 @@ final public class ChallengeViewController: UIViewController{
         
         challengeTableView.snp.makeConstraints { make in
             make.top.equalTo(challengeHeaderView.snp.bottom)
-            make.bottom.equalToSuperview()
-            make.left.right.equalToSuperview()
-            make.width.equalToSuperview()
-            make.height.equalToSuperview().offset(-(self.challengeHeaderView.bounds.height))
+            make.left.right.width.bottom.equalToSuperview()
         }
     }
 }
@@ -113,13 +109,17 @@ final public class ChallengeViewController: UIViewController{
 extension ChallengeViewController: View, UITableViewDelegate{
     
     public func bind(reactor: ChallengeReactor) {
-        Observable.just(Reactor.Action.fetchChallenge)
-            .bind(to: reactor.action)
-            .disposed(by: self.disposeBag)
+        reactor.action.onNext(.fetchChallenge)
+        reactor.action.onNext(.fetchMyChallenge)
         
-        self.dataSource = RxTableViewSectionedReloadDataSource<ChallengeSection>(configureCell:{ dataSource, tableView, indexPath, model in
+        self.dataSource = RxTableViewSectionedReloadDataSource<ChallengeSectionModel>(configureCell:{ dataSource, tableView, indexPath, item in
             let cell = tableView.dequeueReusableCell(withIdentifier: "challengeCell", for: indexPath) as! ChallengeTableViewCell
-            cell.configureModel(model: model)
+            switch item{
+            case .participating(let myChallengeModel):
+                cell.configureWithMyChallengeModel(model: myChallengeModel)
+            case .notParticipaing(let challgensModel):
+                cell.configureModel(model: challgensModel)
+            }
             return cell
         })
         
@@ -135,7 +135,15 @@ extension ChallengeViewController: View, UITableViewDelegate{
                 guard let self = self else {return}
                 let model = dataSource[indexPath]
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self.coordinator?.showChallengeDetailView(model: model)
+//                self.coordinator?.showChallengeDetailView(model: model)
+            }.disposed(by: self.disposeBag)
+        
+        challengeTableView.rx.observe(CGSize.self, "contentSize")
+            .bind{ [weak self] size in
+                guard let size = size, let self = self else {return}
+                self.challengeTableView.snp.updateConstraints({ make in
+                    make.height.equalTo(size.height)
+                })
             }.disposed(by: self.disposeBag)
     }
     
