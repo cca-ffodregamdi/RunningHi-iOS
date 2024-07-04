@@ -44,10 +44,6 @@ public final class ChallengeRepositoryImplementation: ChallengeRepositoryProtoco
             }
     }
     
-    public func getChallengeList() -> Observable<[ChallengeModel]> {
-        return Observable.just([])
-    }
-    
     public func getRank() -> Observable<[RankModel]> {
         return Observable.just([
             RankModel(rank: 1, nickName: "닉네임", distance: 8),

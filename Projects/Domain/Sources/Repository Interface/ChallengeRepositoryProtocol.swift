@@ -10,6 +10,5 @@ import RxSwift
 public protocol ChallengeRepositoryProtocol{
     func fetchChallenge(status: Bool) -> Observable<[ChallengeModel]>
     func fetchMyChallenge(status: Bool) -> Observable<[MyChallengeModel]>
-    func getChallengeList() -> Observable<[ChallengeModel]>
     func getRank() -> Observable<[RankModel]>
 }
