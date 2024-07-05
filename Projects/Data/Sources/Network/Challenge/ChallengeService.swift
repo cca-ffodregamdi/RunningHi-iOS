@@ -12,6 +12,8 @@ import RxSwift
 public enum ChallengeService{
     case fetchChallenge(status: Bool)
     case fetchMyChallenge(status: Bool)
+    case fetchOtherChallengeDetail(challengeId: Int)
+    case fetchMyChallengeDetail(challengeId: Int)
 }
 
 extension ChallengeService: TargetType{
@@ -28,13 +30,17 @@ extension ChallengeService: TargetType{
         switch self{
         case .fetchChallenge: "/challenges/status"
         case .fetchMyChallenge: "/challenges/my-challenge/status"
+        case .fetchOtherChallengeDetail(let challengeId): "/challenges/\(challengeId)"
+        case .fetchMyChallengeDetail(let challengeId): "/challenges/my-challenge/\(challengeId)"
         }
     }
     
     public var method: Moya.Method{
         switch self{
         case .fetchChallenge,
-                .fetchMyChallenge: .get
+                .fetchMyChallenge,
+                .fetchOtherChallengeDetail,
+                .fetchMyChallengeDetail: .get
         
         }
     }
@@ -45,13 +51,19 @@ extension ChallengeService: TargetType{
                 .requestParameters(parameters: ["status" : status], encoding: URLEncoding.queryString)
         case .fetchMyChallenge(let status):
                 .requestParameters(parameters: ["status" : status], encoding: URLEncoding.queryString)
+        case .fetchOtherChallengeDetail:
+                .requestPlain
+        case .fetchMyChallengeDetail:
+                .requestPlain
         }
     }
     
     public var headers: [String : String]?{
         switch self{
         case .fetchChallenge,
-                .fetchMyChallenge:
+                .fetchMyChallenge,
+                .fetchOtherChallengeDetail,
+                .fetchMyChallengeDetail:
             ["Content-type": "application/json",
                     "Authorization": accessToken]
         }

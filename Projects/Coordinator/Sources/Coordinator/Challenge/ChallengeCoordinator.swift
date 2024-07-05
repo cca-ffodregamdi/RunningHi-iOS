@@ -28,8 +28,8 @@ class ChallengeCoordinator: Coordinator{
 }
 
 extension ChallengeCoordinator: ChallengeCoordinatorInterface{
-    func showChallengeDetailView(model: ChallengeModel) {
-        let vc = challengeDIContainer.makeChallengeDetailViewController(model: model, coordinator: self)
+    func showChallengeDetailView(challengeId: Int, isParticipated: Bool) {
+        let vc = challengeDIContainer.makeChallengeDetailViewController(challengeId: challengeId, isParticipated: isParticipated, coordinator: self)
         self.navigationController.pushViewController(vc, animated: true)
     }
 }

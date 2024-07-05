@@ -14,32 +14,40 @@ class RankHeaderElementView: UIView {
     
     private lazy var rankLabel: UILabel = {
         let label = UILabel()
-        label.text = "1"
-        label.font = UIFont.systemFont(ofSize: 24, weight: .bold)
+        label.text = "-"
+        label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
         label.textColor = .white
+        label.textAlignment = .center
+        label.clipsToBounds = true
+        label.backgroundColor = UIColor.colorWithRGB(r: 188, g: 210, b: 244)
         return label
     }()
     
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.backgroundColor = UIColor.colorWithRGB(r: 217, g: 217, b: 217)
+        imageView.image = CommonAsset.defaultLargeProfile.image
+        imageView.layer.borderColor = UIColor.colorWithRGB(r: 188, g: 210, b: 244).cgColor
+        imageView.layer.borderWidth = 2
+        imageView.clipsToBounds = true
         return imageView
     }()
     
     private lazy var nickNameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        label.textColor = .white
-        label.text = "1"
+        label.textColor = .black
+        label.text = "-"
+        label.textAlignment = .center
         return label
     }()
 
-    private lazy var distanceLabel: UILabel = {
+    private lazy var recordLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .white
-        label.text = "1"
+        label.textColor = .black
+        label.text = "-"
+        label.textAlignment = .center
         return label
     }()
     
@@ -53,30 +61,32 @@ class RankHeaderElementView: UIView {
     }
     
     private func configureUI(){
-        self.addSubview(rankLabel)
         self.addSubview(profileImageView)
+        self.addSubview(rankLabel)
         self.addSubview(nickNameLabel)
-        self.addSubview(distanceLabel)
-        
-        rankLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(5)
+        self.addSubview(recordLabel)
+    
+        profileImageView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(20)
+            make.left.equalToSuperview().offset(10)
+            make.right.equalToSuperview().offset(-10)
+            make.height.equalTo(profileImageView.snp.width)
         }
         
-        profileImageView.snp.makeConstraints { make in
-            make.top.equalTo(rankLabel.snp.bottom).offset(10)
+        rankLabel.snp.makeConstraints { make in
+            make.width.height.equalTo(30)
             make.centerX.equalToSuperview()
-            make.width.equalTo(profileImageView.snp.height)
+            make.centerY.equalTo(profileImageView.snp.top)
         }
      
         nickNameLabel.snp.makeConstraints { make in
             make.top.equalTo(profileImageView.snp.bottom).offset(10)
-            make.centerX.equalToSuperview()
+            make.left.right.equalToSuperview()
         }
         
-        distanceLabel.snp.makeConstraints { make in
+        recordLabel.snp.makeConstraints { make in
             make.top.equalTo(nickNameLabel.snp.bottom).offset(5)
-            make.centerX.equalToSuperview()
+            make.left.right.equalToSuperview()
             make.bottom.equalToSuperview().offset(-10)
         }
     }
@@ -84,11 +94,21 @@ class RankHeaderElementView: UIView {
     func configureModel(model: RankModel){
         rankLabel.text = "\(model.rank)"
         nickNameLabel.text = model.nickName
-        distanceLabel.text = "\(model.distance)km"
+        recordLabel.text = model.record
+    }
+    
+    func isFirstRanker(){
+        rankLabel.backgroundColor = UIColor.colorWithRGB(r: 34, g: 101, b: 201)
+        profileImageView.layer.borderColor = UIColor.colorWithRGB(r: 34, g: 101, b: 201).cgColor
+        
+        profileImageView.snp.updateConstraints { make in
+            make.left.right.equalToSuperview()
+        }
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         profileImageView.layer.cornerRadius = profileImageView.bounds.width / 2
+        rankLabel.layer.cornerRadius = rankLabel.bounds.width / 2
     }
 }

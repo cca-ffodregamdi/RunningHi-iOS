@@ -9,5 +9,5 @@ import Foundation
 import Domain
 
 public protocol ChallengeCoordinatorInterface{
-    func showChallengeDetailView(model: ChallengeModel)
+    func showChallengeDetailView(challengeId: Int, isParticipated: Bool)
 }

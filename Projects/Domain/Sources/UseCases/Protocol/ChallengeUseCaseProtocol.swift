@@ -10,5 +10,6 @@ import RxSwift
 protocol ChallengeUseCaseProtocol{
     func fetchChallenge(status: Bool) -> Observable<[ChallengeModel]>
     func fetchMyChallenge(status: Bool) -> Observable<[MyChallengeModel]>
-    func getRank() -> Observable<[RankModel]>
+    func fetcOtherhChallengeDetail(challengeId: Int) -> Observable<OtherChallengeDetailModel>
+    func fetchMyChallengeDetail(challengeId: Int) -> Observable<MyChallengeDetailModel>
 }

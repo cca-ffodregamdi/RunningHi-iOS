@@ -130,12 +130,19 @@ extension ChallengeViewController: View, UITableViewDelegate{
         self.challengeTableView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
         
-        self.challengeTableView.rx.itemSelected
-            .bind{ [weak self] indexPath in
+        self.challengeTableView.rx.modelSelected(ChallengeItem.self)
+            .bind{ [weak self] item in
                 guard let self = self else {return}
-                let model = dataSource[indexPath]
+                var challengeId: Int
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-//                self.coordinator?.showChallengeDetailView(model: model)
+                switch item{
+                case .participating(let myChallengeModel):
+                    challengeId = myChallengeModel.myChallengeId
+                    self.coordinator?.showChallengeDetailView(challengeId: challengeId, isParticipated: true)
+                case .notParticipaing(let challengeModel):
+                    challengeId = challengeModel.challengeId
+                    self.coordinator?.showChallengeDetailView(challengeId: challengeId, isParticipated: false)
+                }
             }.disposed(by: self.disposeBag)
         
         challengeTableView.rx.observe(CGSize.self, "contentSize")

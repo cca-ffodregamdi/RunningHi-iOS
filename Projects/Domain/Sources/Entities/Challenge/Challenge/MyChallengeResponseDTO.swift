@@ -1,35 +1,35 @@
 //
-//  ChallengeResponseDTO.swift
+//  MyChallengeResponseDTO.swift
 //  Domain
 //
-//  Created by 유현진 on 5/29/24.
+//  Created by 유현진 on 7/4/24.
 //
 
 import Foundation
 
-public struct ChallengeResponseDTO: Decodable{
+public struct MyChallengeResponseDTO: Decodable{
     let timeStamp: String
     let status: String
     let message: String
-    public let data: [ChallengeModel]
+    public let data: [MyChallengeModel]
 }
 
-public struct ChallengeModel: Decodable{
-    public let challengeId: Int
+public struct MyChallengeModel: Decodable{
+    public let myChallengeId: Int
     public let title: String
     public let imageUrl: String
-    let startDate: String
+    let stateDate: String
     let endDate: String
     public let remainingTime: Int
     public let participantsCount: Int
     
     enum CodingKeys: String, CodingKey {
-        case challengeId = "challengeNo"
+        case myChallengeId = "memberChallengeId"
         case title
         case imageUrl
-        case startDate
+        case stateDate
         case endDate
-        case remainingTime = "RemainingTime"
+        case remainingTime
         case participantsCount
     }
 }

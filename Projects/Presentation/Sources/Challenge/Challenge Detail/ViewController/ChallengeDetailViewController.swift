@@ -17,7 +17,6 @@ import Common
 final public class ChallengeDetailViewController: UIViewController{
 
     // MARK: Properties
-    var challengeModel: ChallengeModel
     public var disposeBag: DisposeBag = DisposeBag()
     public var coordinator: ChallengeCoordinatorInterface?
     
@@ -60,8 +59,7 @@ final public class ChallengeDetailViewController: UIViewController{
         configureUI()
     }
     
-    public init(challengeModel: ChallengeModel, reactor: ChallengeDetailReactor) {
-        self.challengeModel = challengeModel
+    public init(reactor: ChallengeDetailReactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -107,14 +105,11 @@ final public class ChallengeDetailViewController: UIViewController{
             make.top.equalTo(challengeDetailInfoView.snp.bottom).offset(8)
             make.left.right.equalToSuperview()
             make.width.equalToSuperview()
-            make.height.equalTo(rankTableView.contentSize.height+230)
             make.bottom.equalToSuperview()
         }
     }
     
     func configureNavigationBar(){
-        self.title = self.challengeModel.title
-
         self.navigationController?.navigationBar.sizeToFit()
         self.navigationController?.navigationBar.tintColor = .black
         self.navigationController?.navigationBar.prefersLargeTitles = true
@@ -138,10 +133,26 @@ final public class ChallengeDetailViewController: UIViewController{
     }
 }
 
-extension ChallengeDetailViewController: View, UITableViewDelegate{
+extension ChallengeDetailViewController: View{
 
     public func bind(reactor: ChallengeDetailReactor) {
-        reactor.action.onNext(.fetchRank)
+        reactor.action.onNext(.fetchChallengeInfo)
+        
+        let isParticipatedObservable = reactor.state.map{$0.isParticipated}
+        
+        isParticipatedObservable
+            .bind{ [weak self] isParticipated in
+                guard let self = self else { return }
+                if isParticipated{
+                    guard let model = reactor.currentState.myChallengeDetailModel else { return }
+                    self.title = model.title
+                    self.challengeDetailInfoView.configureModel(content: model.content, goal: model.goal, startDate: model.startDate, endDate: model.endDate, participatedCount: model.participantsCount)
+                }else{
+                    guard let model = reactor.currentState.otherChallengeDetailModel else { return }
+                    self.title = model.title
+                    self.challengeDetailInfoView.configureModel(content: model.content, goal: model.goal, startDate: model.startDate, endDate: model.endDate, participatedCount: model.participantsCount)
+                }
+            }.disposed(by: self.disposeBag)
         
         self.dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, RankModel>>(configureCell: {
             dataSource, tableView, indexPath, model in
@@ -157,14 +168,31 @@ extension ChallengeDetailViewController: View, UITableViewDelegate{
         self.rankTableView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
         
-        reactor.state.map { $0.topRank }
-            .bind{ [weak self] topRanks in
-                guard let self = self else { return }
-                guard let headerView = self.rankTableView.dequeueReusableHeaderFooterView(withIdentifier: "rankHeaderView") as? RankHeaderFooterView else { return }
-                headerView.configureModel(models: topRanks)
-                headerView.frame.size = .init(width: self.view.bounds.width, height: 230)
-                self.rankTableView.tableHeaderView = headerView
-            }.disposed(by: disposeBag)
+        self.rankTableView.rx.observe(CGSize.self, "contentSize")
+            .bind{ [weak self] size in
+                guard let size = size, let self = self else {return}
+                self.rankTableView.snp.updateConstraints { make in
+                    make.height.equalTo(size.height)
+                }
+            }.disposed(by: self.disposeBag)
+        
+//        reactor.state.map { $0.topRank }
+//            .bind{ [weak self] topRanks in
+//                guard let self = self else { return }
+//                guard let headerView = self.rankTableView.dequeueReusableHeaderFooterView(withIdentifier: "rankHeaderView") as? RankHeaderFooterView else { return }
+//                headerView.configureModel(models: topRanks)
+//                headerView.frame.size = .init(width: self.view.bounds.width, height: 230)
+//                self.rankTableView.tableHeaderView = headerView
+//            }.disposed(by: disposeBag)
+    }
+}
+
+extension ChallengeDetailViewController: UITableViewDelegate{
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: "rankHeaderView") as? RankHeaderFooterView else { return nil }
+        guard let reactor = reactor else { return nil }
+        view.configureModel(models: reactor.currentState.topRank)
+        return view
     }
 }
 
