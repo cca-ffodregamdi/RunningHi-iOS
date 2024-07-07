@@ -41,7 +41,7 @@ public extension UIColor{
     // Color Palette
     static var BaseWhite: UIColor { return UIColor(hexaRGB: "fafafa") ?? UIColor.white }
     static var BaseBlack: UIColor { return UIColor(hexaRGB: "0a0a0b") ?? UIColor.white }
-    static var Primary: UIColor { return UIColor(hexaRGB: "2265tC9") ?? UIColor.white }
+    static var Primary: UIColor { return UIColor(hexaRGB: "2265C9") ?? UIColor.white }
     static var Secondary: UIColor { return UIColor(hexaRGB: "AAB9C5") ?? UIColor.white }
     static var Success: UIColor { return UIColor(hexaRGB: "A7D94D") ?? UIColor.white }
     static var Warning: UIColor { return UIColor(hexaRGB: "FFD700") ?? UIColor.white }

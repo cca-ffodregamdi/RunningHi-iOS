@@ -10,11 +10,12 @@ import SnapKit
 
 class RunningView: UIView {
     
-    lazy var label: UILabel = {
-        let label = UILabel()
-        label.text = "러닝중"
-        return label
-    }()
+    //MARK: - Configure
+    
+    private var runningReadyView = RunningReadyView()
+    private var runningRecordView = RunningRecordView()
+    
+    //MARK: - Lifecycle
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,13 +29,22 @@ class RunningView: UIView {
         setupConstraints()
     }
     
+    //MARK: - Configure
+    
     private func setupViews() {
-        addSubview(label)
+//        addSubview(runningReadyView)
+        
+        addSubview(runningRecordView)
     }
     
     private func setupConstraints() {
-        label.snp.makeConstraints { make in
-            make.edges.centerX.centerY.equalToSuperview()
+//        runningReadyView.snp.makeConstraints { make in
+//            make.centerX.centerY.equalToSuperview()
+//        }
+        
+        runningRecordView.snp.makeConstraints { make in
+            make.top.bottom.equalTo(self.safeAreaLayoutGuide)
+            make.left.right.equalToSuperview().inset(20)
         }
     }
 }

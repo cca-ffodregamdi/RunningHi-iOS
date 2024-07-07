@@ -12,6 +12,8 @@ import RxRelay
 
 final public class RunningViewController: UIViewController {
     
+    //MARK: - Properties
+    
     public var coordinator: RunningCoordinatorInterface?
     
     public var isFreeCourse: Bool = true
@@ -21,6 +23,8 @@ final public class RunningViewController: UIViewController {
     private lazy var runningView: RunningView = {
         return RunningView()
     }()
+    
+    //MARK: - Lifecycle
     
     public init(isFreeCourse: Bool) {
         super.init(nibName: nil, bundle: nil)
@@ -45,6 +49,8 @@ final public class RunningViewController: UIViewController {
         configureUI()
         binding()
     }
+    
+    //MARK: - Configure
     
     private func configureUI() {
         self.view.backgroundColor = .BaseWhite

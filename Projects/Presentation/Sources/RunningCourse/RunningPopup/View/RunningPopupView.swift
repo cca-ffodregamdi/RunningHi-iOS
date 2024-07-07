@@ -10,29 +10,12 @@ import SnapKit
 
 class RunningPopupView: UIView {
     
+    //MARK: - Properties
+    
     var tabBarHeight = 0.0
     
-    lazy var freeRunningButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("자유러닝", for: .normal)
-        button.tintColor = .black
-        button.layer.cornerRadius = 24
-//        button.backgroundColor = .Secondary100
-        button.backgroundColor = .Primary
-        button.titleLabel?.font = .Body1Regular
-        return button
-    }()
-    
-    lazy var myRunningButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("목표러닝", for: .normal)
-        button.tintColor = .black
-        button.layer.cornerRadius = 24
-//        button.backgroundColor = .Secondary100
-        button.backgroundColor = .Primary
-        button.titleLabel?.font = .Body1Regular
-        return button
-    }()
+    lazy var freeRunningButton = RunningPopupButton(frame: .zero, title: "자유러닝")
+    lazy var myRunningButton = RunningPopupButton(frame: .zero, title: "목표러닝")
     
     lazy var popupStackView = {
         let stackView = UIStackView()
@@ -41,6 +24,8 @@ class RunningPopupView: UIView {
         stackView.spacing = 8
         return stackView
     }()
+    
+    //MARK: - Lifecycle
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -61,6 +46,8 @@ class RunningPopupView: UIView {
         setupViews()
         setupConstraints()
     }
+    
+    //MARK: - Configure
     
     private func setupViews() {
         addSubview(popupStackView)

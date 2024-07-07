@@ -12,6 +12,8 @@ import RxRelay
 
 final public class RunningPopupViewController: UIViewController {
     
+    //MARK: - Properties
+    
     public var coordinator: TabBarCoordinatorInterface?
     public var tabViewController: UITabBarController?
     public var rootViewController: UIViewController?
@@ -21,6 +23,8 @@ final public class RunningPopupViewController: UIViewController {
     private lazy var runningPopupView: RunningPopupView = {
         return RunningPopupView(tabBarHeight: tabViewController?.tabBar.frame.size.height ?? 0.0)
     }()
+    
+    //MARK: - Lifecycle
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -40,6 +44,8 @@ final public class RunningPopupViewController: UIViewController {
         configureUI()
         binding()
     }
+    
+    //MARK: - Configure
     
     private func configureUI() {
         self.view.backgroundColor = .clear
