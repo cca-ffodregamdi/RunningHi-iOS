@@ -11,7 +11,7 @@ import Moya
 
 class TabBarDIContainer {
     
-    func makeTabBarController(coordinator: TabBarCoordinatorInterface) -> TabBarViewController {
+    func makeTabBarController(coordinator: BaseTabBarCoordinator) -> TabBarViewController {
         let vc = TabBarViewController()
         vc.coordinator = coordinator
         return vc
@@ -19,11 +19,6 @@ class TabBarDIContainer {
     
     func makeRunningPopupViewController() -> RunningPopupViewController {
         let vc = RunningPopupViewController()
-        return vc
-    }
-    
-    func makeRunningViewController() -> RunningViewController {
-        let vc = RunningViewController()
         return vc
     }
 }

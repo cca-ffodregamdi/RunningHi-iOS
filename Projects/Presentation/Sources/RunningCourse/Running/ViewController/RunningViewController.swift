@@ -12,14 +12,20 @@ import RxRelay
 
 final public class RunningViewController: UIViewController {
     
-    public var coordinator: TabBarCoordinatorInterface?
-    public var rootViewController: UIViewController?
+    public var coordinator: RunningCoordinatorInterface?
+    
+    public var isFreeCourse: Bool = true
     
     public var disposeBag = DisposeBag()
     
-//    private lazy var runningPopupView: RunningPopupView = {
-//        return RunningPopupView(tabBarHeight: tabBarHeight)
-//    }()
+    private lazy var runningView: RunningView = {
+        return RunningView()
+    }()
+    
+    public init(isFreeCourse: Bool) {
+        super.init(nibName: nil, bundle: nil)
+        self.isFreeCourse = isFreeCourse
+    }
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -42,11 +48,11 @@ final public class RunningViewController: UIViewController {
     
     private func configureUI() {
         self.view.backgroundColor = .BaseWhite
-//        self.view.addSubview(runningPopupView)
+        self.view.addSubview(runningView)
         
-//        runningPopupView.snp.makeConstraints { make in
-//            make.edges.equalToSuperview()
-//        }
+        runningView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     private func binding() {

@@ -8,10 +8,15 @@
 import UIKit
 import Presentation
 
+protocol BaseTabBarCoordinatorDelegate: AnyObject{
+    func showRunning(isFreeCourse: Bool)
+}
+
 class BaseTabBarCoordinator: Coordinator {
     
     var tabBarController: UITabBarController?
     var childCoordinator: [Coordinator] = []
+    var delegate: BaseTabBarCoordinatorDelegate?
     
     let tabBarDIContainer: TabBarDIContainer
     
@@ -66,9 +71,7 @@ class BaseTabBarCoordinator: Coordinator {
             challengeCoordinator.start()
             tabNavigationController.viewControllers.first?.title = TabBarItemType.Challenge.getTitle()
         case .Course:
-            let courseCoordinator: RunningCourseCoordinatorTest = RunningCourseCoordinatorTest(navigationController: tabNavigationController)
-            self.childCoordinator.append(courseCoordinator)
-            courseCoordinator.start()
+            return
         case .Record:
             return
         case .My:
@@ -114,7 +117,6 @@ extension BaseTabBarCoordinator: TabBarCoordinatorInterface {
     }
     
     func showRunning(isFreeCourse: Bool) {
-        let runningVC = tabBarDIContainer.makeRunningViewController()
-        navigationController.pushViewController(runningVC, animated: true)
+        self.delegate?.showRunning(isFreeCourse: isFreeCourse)
     }
 }
