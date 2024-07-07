@@ -63,7 +63,7 @@ extension RunningViewController: View{
     
     public func bind(reactor: RunningReactor) {
         
-        // 1. Timer 시작 전 Ready 화면 binding
+        //MARK: Timer 시작 전 Ready 화면 binding
         
         Observable.just(Reactor.Action.readyForRunning)
             .bind(to: reactor.action)
@@ -82,7 +82,7 @@ extension RunningViewController: View{
                 self.runningView.setReadyView(time: time)
             }.disposed(by: self.disposeBag)
         
-        // 2. 초마다 Record 값 갱신
+        //MARK: 초마다 Record 값 갱신
         
         reactor.state
             .map{$0.isRunning}
@@ -102,6 +102,8 @@ extension RunningViewController: View{
                 self.runningView.runningRecordView.setRunningData(time: time, averagePace: nil, calorie: nil)
             }.disposed(by: self.disposeBag)
         
+        //MARK: play, pause, stop buttons - tap event
+        
         runningView.runningRecordView.pauseButton.rx.tap
             .bind{ [weak self] _ in
                 guard let _ = self else { return }
@@ -113,5 +115,21 @@ extension RunningViewController: View{
                 guard let _ = self else { return }
                 reactor.action.onNext(.startRunning)
             }.disposed(by: self.disposeBag)
+        
+        runningView.runningRecordView.stopButton.rx.tap
+            .bind { [weak self] _ in
+                guard let _ = self else { return }
+                //TODO: 토스트 메시지 출력 (오늘의 운동을 중지하시려면 길게 눌러주세요)
+            }
+            .disposed(by: disposeBag)
+        
+        runningView.runningRecordView.stopButtonlongPressGesture.rx.event
+            .filter { $0.state == .began }
+            .bind { [weak self] _ in
+                guard let _ = self else { return }
+                reactor.action.onNext(.stopRunning)
+                coordinator.showRunningResult()
+            }
+            .disposed(by: disposeBag)
     }
 }

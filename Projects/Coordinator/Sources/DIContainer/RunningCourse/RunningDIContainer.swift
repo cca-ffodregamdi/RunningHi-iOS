@@ -30,4 +30,10 @@ class RunningDIContainer{
         vc.coordinator = coordinator
         return vc
     }
+    
+    func makeRunningResultViewController(coordinator: RunningCoordinator) -> RunningResultViewController{
+        let vc = RunningResultViewController()
+        vc.coordinator = coordinator
+        return vc
+    }
 }

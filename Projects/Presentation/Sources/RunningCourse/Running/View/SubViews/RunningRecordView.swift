@@ -52,6 +52,8 @@ class RunningRecordView: UIView {
     var playButton = RunningRecordButton(frame: .zero, image: CommonAsset.play.image)
     var stopButton = RunningRecordButton(frame: .zero, image: CommonAsset.stop.image)
     
+    let stopButtonlongPressGesture = UILongPressGestureRecognizer()
+    
     private var runningButtonStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -92,6 +94,8 @@ class RunningRecordView: UIView {
         addSubview(runningButtonStackView)
         runningButtonStackView.addArrangedSubview(stopButton)
         runningButtonStackView.addArrangedSubview(playButton)
+        
+        stopButton.addGestureRecognizer(stopButtonlongPressGesture)
     }
     
     private func setupConstraints() {
