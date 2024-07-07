@@ -34,8 +34,10 @@ public class AppCoordinator: Coordinator{
     
     private func showBaseTabBarController(){
         self.navigationController.viewControllers.removeAll()
+        
         let coordinator = BaseTabBarCoordinator(navigationController: self.navigationController)
         coordinator.start()
+        coordinator.delegate = self
         self.childCoordinator.append(coordinator)
     }
     
@@ -45,11 +47,24 @@ public class AppCoordinator: Coordinator{
         coordinator.delegate = self
         self.childCoordinator.append(coordinator)
     }
+    
+    private func showRunningViewController(isFreeCourse: Bool) {
+        let coordinator = RunningCoordinator(navigationController: self.navigationController)
+        coordinator.isFreeCourse = isFreeCourse
+        coordinator.start()
+        self.childCoordinator.append(coordinator)
+    }
 }
 
 extension AppCoordinator: LoginCoordinatorDelegate{
     func didLoggedIn(coordinator: LoginCoordinator) {
         self.childCoordinator = self.childCoordinator.filter{$0 !== coordinator}
         self.showBaseTabBarController()
+    }
+}
+
+extension AppCoordinator: BaseTabBarCoordinatorDelegate{
+    func showRunning(isFreeCourse: Bool) {
+        self.showRunningViewController(isFreeCourse: isFreeCourse)
     }
 }

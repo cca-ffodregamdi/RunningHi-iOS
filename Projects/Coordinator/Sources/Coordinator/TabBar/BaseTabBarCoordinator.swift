@@ -6,18 +6,25 @@
 //
 
 import UIKit
-import Common
+import Presentation
 
-class BaseTabBarCoordinator: TabBarCoordinator{
-    var tabBarController: UITabBarController
+protocol BaseTabBarCoordinatorDelegate: AnyObject{
+    func showRunning(isFreeCourse: Bool)
+}
+
+class BaseTabBarCoordinator: Coordinator {
     
+    var tabBarController: UITabBarController?
     var childCoordinator: [Coordinator] = []
+    var delegate: BaseTabBarCoordinatorDelegate?
+    
+    let tabBarDIContainer: TabBarDIContainer
     
     private var navigationController: UINavigationController!
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
-        self.tabBarController = UITabBarController()
+        self.tabBarDIContainer = TabBarDIContainer()
     }
     
     func start() {
@@ -27,6 +34,8 @@ class BaseTabBarCoordinator: TabBarCoordinator{
             self.createTabNavigationController(tabBarItem: $0)
         }
         controllers.forEach{self.startTabCoordinator(tabNavigationController: $0)}
+        
+        self.tabBarController = tabBarDIContainer.makeTabBarController(coordinator: self)
         self.configureTabBarController(tabNavigationController: controllers)
         self.addTabBarController()
     }
@@ -62,9 +71,7 @@ class BaseTabBarCoordinator: TabBarCoordinator{
             challengeCoordinator.start()
             tabNavigationController.viewControllers.first?.title = TabBarItemType.Challenge.getTitle()
         case .Course:
-            let courseCoordinator: RunningCourseCoordinatorTest = RunningCourseCoordinatorTest(navigationController: tabNavigationController)
-            self.childCoordinator.append(courseCoordinator)
-            courseCoordinator.start()
+            return
         case .Record:
             return
         case .My:
@@ -76,16 +83,40 @@ class BaseTabBarCoordinator: TabBarCoordinator{
     }
     
     private func configureTabBarController(tabNavigationController: [UIViewController]){
-        self.tabBarController.setViewControllers(tabNavigationController, animated: false)
-        self.tabBarController.selectedIndex = TabBarItemType.Feed.getNumber()
-        self.tabBarController.view.backgroundColor = .systemBackground
-        self.tabBarController.tabBar.backgroundColor = .systemBackground
-        self.tabBarController.tabBar.tintColor = .black
-        
+        if let tabBarController = tabBarController {
+            tabBarController.setViewControllers(tabNavigationController, animated: false)
+            tabBarController.selectedIndex = TabBarItemType.Feed.getNumber()
+            tabBarController.view.backgroundColor = .systemBackground
+            tabBarController.tabBar.backgroundColor = .systemBackground
+            tabBarController.tabBar.tintColor = .black
+        }
     }
     
     private func addTabBarController(){
-        self.navigationController.pushViewController(self.tabBarController, animated: true)
+        if let tabBarController = tabBarController {
+            self.navigationController.pushViewController(tabBarController, animated: true)
+        }
     }
 }
 
+extension BaseTabBarCoordinator: TabBarCoordinatorInterface {
+    
+    func showRunningPopup(_ viewController: UIViewController) {
+        if let tabBarController = tabBarController {
+            let runningPopupVC = tabBarDIContainer.makeRunningPopupViewController()
+            runningPopupVC.coordinator = self
+            runningPopupVC.rootViewController = viewController
+            runningPopupVC.tabViewController = tabBarController
+            runningPopupVC.modalPresentationStyle = .overFullScreen
+            viewController.present(runningPopupVC, animated: false, completion: nil)
+        }
+    }
+    
+    func cancelRunningPopup(_ viewController: UIViewController) {
+        viewController.dismiss(animated: false)
+    }
+    
+    func showRunning(isFreeCourse: Bool) {
+        self.delegate?.showRunning(isFreeCourse: isFreeCourse)
+    }
+}
