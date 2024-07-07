@@ -8,12 +8,10 @@
 import Foundation
 import Presentation
 
-class RunningCourseDIContainer{
-    
-    
-    func makeRunningCourseViewController(coordinator: RunningCourseCoordinatorTest) -> RunningCourseViewController{
-        let vc = RunningCourseViewController()
-        vc.coordinator = coordinator
-        return vc
-    }
-}
+//class RunningCourseDIContainer{
+//    func makeRunningCourseViewController(coordinator: RunningCourseCoordinatorTest) -> RunningCourseViewController{
+//        let vc = RunningCourseViewController()
+//        vc.coordinator = coordinator
+//        return vc
+//    }
+//}

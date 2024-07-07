@@ -1,18 +1,32 @@
 //
-//  TabBarCoordinator.swift
+//  TabBarDIContainer.swift
 //  Coordinator
 //
-//  Created by 유현진 on 6/5/24.
+//  Created by najin on 7/2/24.
 //
 
-import UIKit
+import Presentation
 import Common
 import Moya
 
-protocol TabBarCoordinator: Coordinator{
-    var tabBarController: UITabBarController { get set }
+class TabBarDIContainer {
+    
+    func makeTabBarController(coordinator: TabBarCoordinatorInterface) -> TabBarViewController {
+        let vc = TabBarViewController()
+        vc.coordinator = coordinator
+        return vc
+    }
+    
+    func makeRunningPopupViewController() -> RunningPopupViewController {
+        let vc = RunningPopupViewController()
+        return vc
+    }
+    
+    func makeRunningViewController() -> RunningViewController {
+        let vc = RunningViewController()
+        return vc
+    }
 }
-
 
 enum TabBarItemType: String, CaseIterable{
     case Feed, Challenge, Course, Record, My

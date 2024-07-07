@@ -8,7 +8,7 @@
 import UIKit
 import KakaoSDKCommon
 import KakaoSDKUser
-import Presentation
+//import Presentation
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -26,10 +26,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationDidEnterBackground(_ application: UIApplication) {
-        LocationManager.shared.startLocationUpdates()
+        //TODO: Presentation 참조하면 안됨 (추후 Coord로 분리)
+//        LocationManager.shared.startLocationUpdates() ->
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
-        LocationManager.shared.startLocationUpdates()
+        //TODO: Presentation 참조하면 안됨 (추후 Coord로 분리)
+//        LocationManager.shared.startLocationUpdates()
     }
 }

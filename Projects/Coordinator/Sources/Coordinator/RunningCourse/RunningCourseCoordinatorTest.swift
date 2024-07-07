@@ -13,16 +13,16 @@ class RunningCourseCoordinatorTest: Coordinator{
     private var navigationController: UINavigationController!
     var childCoordinator: [Coordinator] = []
     
-    let runningCourseDIContainer: RunningCourseDIContainer
+//    let runningCourseDIContainer: RunningCourseDIContainer
     
     public init(navigationController: UINavigationController) {
         self.navigationController = navigationController
-        self.runningCourseDIContainer = RunningCourseDIContainer()
+//        self.runningCourseDIContainer = RunningCourseDIContainer()
     }
     
     func start() {
-        let vc = runningCourseDIContainer.makeRunningCourseViewController(coordinator: self)
-        self.navigationController.pushViewController(vc, animated: true)
+//        let vc = runningCourseDIContainer.makeRunningCourseViewController(coordinator: self)
+//        self.navigationController.pushViewController(vc, animated: true)
     }
 }
 extension RunningCourseCoordinatorTest: RunningCourseCoordinatorInterface{
