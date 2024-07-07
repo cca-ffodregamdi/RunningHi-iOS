@@ -13,9 +13,9 @@ class RunningRecordView: UIView {
     
     //MARK: - Properties
     
-    private var timeLabel = RunningInfoCell()
-    private var averagePaceLabel = RunningInfoCell()
-    private var calorieLabel = RunningInfoCell()
+    private var timeLabel = RunningInfoCell(title: "시간")
+    private var averagePaceLabel = RunningInfoCell(title: "평균 페이스")
+    private var calorieLabel = RunningInfoCell(title: "소모 칼로리")
     
     private var recordInfoStackView = {
         let stackView = UIStackView()
@@ -48,10 +48,9 @@ class RunningRecordView: UIView {
         return stackView
     }()
     
-    private var pauseButton = RunningRecordButton(frame: .zero, image: CommonAsset.pause.image)
-    
-    private var playButton = RunningRecordButton(frame: .zero, image: CommonAsset.play.image)
-    private var stopButton = RunningRecordButton(frame: .zero, image: CommonAsset.stop.image)
+    var pauseButton = RunningRecordButton(frame: .zero, image: CommonAsset.pause.image)
+    var playButton = RunningRecordButton(frame: .zero, image: CommonAsset.play.image)
+    var stopButton = RunningRecordButton(frame: .zero, image: CommonAsset.stop.image)
     
     private var runningButtonStackView = {
         let stackView = UIStackView()
@@ -121,8 +120,30 @@ class RunningRecordView: UIView {
     
     //MARK: - Helpers
     
+    func initRunningData(time: Int = 0, averagePace: Int = 0, calorie: Int = 0) {
+        timeLabel.setData(data: "\(time)")
+        averagePaceLabel.setData(data: "\(averagePace)")
+        calorieLabel.setData(data: "\(calorie)")
+        
+        toggleRunningState(isRunning: true)
+    }
+    
+    func setRunningData(time: Int?, averagePace: Int?, calorie: Int?) {
+        if let time = time {
+            timeLabel.setData(data: "\(time)")
+        }
+        
+        if let averagePace = averagePace {
+            averagePaceLabel.setData(data: "\(averagePace)")
+        }
+        
+        if let calorie = calorie {
+            calorieLabel.setData(data: "\(calorie)")
+        }
+    }
+    
     func toggleRunningState(isRunning: Bool) {
-        pauseButton.isHidden = isRunning
-        runningButtonStackView.isHidden = !isRunning
+        pauseButton.isHidden = !isRunning
+        runningButtonStackView.isHidden = isRunning
     }
 }

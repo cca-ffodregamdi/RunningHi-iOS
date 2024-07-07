@@ -53,6 +53,8 @@ class RunningReadyView: UIView {
     //MARK: - Configure
     
     private func setupViews() {
+        backgroundColor = .BaseWhite
+        
         addSubview(timerStackView)
         timerStackView.addArrangedSubview(readyTimeLabel)
         timerStackView.addArrangedSubview(readyInfoLabel)
@@ -62,6 +64,12 @@ class RunningReadyView: UIView {
         timerStackView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
+    }
+    
+    //MARK: - Helpers
+    
+    func setTime(time: Int) {
+        readyTimeLabel.text = "\(time)"
     }
 }
 

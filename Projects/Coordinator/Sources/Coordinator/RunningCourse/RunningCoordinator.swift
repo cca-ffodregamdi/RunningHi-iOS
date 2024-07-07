@@ -15,14 +15,21 @@ class RunningCoordinator: Coordinator {
     
     let runningDIContainer: RunningDIContainer
     
+    var isFreeCourse: Bool = true
+    
     public init(navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.runningDIContainer = RunningDIContainer()
     }
     
     func start() {
-        let vc = runningDIContainer.makeRunningViewController(coordinator: self)
-        self.navigationController.pushViewController(vc, animated: true)
+        if isFreeCourse {
+            let vc = runningDIContainer.makeRunningViewController(coordinator: self)
+            self.navigationController.pushViewController(vc, animated: true)
+        } else {
+            let vc = runningDIContainer.makeRunningSettingViewController(coordinator: self)
+            self.navigationController.pushViewController(vc, animated: true)
+        }
     }
 }
 

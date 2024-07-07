@@ -51,6 +51,14 @@ class RunningInfoCell: UIView {
         setupConstraints()
     }
     
+    required init(title: String) {
+        super.init(frame: .zero)
+        
+        titleLabel.text = title
+        setupViews()
+        setupConstraints()
+    }
+    
     //MARK: - Configure
     
     private func setupViews() {
@@ -63,5 +71,11 @@ class RunningInfoCell: UIView {
         infoStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    //MARK: - Helpers
+    
+    func setData(data: String) {
+        dataLabel.text = data
     }
 }
