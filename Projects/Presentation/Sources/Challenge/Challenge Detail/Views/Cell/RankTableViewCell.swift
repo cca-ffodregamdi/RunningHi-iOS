@@ -85,6 +85,6 @@ class RankTableViewCell: UITableViewCell {
     func configureModel(model: RankModel){
         rankLabel.text = "\(model.rank)"
         nickNameLabel.text = model.nickName
-        distanceLabel.text = "\(model.distance)"
+        distanceLabel.text = model.record
     }
 }

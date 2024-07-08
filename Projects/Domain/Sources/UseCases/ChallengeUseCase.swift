@@ -16,11 +16,23 @@ public class ChallengeUseCase: ChallengeUseCaseProtocol{
         self.repository = repository
     }
     
-    public func getChallengeList() -> Observable<[ChallengeModel]> {
-        return repository.getChallengeList()
+    public func fetchChallenge(status: Bool) -> Observable<[ChallengeModel]> {
+        return repository.fetchChallenge(status: status)
     }
     
-    public func getRank() -> Observable<[RankModel]> {
-        return repository.getRank()
+    public func fetchMyChallenge(status: Bool) -> Observable<[MyChallengeModel]> {
+        return repository.fetchMyChallenge(status: status)
+    }
+    
+    public func fetcOtherhChallengeDetail(challengeId: Int) -> Observable<OtherChallengeDetailModel> {
+        return repository.fetcOtherhChallengeDetail(challengeId: challengeId)
+    }
+    
+    public func fetchMyChallengeDetail(challengeId: Int) -> Observable<MyChallengeDetailModel> {
+        return repository.fetchMyChallengeDetail(challengeId: challengeId)
+    }
+    
+    public func joinChallenge(joinChallengeRequestModel: JoinChallengeRequestDTO) -> Observable<Any> {
+        return repository.joinChallenge(joinChallengeRequestModel: joinChallengeRequestModel)
     }
 }

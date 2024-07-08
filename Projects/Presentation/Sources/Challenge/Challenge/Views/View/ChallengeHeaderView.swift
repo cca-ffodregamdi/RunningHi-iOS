@@ -159,7 +159,7 @@ class ChallengeHeaderView: UIView {
         
         self.addSubview(headerTitleLabel)
         self.addSubview(stackView)
-        self.addSubview(createChallengeButton)
+//        self.addSubview(createChallengeButton)
         
         headerTitleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(21)
@@ -171,15 +171,16 @@ class ChallengeHeaderView: UIView {
             make.left.equalToSuperview().offset(20)
             make.height.equalTo(80)
             make.right.equalToSuperview().offset(-20)
+            make.bottom.equalToSuperview().offset(-20) // add
         }
         
-        createChallengeButton.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(stackView.snp.bottom).offset(30)
-            make.bottom.equalToSuperview().offset(-25)
-            make.width.equalToSuperview().dividedBy(2.5)
-            make.height.equalTo(40)
-        }
+//        createChallengeButton.snp.makeConstraints { make in
+//            make.centerX.equalToSuperview()
+//            make.top.equalTo(stackView.snp.bottom).offset(30)
+//            make.bottom.equalToSuperview().offset(-25)
+//            make.width.equalToSuperview().dividedBy(2.5)
+//            make.height.equalTo(40)
+//        }
     }
     
     func configureModel(){

@@ -22,27 +22,24 @@ class RankHeaderFooterView: UITableViewHeaderFooterView {
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 10
+        stackView.spacing = 15
         stackView.distribution = .fillEqually
-        stackView.alignment = .lastBaseline
+        stackView.alignment = .bottom
         return stackView
     }()
 
     private lazy var leftRankView: RankHeaderElementView = {
         let view = RankHeaderElementView()
-        view.backgroundColor = UIColor.colorWithRGB(r: 188, g: 201, b: 244)
         return view
     }()
     
     private lazy var centerRankView: RankHeaderElementView = {
         let view = RankHeaderElementView()
-        view.backgroundColor = UIColor.colorWithRGB(r: 34, g: 101, b: 201)
         return view
     }()
     
     private lazy var rightRankView: RankHeaderElementView = {
         let view = RankHeaderElementView()
-        view.backgroundColor = UIColor.colorWithRGB(r: 188, g: 201, b: 244)
         return view
     }()
     
@@ -57,40 +54,22 @@ class RankHeaderFooterView: UITableViewHeaderFooterView {
     
     private func configureUI(){
         self.addSubview(titleLabel)
-        self.addSubview(stackView)
+        
         [leftRankView, centerRankView, rightRankView].forEach{
             self.stackView.addArrangedSubview($0)
-            $0.translatesAutoresizingMaskIntoConstraints = false
         }
+        self.addSubview(stackView)
         
         titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(10)
+            make.top.equalToSuperview().offset(20)
             make.left.equalToSuperview().offset(20)
         }
         
         stackView.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(10)
-            make.left.equalToSuperview().offset(20).priority(.high)
-            make.right.equalToSuperview().offset(-20).priority(.high)
-            make.bottom.equalToSuperview().offset(-20)
-        }
-        
-        leftRankView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(10)
-            make.left.equalToSuperview()
-            make.bottom.equalToSuperview()
-        }
-        
-        centerRankView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.left.equalTo(leftRankView.snp.right).offset(15).priority(.high)
-            make.right.equalTo(rightRankView.snp.left).offset(-15).priority(.high)
-            make.bottom.equalToSuperview()
-        }
-        rightRankView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(10)
-            make.right.equalToSuperview()
-            make.bottom.equalToSuperview()
+            make.top.equalTo(titleLabel.snp.bottom).offset(10).priority(.high)
+            make.left.equalToSuperview().offset(20)
+            make.right.equalToSuperview().offset(-20)
+            make.bottom.equalToSuperview().offset(-20).priority(.high)
         }
     }
     
@@ -98,19 +77,13 @@ class RankHeaderFooterView: UITableViewHeaderFooterView {
         self.titleLabel.text = "랭킹"
         models.forEach{
             if $0.rank == 1{
+                self.centerRankView.isFirstRanker()
                 self.centerRankView.configureModel(model: $0)
             }else if $0.rank == 2{
                 self.leftRankView.configureModel(model: $0)
             }else{
                 self.rightRankView.configureModel(model: $0)
             }
-        }
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        [centerRankView, leftRankView, rightRankView].forEach{
-            $0.layer.cornerRadius = $0.bounds.width * 0.25
         }
     }
 }

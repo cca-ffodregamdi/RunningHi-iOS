@@ -40,4 +40,25 @@ public extension Date{
         let formattedString = formatter.string(from: TimeInterval(seconds)) ?? "00:00:00"
         return formattedString
     }
+    
+    func formatChallengeTermToMd(dateString: String) -> String{
+        let possibleFormats = [
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        ]
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "ko_KR")
+        dateFormatter.timeZone = TimeZone(abbreviation: "KST")
+        
+        for format in possibleFormats{
+            dateFormatter.dateFormat = format
+            if let date = dateFormatter.date(from: dateString){
+                let MdFormatter = DateFormatter()
+                MdFormatter.dateFormat = "M월 d일"
+                return MdFormatter.string(from: date)
+            }
+        }
+        return "알 수 없음"
+    }
 }

@@ -8,34 +8,73 @@
 import Foundation
 import Domain
 import RxSwift
+import Moya
+import RxMoya
 
 public final class ChallengeRepositoryImplementation: ChallengeRepositoryProtocol{
     
+    private let service = MoyaProvider<ChallengeService>()
+    
     public init() { }
     
-    public func getChallengeList() -> Observable<[ChallengeModel]> {
-        return Observable.just([
-            ChallengeModel(title: "첫번째 챌린지", distance: 10, memberCount: 100, isParticipating: true),
-            ChallengeModel(title: "두번째 챌린지", distance: 10, memberCount: 100, isParticipating: false),
-            ChallengeModel(title: "세번째 챌린지", distance: 10, memberCount: 100, isParticipating: true),
-            ChallengeModel(title: "네번째 챌린지", distance: 10, memberCount: 100, isParticipating: false),
-            ChallengeModel(title: "다섯번째 챌린지", distance: 10, memberCount: 100, isParticipating: true),
-            ChallengeModel(title: "여섯번째 챌린지", distance: 10, memberCount: 100, isParticipating: false)])
+    public func fetchChallenge(status: Bool) -> Observable<[ChallengeModel]> {
+        return service.rx.request(.fetchChallenge(status: status))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> [ChallengeModel] in
+                let challengeResponse = try JSONDecoder().decode(ChallengeResponseDTO.self, from: response.data)
+                return challengeResponse.data
+            }.asObservable()
+            .catch{ error in
+                print("ChallengeRepositoryImplementation fetchChallenge decoding error: \(error)")
+                return Observable.error(error)
+            }
+            
     }
     
-    public func getRank() -> Observable<[RankModel]> {
-        return Observable.just([
-            RankModel(rank: 1, nickName: "닉네임", distance: 8),
-            RankModel(rank: 2, nickName: "닉네임", distance: 8),
-            RankModel(rank: 3, nickName: "닉네임", distance: 8),
-            RankModel(rank: 4, nickName: "닉네임", distance: 8),
-            RankModel(rank: 5, nickName: "닉네임", distance: 8),
-            RankModel(rank: 6, nickName: "닉네임", distance: 8),
-            RankModel(rank: 7, nickName: "닉네임", distance: 8),
-            RankModel(rank: 8, nickName: "닉네임", distance: 8),
-            RankModel(rank: 9, nickName: "닉네임", distance: 8),
-            RankModel(rank: 10, nickName: "닉네임", distance: 8),
-            RankModel(rank: 11, nickName: "닉네임", distance: 8)
-        ])
+    public func fetchMyChallenge(status: Bool) -> Observable<[MyChallengeModel]> {
+        return service.rx.request(.fetchMyChallenge(status: status))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> [MyChallengeModel] in
+                let myChallengeResponse = try JSONDecoder().decode(MyChallengeResponseDTO.self, from: response.data)
+                return myChallengeResponse.data
+            }.asObservable()
+            .catch{ error in
+                print("ChallengeRepositoryImplementation fetchMyChallenge decoding error: \(error)")
+                return Observable.error(error)
+            }
+    }
+    
+    public func fetcOtherhChallengeDetail(challengeId: Int) -> Observable<OtherChallengeDetailModel> {
+        return service.rx.request(.fetchOtherChallengeDetail(challengeId: challengeId))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> OtherChallengeDetailModel in
+                let otherChallengeResponse = try JSONDecoder().decode(OtherChallengeDetailResponseDTO.self, from: response.data)
+                return otherChallengeResponse.data
+            }.asObservable()
+            .catch { error in
+                print("ChallengeRepositoryImplementation fetcOtherhChallengeDetail decoding error: \(error)")
+                return Observable.error(error)
+            }
+    }
+    
+    public func fetchMyChallengeDetail(challengeId: Int) -> Observable<MyChallengeDetailModel> {
+        return service.rx.request(.fetchMyChallengeDetail(challengeId: challengeId))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> MyChallengeDetailModel in
+                let myChallengeResponse = try JSONDecoder().decode(MyChallengeDetailResponseDTO.self, from: response.data)
+                return myChallengeResponse.data
+            }.asObservable()
+            .catch { error in
+                print("ChallengeRepositoryImplementation fetchMyChallengeDetail decoding error: \(error)")
+                return Observable.error(error)
+            }
+    }
+    
+    public func joinChallenge(joinChallengeRequestModel: JoinChallengeRequestDTO) -> Observable<Any> {
+        return service.rx.request(.joinChallenge(joinChallengeRequestModel: joinChallengeRequestModel))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
     }
 }
