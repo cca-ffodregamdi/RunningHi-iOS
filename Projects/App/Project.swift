@@ -7,7 +7,7 @@ let project = Project(
             name: "RunningHi",
             destinations: .iOS,
             product: .app,
-            bundleId: "com.RunningHi",
+            bundleId: "com.runninghi.app",
             infoPlist: .extendingDefault(
                 with: [
                     "UILaunchStoryboardName": "LaunchScreen.storyboard",
