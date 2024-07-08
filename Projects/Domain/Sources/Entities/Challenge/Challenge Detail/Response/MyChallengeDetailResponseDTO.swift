@@ -19,7 +19,7 @@ public struct MyChallengeDetailModel: Decodable{
     public let myChallengeId: Int
     public let title: String
     public let content: String
-    public let challgenCategory: String
+    public let challengeCategory: String
     public let imageUrl: String
     public let goal: String
     public let startDate: String
@@ -34,9 +34,9 @@ public struct MyChallengeDetailModel: Decodable{
         case myChallengeId = "memberChallengeId"
         case title
         case content
-        case challgenCategory
+        case challengeCategory
         case imageUrl
-        case goal
+        case goal = "targetValue"
         case startDate
         case endDate
         case record

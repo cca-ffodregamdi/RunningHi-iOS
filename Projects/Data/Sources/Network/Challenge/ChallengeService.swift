@@ -8,12 +8,14 @@
 import Foundation
 import Moya
 import RxSwift
+import Domain
 
 public enum ChallengeService{
     case fetchChallenge(status: Bool)
     case fetchMyChallenge(status: Bool)
     case fetchOtherChallengeDetail(challengeId: Int)
     case fetchMyChallengeDetail(challengeId: Int)
+    case joinChallenge(joinChallengeRequestModel: JoinChallengeRequestDTO)
 }
 
 extension ChallengeService: TargetType{
@@ -32,6 +34,7 @@ extension ChallengeService: TargetType{
         case .fetchMyChallenge: "/challenges/my-challenge/status"
         case .fetchOtherChallengeDetail(let challengeId): "/challenges/\(challengeId)"
         case .fetchMyChallengeDetail(let challengeId): "/challenges/my-challenge/\(challengeId)"
+        case .joinChallenge: "/challenges/my-challenge"
         }
     }
     
@@ -41,7 +44,8 @@ extension ChallengeService: TargetType{
                 .fetchMyChallenge,
                 .fetchOtherChallengeDetail,
                 .fetchMyChallengeDetail: .get
-        
+        case .joinChallenge:
+                .post
         }
     }
     
@@ -55,6 +59,8 @@ extension ChallengeService: TargetType{
                 .requestPlain
         case .fetchMyChallengeDetail:
                 .requestPlain
+        case .joinChallenge(let joinChallengeRequestModel):
+                .requestJSONEncodable(joinChallengeRequestModel)
         }
     }
     
@@ -63,7 +69,8 @@ extension ChallengeService: TargetType{
         case .fetchChallenge,
                 .fetchMyChallenge,
                 .fetchOtherChallengeDetail,
-                .fetchMyChallengeDetail:
+                .fetchMyChallengeDetail,
+                .joinChallenge:
             ["Content-type": "application/json",
                     "Authorization": accessToken]
         }

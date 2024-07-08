@@ -12,4 +12,5 @@ protocol ChallengeUseCaseProtocol{
     func fetchMyChallenge(status: Bool) -> Observable<[MyChallengeModel]>
     func fetcOtherhChallengeDetail(challengeId: Int) -> Observable<OtherChallengeDetailModel>
     func fetchMyChallengeDetail(challengeId: Int) -> Observable<MyChallengeDetailModel>
+    func joinChallenge(joinChallengeRequestModel: JoinChallengeRequestDTO) -> Observable<Any>
 }

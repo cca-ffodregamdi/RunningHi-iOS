@@ -62,6 +62,7 @@ final public class ChallengeViewController: UIViewController{
         super.viewWillAppear(animated)
         self.title = "챌린지"
         self.navigationController?.navigationBar.prefersLargeTitles = false
+        self.tabBarController?.tabBar.isHidden = false
     }
     
     public init(reactor: ChallengeReactor){

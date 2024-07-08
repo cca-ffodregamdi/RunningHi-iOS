@@ -61,7 +61,7 @@ class RankHeaderFooterView: UITableViewHeaderFooterView {
         self.addSubview(stackView)
         
         titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(10)
+            make.top.equalToSuperview().offset(20)
             make.left.equalToSuperview().offset(20)
         }
         

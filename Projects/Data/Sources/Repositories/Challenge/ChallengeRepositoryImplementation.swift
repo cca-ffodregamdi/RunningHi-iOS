@@ -69,4 +69,12 @@ public final class ChallengeRepositoryImplementation: ChallengeRepositoryProtoco
                 return Observable.error(error)
             }
     }
+    
+    public func joinChallenge(joinChallengeRequestModel: JoinChallengeRequestDTO) -> Observable<Any> {
+        return service.rx.request(.joinChallenge(joinChallengeRequestModel: joinChallengeRequestModel))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
 }

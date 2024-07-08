@@ -290,7 +290,7 @@ final public class FeedDetailViewController: UIViewController {
         
         let scrollAppearance = UINavigationBarAppearance()
         scrollAppearance.configureWithTransparentBackground()
-        scrollAppearance.configureWithTransparentBackground()
+        scrollAppearance.configureWithOpaqueBackground()
         scrollAppearance.backgroundColor = .systemBackground
         scrollAppearance.shadowColor = .clear
         
@@ -316,6 +316,7 @@ final public class FeedDetailViewController: UIViewController {
             make.left.right.equalToSuperview()
             make.bottom.equalTo(self.commentInputView.snp.top)
         }
+        
         stickyViewHeight = stickyImageView.heightAnchor.constraint(equalToConstant: stickViewDefaultHeight)
         stickyViewHeight?.isActive = true
         

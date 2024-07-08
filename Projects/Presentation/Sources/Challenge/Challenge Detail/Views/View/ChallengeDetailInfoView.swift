@@ -25,6 +25,10 @@ class ChallengeDetailInfoView: UIView {
         return label
     }()
     
+    private lazy var challengeAchievementRateView: ChallengeAchievementRateView = {
+        return ChallengeAchievementRateView()
+    }()
+    
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -107,7 +111,32 @@ class ChallengeDetailInfoView: UIView {
     func configureModel(content: String, goal: String, startDate: String, endDate: String, participatedCount: Int){
         contentLabel.text = content
         goalElementView.configureModel(title: "챌린지 목표", value: goal)
-        termElementView.configureModel(title: "기간", value: Date().formatDateStringToMD(dateString: startDate) + " ~ " + Date().formatDateStringToMD(dateString: endDate))
+        termElementView.configureModel(title: "기간", value: Date().formatChallengeTermToMd(dateString: startDate) + " ~ " + Date().formatChallengeTermToMd(dateString: endDate))
         participatedCountElementView.configureModel(title: "참여자", value: "\(participatedCount)명")
+    }
+    
+    func configureAchievementRateView(isParticipated: Bool, record: Int?, goal: Int?){
+        if isParticipated{
+            self.addSubview(challengeAchievementRateView)
+            challengeAchievementRateView.configureModel(record: record ?? 0, goal: goal ?? 0)
+            challengeAchievementRateView.snp.makeConstraints { make in
+                make.top.equalTo(contentLabel.snp.bottom).offset(20)
+                make.left.equalToSuperview()
+                make.right.equalToSuperview()
+            }
+            
+            challengeInfoTitleLabel.snp.remakeConstraints { make in
+                make.top.equalTo(challengeAchievementRateView.snp.bottom).offset(30)
+                make.left.equalToSuperview().offset(20)
+                make.right.equalToSuperview().offset(-20)
+            }
+        }else{
+            challengeAchievementRateView.removeFromSuperview()
+            challengeInfoTitleLabel.snp.updateConstraints { make in
+                make.top.equalTo(contentLabel.snp.bottom).offset(30)
+                make.left.equalToSuperview().offset(20)
+                make.right.equalToSuperview().offset(-20)
+            }
+        }
     }
 }

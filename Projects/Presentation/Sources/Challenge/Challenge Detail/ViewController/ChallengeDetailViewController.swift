@@ -20,15 +20,32 @@ final public class ChallengeDetailViewController: UIViewController{
     public var disposeBag: DisposeBag = DisposeBag()
     public var coordinator: ChallengeCoordinatorInterface?
     
+    private var stickyViewHeight: NSLayoutConstraint?
+    
+    private let stickViewDefaultHeight: CGFloat = UIScreen.main.bounds.height / 3
+    
     private var dataSource: RxTableViewSectionedReloadDataSource<SectionModel<String, RankModel>>!
+    
+    private lazy var stickyImageView: StickyImageView = {
+        return StickyImageView(frame: .zero)
+    }()
+    
+    private lazy var joinButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("참여하기", for: .normal)
+        button.setTitleColor(UIColor.colorWithRGB(r: 250, g: 250, b: 250), for: .normal)
+        button.backgroundColor = UIColor.colorWithRGB(r: 34, g: 101, b: 201)
+        return button
+    }()
     
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
-        scrollView.alwaysBounceVertical = true
+        scrollView.alwaysBounceVertical = false
+        scrollView.backgroundColor = .white
+        scrollView.clipsToBounds = true
         scrollView.contentInsetAdjustmentBehavior = .never
-        scrollView.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
         return scrollView
     }()
     
@@ -36,8 +53,10 @@ final public class ChallengeDetailViewController: UIViewController{
         return ChallengeDetailInfoView()
     }()
     
-    private lazy var challengeDetailHeaderView: ChallengeDetailHeaderView = {
-        return ChallengeDetailHeaderView()
+    private lazy var infoRankBreakLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
+        return view
     }()
     
     private lazy var rankTableView: UITableView = {
@@ -45,11 +64,12 @@ final public class ChallengeDetailViewController: UIViewController{
         tableView.isScrollEnabled = false
         tableView.showsVerticalScrollIndicator = false
         tableView.showsHorizontalScrollIndicator = false
+        tableView.register(RankTableViewCell.self, forCellReuseIdentifier: "rankCell")
+        tableView.register(RankHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: "rankHeaderView")
         tableView.separatorStyle = .none
         tableView.estimatedRowHeight = UITableView.automaticDimension
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.register(RankTableViewCell.self, forCellReuseIdentifier: "rankCell")
-        tableView.register(RankHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: "rankHeaderView")
+        tableView.sectionHeaderTopPadding = 0
         return tableView
     }()
     
@@ -71,16 +91,21 @@ final public class ChallengeDetailViewController: UIViewController{
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigationBar()
+        self.tabBarController?.tabBar.isHidden = true
+    }
+    
+    public override func viewDidLayoutSubviews() {
+        joinButton.layer.cornerRadius = joinButton.bounds.height * 0.5
     }
     
     private func configureUI(){
-        self.view.backgroundColor = .systemBackground
-        
+        self.view.backgroundColor = .white
         self.view.addSubview(scrollView)
-        
-        [challengeDetailInfoView, challengeDetailHeaderView, rankTableView].forEach{
-            self.scrollView.addSubview($0)
-        }
+        self.scrollView.addSubview(stickyImageView)
+        self.scrollView.addSubview(challengeDetailInfoView)
+        self.scrollView.addSubview(infoRankBreakLine)
+        self.scrollView.addSubview(rankTableView)
+        self.view.addSubview(joinButton)
         
         scrollView.snp.makeConstraints { make in
             make.top.equalToSuperview()
@@ -88,48 +113,68 @@ final public class ChallengeDetailViewController: UIViewController{
             make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
         }
         
-        challengeDetailHeaderView.snp.makeConstraints { make in
+        stickyImageView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.left.right.equalToSuperview()
-            make.width.equalToSuperview()
-            make.height.equalToSuperview().dividedBy(3)
+            make.height.equalTo(stickViewDefaultHeight)
         }
         
         challengeDetailInfoView.snp.makeConstraints { make in
-            make.top.equalTo(challengeDetailHeaderView.snp.bottom)
+            make.top.equalTo(stickyImageView.snp.bottom)
             make.left.right.equalToSuperview()
             make.width.equalToSuperview()
+        }
+        
+        infoRankBreakLine.snp.makeConstraints { make in
+            make.top.equalTo(challengeDetailInfoView.snp.bottom)
+            make.left.right.equalToSuperview()
+            make.height.equalTo(8)
         }
         
         rankTableView.snp.makeConstraints { make in
-            make.top.equalTo(challengeDetailInfoView.snp.bottom).offset(8)
+            make.top.equalTo(infoRankBreakLine.snp.bottom)
             make.left.right.equalToSuperview()
             make.width.equalToSuperview()
-            make.bottom.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-40)
+        }
+        
+        joinButton.snp.makeConstraints { make in
+            make.bottom.equalToSuperview().offset(-30)
+            make.left.equalToSuperview().offset(20)
+            make.right.equalToSuperview().offset(-20)
+            make.height.equalTo(45)
         }
     }
     
-    func configureNavigationBar(){
-        self.navigationController?.navigationBar.sizeToFit()
-        self.navigationController?.navigationBar.tintColor = .black
+    private func configureNavigationBar(){
         self.navigationController?.navigationBar.prefersLargeTitles = true
-        
+        self.navigationController?.navigationBar.tintColor = .black
+        self.navigationController?.navigationBar.isTranslucent = true
+
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
         appearance.configureWithOpaqueBackground()
-        appearance.largeTitleTextAttributes = [.font: UIFont.systemFont(ofSize: 24, weight: .bold)]
         appearance.backgroundColor = .clear
         appearance.shadowColor = .clear
         
         let scrollAppearance = UINavigationBarAppearance()
         scrollAppearance.configureWithTransparentBackground()
-        scrollAppearance.configureWithTransparentBackground()
+        scrollAppearance.configureWithOpaqueBackground()
         scrollAppearance.backgroundColor = .systemBackground
         scrollAppearance.shadowColor = .clear
         
         navigationController?.navigationBar.standardAppearance = scrollAppearance
-        navigationController?.navigationBar.compactAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
+    }
+    
+    private func remakeAutoLayoutWithRankTableView(){
+        // 참여하기 버튼이 없을 경우 하단 여백 제거
+        self.rankTableView.snp.remakeConstraints { make in
+            make.top.equalTo(self.infoRankBreakLine.snp.bottom)
+            make.left.right.equalToSuperview()
+            make.width.equalToSuperview()
+            make.bottom.equalToSuperview()
+        }
     }
 }
 
@@ -138,19 +183,24 @@ extension ChallengeDetailViewController: View{
     public func bind(reactor: ChallengeDetailReactor) {
         reactor.action.onNext(.fetchChallengeInfo)
         
-        let isParticipatedObservable = reactor.state.map{$0.isParticipated}
-        
-        isParticipatedObservable
-            .bind{ [weak self] isParticipated in
+        reactor.state.map{$0.isFetched}
+            .filter{$0}
+            .distinctUntilChanged()
+            .bind{ [weak self] _ in
                 guard let self = self else { return }
-                if isParticipated{
+                if reactor.currentState.isParticipated{
                     guard let model = reactor.currentState.myChallengeDetailModel else { return }
-                    self.title = model.title
                     self.challengeDetailInfoView.configureModel(content: model.content, goal: model.goal, startDate: model.startDate, endDate: model.endDate, participatedCount: model.participantsCount)
+                    self.stickyImageView.setImage(urlString: "https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20231102-1.JPG?alt=media")
+                    self.title = model.title
+                    self.rankTableView.snp.updateConstraints { make in
+                        make.bottom.equalToSuperview()
+                    }
                 }else{
                     guard let model = reactor.currentState.otherChallengeDetailModel else { return }
-                    self.title = model.title
                     self.challengeDetailInfoView.configureModel(content: model.content, goal: model.goal, startDate: model.startDate, endDate: model.endDate, participatedCount: model.participantsCount)
+                    self.stickyImageView.setImage(urlString: "https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20231102-1.JPG?alt=media")
+                    self.title = model.title
                 }
             }.disposed(by: self.disposeBag)
         
@@ -165,9 +215,6 @@ extension ChallengeDetailViewController: View{
             .bind(to: self.rankTableView.rx.items(dataSource: self.dataSource))
             .disposed(by: self.disposeBag)
         
-        self.rankTableView.rx.setDelegate(self)
-            .disposed(by: self.disposeBag)
-        
         self.rankTableView.rx.observe(CGSize.self, "contentSize")
             .bind{ [weak self] size in
                 guard let size = size, let self = self else {return}
@@ -176,14 +223,42 @@ extension ChallengeDetailViewController: View{
                 }
             }.disposed(by: self.disposeBag)
         
-//        reactor.state.map { $0.topRank }
-//            .bind{ [weak self] topRanks in
+ 
+//        let tapGesture = UITapGestureRecognizer()
+//        stickyImageView.addGestureRecognizer(tapGesture)
+//        stickyImageView.isUserInteractionEnabled = true
+//        tapGesture.rx.event
+//            .bind{ [weak self] _ in
 //                guard let self = self else { return }
-//                guard let headerView = self.rankTableView.dequeueReusableHeaderFooterView(withIdentifier: "rankHeaderView") as? RankHeaderFooterView else { return }
-//                headerView.configureModel(models: topRanks)
-//                headerView.frame.size = .init(width: self.view.bounds.width, height: 230)
-//                self.rankTableView.tableHeaderView = headerView
-//            }.disposed(by: disposeBag)
+//                let vc = ThumbnailImageViewController(imageUrl: url)
+//                vc.modalPresentationStyle = .fullScreen
+//                self.present(vc, animated: true)
+//            }.disposed(by: self.disposeBag)
+        
+        self.rankTableView.rx.setDelegate(self)
+            .disposed(by: self.disposeBag)
+        
+        reactor.state.map{$0.isParticipated}
+            .bind(to: self.joinButton.rx.isHidden)
+            .disposed(by: self.disposeBag)
+        
+        reactor.state.map{$0.isParticipated}
+            .bind{ [weak self] isParticipated in
+                guard let self = self else { return }
+                if isParticipated{
+                    guard let model = reactor.currentState.myChallengeDetailModel else { return }
+                    self.challengeDetailInfoView.configureAchievementRateView(isParticipated: true, record: Int(model.record)!, goal: Int(model.goal)!)
+                }else{
+                    guard let model = reactor.currentState.otherChallengeDetailModel else { return }
+                    self.challengeDetailInfoView.configureAchievementRateView(isParticipated: false, record: nil, goal: nil)
+                }
+            }.disposed(by: self.disposeBag)
+        
+        joinButton.rx.tap
+            .map{ _ in
+                return Reactor.Action.joinChallenge(JoinChallengeRequestDTO(challengeId: reactor.currentState.challengeId))
+            }.bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
     }
 }
 

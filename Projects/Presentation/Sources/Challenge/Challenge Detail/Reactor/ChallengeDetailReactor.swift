@@ -13,17 +13,20 @@ import Domain
 public class ChallengeDetailReactor: Reactor{
     public enum Action{
         case fetchChallengeInfo
+        case joinChallenge(JoinChallengeRequestDTO)
     }
     
     public enum Mutation{
         case setOtherChallengeModel(OtherChallengeDetailModel)
         case setMyChallengeModel(MyChallengeDetailModel)
+        case setFetched(Bool)
         case resetRank
     }
     
     public struct State{
         var challengeId: Int
         var isParticipated: Bool
+        var isFetched = false
         var topRank: [RankModel] = []
         var otherRank: [RankModel] = []
         var myRank: RankModel?
@@ -44,15 +47,26 @@ public class ChallengeDetailReactor: Reactor{
         case .fetchChallengeInfo:
             if currentState.isParticipated{
                 return Observable.concat([
+                    Observable.just(Mutation.setFetched(false)),
                     Observable.just(Mutation.resetRank),
-                    challengeUseCase.fetchMyChallengeDetail(challengeId: currentState.challengeId).map{Mutation.setMyChallengeModel($0)}
+                    challengeUseCase.fetchMyChallengeDetail(challengeId: currentState.challengeId).map{Mutation.setMyChallengeModel($0)},
+                    Observable.just(Mutation.setFetched(true))
                 ])
             }else{
                 return Observable.concat([
+                    Observable.just(Mutation.setFetched(false)),
                     Observable.just(Mutation.resetRank),
                     challengeUseCase.fetcOtherhChallengeDetail(challengeId: currentState.challengeId).map{Mutation.setOtherChallengeModel($0)},
+                    Observable.just(Mutation.setFetched(true))
                 ])
             }
+        case .joinChallenge(let joinChallengeRequestModel):
+            return Observable.concat([
+                Observable.just(Mutation.setFetched(false)),
+                challengeUseCase.joinChallenge(joinChallengeRequestModel: joinChallengeRequestModel).map{_ in Mutation.resetRank},
+                challengeUseCase.fetchMyChallengeDetail(challengeId: currentState.challengeId).map{Mutation.setMyChallengeModel($0)},
+                Observable.just(Mutation.setFetched(true))
+            ])
         }
     }
     
@@ -77,6 +91,8 @@ public class ChallengeDetailReactor: Reactor{
             newState.topRank = topRank
             newState.otherRank = otherRank
             newState.myChallengeDetailModel = nil
+        case .setFetched(let value):
+            newState.isFetched = value
         }
         return newState
     }
