@@ -21,8 +21,10 @@ public extension Date{
                 return "\(intervalTime)분 전"
             }else if intervalTime < 60 * 24{
                 return "\(intervalTime/60)시간 전"
-            }else if intervalTime < 60 * 24 * 365{
+            }else if intervalTime < 60 * 24 * 30{
                 return "\(intervalTime/60/24)일 전"
+            }else if intervalTime < 60 * 24 * 365{
+                return "\(intervalTime/60/24/30)달 전"
             }else{
                 return "\(intervalTime/60/24/365)년 전"
             }

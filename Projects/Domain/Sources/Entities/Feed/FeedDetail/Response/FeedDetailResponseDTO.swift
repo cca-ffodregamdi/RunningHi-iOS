@@ -21,13 +21,13 @@ public struct FeedDetailResponseDTO: Decodable{
     }
 }
 
-public struct FeedDetailModel: Decodable{
+public struct FeedDetailModel: Decodable, Equatable{
     public let nickname: String?
     public let profileImageUrl: String?
     public let level: Int
     public let postContent: String
     public let role: String
-    public let loactionName: String?
+    public let locationName: String
     public let distance: Float
     public let time: Int
     public let meanPace: Int
@@ -37,6 +37,7 @@ public struct FeedDetailModel: Decodable{
     public var commentCount: Int
     public var likeCount: Int
     public let isOwner: Bool
+    public var isLiked: Bool
     
     enum CodingKeys: String, CodingKey {
         case nickname
@@ -44,7 +45,7 @@ public struct FeedDetailModel: Decodable{
         case level
         case postContent
         case role
-        case loactionName
+        case locationName
         case distance
         case time
         case meanPace
@@ -54,5 +55,26 @@ public struct FeedDetailModel: Decodable{
         case likeCount = "likeCnt"
         case commentCount = "replyCnt"
         case isOwner = "owner"
+        case isLiked
     }
+    
+    public static func == (lhs: FeedDetailModel, rhs: FeedDetailModel) -> Bool {
+          return lhs.nickname == rhs.nickname &&
+                 lhs.profileImageUrl == rhs.profileImageUrl &&
+                 lhs.level == rhs.level &&
+                 lhs.postContent == rhs.postContent &&
+                 lhs.role == rhs.role &&
+                 lhs.locationName == rhs.locationName &&
+                 lhs.distance == rhs.distance &&
+                 lhs.time == rhs.time &&
+                 lhs.meanPace == rhs.meanPace &&
+                 lhs.kcal == rhs.kcal &&
+                 lhs.imageUrl == rhs.imageUrl &&
+                 lhs.createDate == rhs.createDate &&
+                 lhs.commentCount == rhs.commentCount &&
+                 lhs.likeCount == rhs.likeCount &&
+                 lhs.isOwner == rhs.isOwner &&
+                 lhs.isLiked == rhs.isLiked
+      }
+    
 }
