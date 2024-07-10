@@ -119,19 +119,29 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }.asObservable()
     }
     
-    public func likePost(likePost: FeedLikeRequestDTO) -> Observable<Any> {
+    public func likePost(likePost: FeedLikeRequestDTO) -> Observable<FeedLikeResponseModel> {
         return service.rx.request(.likePost(likePost: likePost))
             .filterSuccessfulStatusCodes()
-            .map{ _ in
-                return Observable.just(())
+            .map{ response -> FeedLikeResponseModel in
+                let feedLikeResponse = try JSONDecoder().decode(FeedLikeResponseDTO.self, from: response.data)
+                return feedLikeResponse.data
             }.asObservable()
+            .catch { error in
+                print("FeedRepositoryImplementation likePost error = \(error)")
+                return Observable.error(error)
+            }
     }
     
-    public func unLikePost(postId: Int) -> Observable<Any> {
+    public func unLikePost(postId: Int) -> Observable<FeedLikeResponseModel> {
         return service.rx.request(.unLikePost(postId: postId))
             .filterSuccessfulStatusCodes()
-            .map{ _ in
-                return Observable.just(())
+            .map{ response -> FeedLikeResponseModel in
+                let feedLikeResponse = try JSONDecoder().decode(FeedLikeResponseDTO.self, from: response.data)
+                return feedLikeResponse.data
             }.asObservable()
+            .catch { error in
+                print("FeedRepositoryImplementation unLikePost error = \(error)")
+                return Observable.error(error)
+            }
     }
 }

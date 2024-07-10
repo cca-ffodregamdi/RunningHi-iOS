@@ -93,9 +93,17 @@ public class FeedDetailReactor: Reactor{
         case .deletePost(let postId):
             return feedUseCase.deletePost(postId: postId).map{ _ in Mutation.deletePost }
         case .likePost(let likePost):
-            return feedUseCase.likePost(likePost: likePost).map{ _ in Mutation.setLike(true)}
+            return Observable.concat([
+                feedUseCase.likePost(likePost: likePost).map{Mutation.updateLikeCount($0.likeCount)},
+                Observable.just(Mutation.updateIsLike(true))
+            ])
+            
         case .unLikePost(let postId):
-            return feedUseCase.unLikePost(postId: postId).map{ _ in Mutation.setLike(false) }
+            return Observable.concat([
+                feedUseCase.unLikePost(postId: postId).map{ Mutation.updateLikeCount($0.likeCount) },
+                Observable.just(Mutation.updateIsLike(false))
+            ])
+            
         }
     }
     
