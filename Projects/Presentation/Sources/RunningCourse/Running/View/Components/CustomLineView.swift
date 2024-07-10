@@ -20,15 +20,20 @@ class CustomLineView: UIView {
         setupLine()
     }
     
+    required init(color: UIColor = .Neutrals100, height: Int = 1) {
+        super.init(frame: .zero)
+        setupLine(color: color, height: height)
+    }
+    
     //MARK: - Configure
     
-    private func setupLine() {
+    private func setupLine(color: UIColor = .Neutrals100, height: Int = 1) {
         let lineView = UIView()
-        lineView.backgroundColor = .Neutrals100
+        lineView.backgroundColor = color
         
         addSubview(lineView)
         lineView.snp.makeConstraints { make in
-            make.height.equalTo(1)
+            make.height.equalTo(height)
             make.edges.equalToSuperview()
         }
     }

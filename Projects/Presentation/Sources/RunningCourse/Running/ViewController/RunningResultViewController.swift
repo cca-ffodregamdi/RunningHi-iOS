@@ -6,9 +6,11 @@
 //
 
 import UIKit
+import RxCocoa
 import RxSwift
 import ReactorKit
 import RxRelay
+import RxDataSources
 
 final public class RunningResultViewController: UIViewController {
     
@@ -18,8 +20,8 @@ final public class RunningResultViewController: UIViewController {
     
     public var disposeBag = DisposeBag()
     
-    private lazy var runningView: UIView = {
-        return UIView()
+    private var runningResultView: RunningResultView = {
+        return RunningResultView()
     }()
     
     //MARK: - Lifecycle
@@ -46,15 +48,32 @@ final public class RunningResultViewController: UIViewController {
     //MARK: - Configure
     
     private func configureUI() {
-        self.view.backgroundColor = .BaseWhite
-        self.view.addSubview(runningView)
+        self.view.backgroundColor = .white
+        self.view.addSubview(runningResultView)
         
-        runningView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        runningResultView.snp.makeConstraints { make in
+            make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
     
     private func binding() {
+        Observable<[Int]>.just([1,2,3,4,5])
+            .bind(to: runningResultView.recordView.tableView.rx.items(cellIdentifier: RunningResultRecordTableViewCell.identifier, cellType: RunningResultRecordTableViewCell.self)) { index, model, cell in
+                cell.setData(distance: 0, averagePace: 0, calorie: 0)
+                
+                // 마지막줄 라인 제거
+                if index == 4 {
+                    cell.removeLine()
+                }
+            }
+            .disposed(by: disposeBag)
         
+        self.runningResultView.recordView.tableView.rx.observe(CGSize.self, "contentSize")
+            .bind{ [weak self] size in
+                guard let size = size, let self = self else {return}
+                self.runningResultView.recordView.tableView.snp.updateConstraints { make in
+                    make.height.equalTo(size.height)
+                }
+            }.disposed(by: self.disposeBag)
     }
 }
