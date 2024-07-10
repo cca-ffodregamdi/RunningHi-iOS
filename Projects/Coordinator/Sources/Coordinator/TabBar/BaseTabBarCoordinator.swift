@@ -108,12 +108,12 @@ extension BaseTabBarCoordinator: TabBarCoordinatorInterface {
             runningPopupVC.rootViewController = viewController
             runningPopupVC.tabViewController = tabBarController
             runningPopupVC.modalPresentationStyle = .overFullScreen
-            viewController.present(runningPopupVC, animated: false, completion: nil)
+            viewController.parent?.present(runningPopupVC, animated: false, completion: nil)
         }
     }
     
     func cancelRunningPopup(_ viewController: UIViewController) {
-        viewController.dismiss(animated: false)
+        viewController.parent?.dismiss(animated: false)
     }
     
     func showRunning(isFreeCourse: Bool) {

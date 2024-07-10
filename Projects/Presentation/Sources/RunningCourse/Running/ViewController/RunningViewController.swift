@@ -126,9 +126,9 @@ extension RunningViewController: View{
         runningView.runningRecordView.stopButtonlongPressGesture.rx.event
             .filter { $0.state == .began }
             .bind { [weak self] _ in
-                guard let _ = self else { return }
+                guard let self = self else { return }
                 reactor.action.onNext(.stopRunning)
-                coordinator.showRunningResult()
+                self.coordinator?.showRunningResult()
             }
             .disposed(by: disposeBag)
     }
