@@ -29,7 +29,7 @@ public struct MyChallengeModel: Decodable{
         case imageUrl
         case startDate
         case endDate
-        case remainingTime = "RemainingTime"
+        case remainingTime
         case participantsCount
     }
 }

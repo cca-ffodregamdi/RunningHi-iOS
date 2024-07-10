@@ -84,6 +84,7 @@ public class ChallengeDetailReactor: Reactor{
             newState.topRank = topRank
             newState.otherRank = otherRank
             newState.otherChallengeDetailModel = nil
+            newState.isParticipated = true
         case .setOtherChallengeModel(let otherChallengeModel):
             newState.otherChallengeDetailModel = otherChallengeModel
             let topRank = otherChallengeModel.ranking.filter{$0.rank < 4}
@@ -91,6 +92,7 @@ public class ChallengeDetailReactor: Reactor{
             newState.topRank = topRank
             newState.otherRank = otherRank
             newState.myChallengeDetailModel = nil
+            newState.isParticipated = false
         case .setFetched(let value):
             newState.isFetched = value
         }

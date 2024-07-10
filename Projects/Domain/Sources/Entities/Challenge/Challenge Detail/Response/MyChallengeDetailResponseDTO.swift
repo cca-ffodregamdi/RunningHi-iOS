@@ -21,10 +21,10 @@ public struct MyChallengeDetailModel: Decodable{
     public let content: String
     public let challengeCategory: String
     public let imageUrl: String
-    public let goal: String
+    public let goal: Float
     public let startDate: String
     public let endDate: String
-    public let record: String
+    public let record: Float
     public let participantsCount: Int
     public let challengeRanking: [RankModel]
     public let myRanking: RankModel
@@ -36,7 +36,7 @@ public struct MyChallengeDetailModel: Decodable{
         case content
         case challengeCategory
         case imageUrl
-        case goal = "targetValue"
+        case goal
         case startDate
         case endDate
         case record
