@@ -33,18 +33,19 @@ public class FeedDetailReactor: Reactor{
         case setLoading(Bool)
         case deleteComment
         case deletePost
-        case setLike(Bool)
+        case updateIsLike(Bool)
+        case updateLikeCount(Int)
     }
     
     public struct State{
         var postId: Int
         var postModel: FeedDetailModel?
-        var isFetchedPost: Bool = false
         var commentModels: [CommentModel] = []
-        var isWroteComment: Bool = false
-        var isLike: Bool = false
+        
         var isBookmark: Bool = false
+        var isLike: Bool = false
         var isLoading: Bool = false
+        var isWroteComment: Bool = false
         var deletedPost: Bool = false
     }
     
@@ -58,8 +59,10 @@ public class FeedDetailReactor: Reactor{
 
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
-        case .fetchPost: return feedUseCase.fetchPost(postId: currentState.postId).map{ Mutation.setPost($0) }
-    
+        case .fetchPost: return Observable.concat([
+            feedUseCase.fetchPost(postId: currentState.postId).map{ Mutation.setPost($0) },
+        ])
+            
         case .fetchComment:
             guard !currentState.isLoading else { return .empty()}
             return Observable.concat([
@@ -75,7 +78,7 @@ public class FeedDetailReactor: Reactor{
                 feedUseCase.fetchComment(postId: commentModel.postNo).map{ Mutation.setComment($0) },
                 Observable.just(Mutation.setLoading(false)),
                 Observable.just(Mutation.setWroteComment(true)),
-                Observable.just(Mutation.setWroteComment(false))
+                Observable.just(Mutation.setWroteComment(false)),
             ])
             
         case .makeBookmark(let bookmarkRequest):
@@ -112,11 +115,9 @@ public class FeedDetailReactor: Reactor{
         switch mutation{
         case .setPost(let model):
             newState.postModel = model
-            newState.isFetchedPost = true
-            // 좋아요 유무 업데이트
+            newState.isLike = model.isLiked
         case .setComment(let models):
             newState.commentModels = models
-            newState.postModel?.commentCount = models.count
         case .setLoading(let value):
             newState.isLoading = value
         case .writeComment(let model):
@@ -129,9 +130,10 @@ public class FeedDetailReactor: Reactor{
             break
         case .deletePost:
             newState.deletedPost = true
-        case .setLike(let value):
+        case .updateIsLike(let value):
             newState.isLike = value
-            // 좋아요 갯수 업데이트
+        case .updateLikeCount(let count):
+            newState.postModel?.likeCount = count
         }
         return newState
     }

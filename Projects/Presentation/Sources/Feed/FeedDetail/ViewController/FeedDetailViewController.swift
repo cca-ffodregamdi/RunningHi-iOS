@@ -133,9 +133,9 @@ final public class FeedDetailViewController: UIViewController {
     private func setNavigationBarButton(isOwner: Bool){
         var barButtonItems: [UIBarButtonItem] = []
         if isOwner{
-            barButtonItems.append(UIBarButtonItem(customView: bookmarkButton))
-        }else{
             barButtonItems.append(UIBarButtonItem(customView: optionButton))
+        }else{
+            barButtonItems.append(UIBarButtonItem(customView: bookmarkButton))
         }
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
@@ -336,21 +336,39 @@ final public class FeedDetailViewController: UIViewController {
 extension FeedDetailViewController: View{
     
     public func bind(reactor: FeedDetailReactor) {
-        reactor.action.onNext(.fetchPost)
-        reactor.action.onNext(.fetchComment)
+
+        Observable.just(Reactor.Action.fetchPost)
+            .bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
+
+        Observable.just(Reactor.Action.fetchComment)
+            .bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
         
         reactor.state
-            .map{$0.isFetchedPost}
+            .compactMap{ $0.postModel }
             .distinctUntilChanged()
-            .filter{$0}
-            .bind{ [weak self] _ in
-                guard let self = self, let model = reactor.currentState.postModel else { return }
+            .bind{ [weak self] model in
+                guard let self = self else { return }
                 self.postView.configureModel(model: model)
                 self.recordView.configureModel(time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
-                self.setNavigationBarButton(isOwner: model.isOwner)
-                self.configureStickyView(imageUrl: model.imageUrl)
             }.disposed(by: self.disposeBag)
         
+        reactor.state.compactMap{$0.postModel?.imageUrl}
+            .distinctUntilChanged()
+            .bind{ [weak self] imageUrl in
+                guard let self = self else { return }
+                self.configureStickyView(imageUrl: imageUrl)
+            }.disposed(by: self.disposeBag)
+        
+        reactor.state.compactMap{$0.postModel}
+            .map{$0.isOwner}
+            .distinctUntilChanged()
+            .bind{ [weak self] isOwner in
+                guard let self = self else { return }
+                self.setNavigationBarButton(isOwner: isOwner)
+            }.disposed(by: self.disposeBag)
+            
         let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, CommentModel>> (configureCell: { dataSource, tableView, indexPath, item in
             let cell = tableView.dequeueReusableCell(withIdentifier: "commentCell", for: indexPath) as! CommentTableViewCell
             cell.configureModel(model: item)
