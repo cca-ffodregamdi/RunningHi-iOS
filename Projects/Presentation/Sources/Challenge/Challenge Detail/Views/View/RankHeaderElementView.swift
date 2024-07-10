@@ -92,10 +92,17 @@ class RankHeaderElementView: UIView {
         }
     }
     
-    func configureModel(model: RankModel){
+    func configureModel(model: RankModel, challengeCategory: String){
         rankLabel.text = "\(model.rank)"
         nickNameLabel.text = model.nickName
-        recordLabel.text = model.record
+        
+        if challengeCategory == "SPEED"{
+            recordLabel.text = Int.convertMeanPaceToString(meanPace: Int(model.record))
+        }else if challengeCategory == "ATTENDANCE"{
+            recordLabel.text = "\(Int(model.record))회"
+        }else{
+            recordLabel.text = "\(model.record)km"
+        }
     }
     
     func isFirstRanker(){

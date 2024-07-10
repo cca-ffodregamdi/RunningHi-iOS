@@ -33,6 +33,14 @@ class ChallengeAchievementRateView: UIView {
         return label
     }()
     
+    private lazy var achievementProgressView: UIProgressView = {
+        let progressView = UIProgressView()
+        progressView.trackTintColor = UIColor.colorWithRGB(r: 221, g: 233, b: 249)
+        progressView.progressTintColor = UIColor.colorWithRGB(r: 34, g: 101, b: 201)
+        
+        return progressView
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureUI()
@@ -65,10 +73,30 @@ class ChallengeAchievementRateView: UIView {
         }
     }
     
-    func configureModel(record: Int, goal: Int){
-        // TODO: 카테고리 별 단위
-        // TODO: 초 단위 -> 분으로 변환
-        recordLabel.text = "\(record)/ "
-        goalLabel.text = "\(goal)"
+    func configureModel(challengeCategoryModel: ChallengeCategory){
+        recordLabel.text = challengeCategoryModel.recordString
+        goalLabel.text = " \(challengeCategoryModel.goalString)"
+        
+        if challengeCategoryModel.category != .SPEED{
+            self.addSubview(achievementProgressView)
+            achievementProgressView.snp.makeConstraints { make in
+                make.left.equalToSuperview().offset(20)
+                make.right.equalToSuperview().offset(-20)
+                make.bottom.equalToSuperview().offset(-20)
+            }
+            
+            recordLabel.snp.remakeConstraints { make in
+                make.top.equalTo(titleLabel.snp.bottom).offset(20)
+                make.left.equalToSuperview().offset(20)
+                make.bottom.equalTo(achievementProgressView.snp.top).offset(-20)
+            }
+            
+            goalLabel.snp.remakeConstraints{ make in
+                make.top.equalTo(titleLabel.snp.bottom).offset(20)
+                make.left.equalTo(recordLabel.snp.right)
+                make.bottom.equalTo(achievementProgressView.snp.top).offset(-20)
+            }
+            achievementProgressView.progress = (challengeCategoryModel.record / challengeCategoryModel.goal)
+        }
     }
 }

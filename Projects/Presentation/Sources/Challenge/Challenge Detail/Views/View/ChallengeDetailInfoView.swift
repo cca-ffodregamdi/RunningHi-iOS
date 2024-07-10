@@ -108,17 +108,25 @@ class ChallengeDetailInfoView: UIView {
         }
     }
     
-    func configureModel(content: String, goal: String, startDate: String, endDate: String, participatedCount: Int){
+    func configureModel(content: String, goal: Float, startDate: String, endDate: String, participatedCount: Int){
         contentLabel.text = content
-        goalElementView.configureModel(title: "챌린지 목표", value: goal)
+        goalElementView.configureModel(title: "챌린지 목표", value: "\(goal)")
         termElementView.configureModel(title: "기간", value: Date().formatChallengeTermToMd(dateString: startDate) + " ~ " + Date().formatChallengeTermToMd(dateString: endDate))
         participatedCountElementView.configureModel(title: "참여자", value: "\(participatedCount)명")
     }
     
-    func configureAchievementRateView(isParticipated: Bool, record: Int?, goal: Int?){
+    func configureAchievementRateView(category: String, isParticipated: Bool, record: Float?, goal: Float?){
         if isParticipated{
             self.addSubview(challengeAchievementRateView)
-            challengeAchievementRateView.configureModel(record: record ?? 0, goal: goal ?? 0)
+            var challengeCategoryModel: ChallengeCategory?{
+                guard let categoryType = ChallengeCategoryType(rawValue: category) else {
+                        return nil
+                    }
+                    return ChallengeCategory(category: categoryType, record: record ?? 0.0, goal: goal ?? 0.0)
+            }
+            
+            guard let challengeCategoryModel = challengeCategoryModel else { return }
+            challengeAchievementRateView.configureModel(challengeCategoryModel: challengeCategoryModel)
             challengeAchievementRateView.snp.makeConstraints { make in
                 make.top.equalTo(contentLabel.snp.bottom).offset(20)
                 make.left.equalToSuperview()

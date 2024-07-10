@@ -20,7 +20,7 @@ public struct OtherChallengeDetailModel: Decodable{
     public let content: String
     public let challengeCategory: String
     public let imageUrl: String
-    public let goal: String
+    public let goal: Float
     public let startDate: String
     public let endDate: String
     public let participantsCount: Int

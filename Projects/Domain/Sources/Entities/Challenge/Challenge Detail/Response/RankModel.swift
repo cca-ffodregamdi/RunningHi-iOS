@@ -11,7 +11,7 @@ public struct RankModel: Decodable{
     public let profileImageUrl: String?
     public let rank: Int
     public let nickName: String
-    public let record: String
+    public let record: Float
     let myChallengeId: Int
     
     enum CodingKeys: String, CodingKey {

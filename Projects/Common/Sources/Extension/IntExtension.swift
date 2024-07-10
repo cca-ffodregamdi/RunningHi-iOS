@@ -10,7 +10,7 @@ import Foundation
 public extension Int{
     static func convertMeanPaceToString(meanPace: Int) -> String{
         var meanPaceMin: String {
-            return meanPace / 60 != 0 ? "\(meanPace / 60)’ " : ""
+            return meanPace / 60 != 0 ? "\(meanPace / 60)’" : ""
         }
         var meanPaceSec: String {
             if meanPace % 60 == 0 {

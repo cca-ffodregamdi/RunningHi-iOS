@@ -73,6 +73,10 @@ final public class ChallengeDetailViewController: UIViewController{
         return tableView
     }()
     
+    private lazy var myRankView: MyRankView = {
+        return MyRankView()
+    }()
+    
     // MARK: LifeCyecle
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -207,7 +211,16 @@ extension ChallengeDetailViewController: View{
         self.dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, RankModel>>(configureCell: {
             dataSource, tableView, indexPath, model in
             let cell = tableView.dequeueReusableCell(withIdentifier: "rankCell", for: indexPath) as! RankTableViewCell
-            cell.configureModel(model: model)
+            let challengeCategory: String
+            if reactor.currentState.isParticipated{
+                guard let myChallengeModel = reactor.currentState.myChallengeDetailModel else { return RankTableViewCell() }
+                challengeCategory = myChallengeModel.challengeCategory
+            }else{
+                guard let otherChallengeModel = reactor.currentState.otherChallengeDetailModel else { return RankTableViewCell() }
+                challengeCategory = otherChallengeModel.challengeCategory
+            }
+            
+            cell.configureModel(model: model, challengeCategory: challengeCategory)
             return cell
         })
         
@@ -247,12 +260,26 @@ extension ChallengeDetailViewController: View{
                 guard let self = self else { return }
                 if isParticipated{
                     guard let model = reactor.currentState.myChallengeDetailModel else { return }
-                    self.challengeDetailInfoView.configureAchievementRateView(isParticipated: true, record: Int(model.record)!, goal: Int(model.goal)!)
+                    self.challengeDetailInfoView.configureAchievementRateView(category: model.challengeCategory, isParticipated: true, record: model.record, goal: model.goal)
                 }else{
                     guard let model = reactor.currentState.otherChallengeDetailModel else { return }
-                    self.challengeDetailInfoView.configureAchievementRateView(isParticipated: false, record: nil, goal: nil)
+                    self.challengeDetailInfoView.configureAchievementRateView(category: model.challengeCategory, isParticipated: false, record: nil, goal: nil)
                 }
             }.disposed(by: self.disposeBag)
+        
+//        reactor.state.map{$0.isParticipated}
+//            .filter{$0}
+//            .bind{ [weak self] _ in
+//                guard let self = self else { return }
+//                self.view.addSubview(myRankView)
+//                guard let model = reactor.currentState.myChallengeDetailModel else { return }
+//                self.myRankView.configureModel(model: model.myRanking, challengeCategory: model.challengeCategory)
+//                self.myRankView.snp.makeConstraints { make in
+//                    make.bottom.equalToSuperview()
+//                    make.left.right.equalToSuperview()
+//                    make.height.equalTo(30)
+//                }
+//            }.disposed(by: self.disposeBag)
         
         joinButton.rx.tap
             .map{ _ in
@@ -266,7 +293,15 @@ extension ChallengeDetailViewController: UITableViewDelegate{
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: "rankHeaderView") as? RankHeaderFooterView else { return nil }
         guard let reactor = reactor else { return nil }
-        view.configureModel(models: reactor.currentState.topRank)
+        let challengeCategory: String
+        if reactor.currentState.isParticipated{
+            guard let myChallengeModel = reactor.currentState.myChallengeDetailModel else { return nil }
+            challengeCategory = myChallengeModel.challengeCategory
+        }else{
+            guard let otherChallengeModel = reactor.currentState.otherChallengeDetailModel else { return nil }
+            challengeCategory = otherChallengeModel.challengeCategory
+        }
+        view.configureModel(models: reactor.currentState.topRank, challengeCategory: challengeCategory)
         return view
     }
 }
