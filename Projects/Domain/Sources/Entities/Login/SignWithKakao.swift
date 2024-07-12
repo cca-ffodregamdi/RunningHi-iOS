@@ -1,5 +1,5 @@
 //
-//  LoginKakaoRequest.swift
+//  SignWithKakao.swift
 //  Domain
 //
 //  Created by 유현진 on 6/10/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct LoginKakaoRequest: Codable{
+public struct SignWithKakao: Codable{
     var kakaoToken: String
     
     enum CodingKeys: CodingKey {

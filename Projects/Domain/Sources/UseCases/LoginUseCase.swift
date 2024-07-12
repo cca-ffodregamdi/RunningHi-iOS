@@ -16,12 +16,16 @@ final public class LoginUseCase: LoginUseCaseProtocol{
         self.loginRepository = loginRepository
     }
     
-    public func kakaoLogin() -> Observable<OAuthToken>{
-        return loginRepository.kakaoLogin()
+    public func loginWithKakao() -> Observable<OAuthToken>{
+        return loginRepository.loginWithKakao()
     }
     
-    public func requestWithKakaoToken(kakaoAccessToken: String) -> Observable<(String, String)>{
-        return loginRepository.requestWithKakaoToken(kakaoAccessToken: kakaoAccessToken)
+    public func signWithKakao(kakaoAccessToken: String) -> Observable<(String, String)>{
+        return loginRepository.signWithKakao(kakaoAccessToken: kakaoAccessToken)
+    }
+    
+    public func signWithApple(requestModel: SignWithApple) -> Observable<(String, String)> {
+        return loginRepository.signWithApple(requestModel: requestModel)
     }
 }
 

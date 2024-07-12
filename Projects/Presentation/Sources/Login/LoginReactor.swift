@@ -19,12 +19,11 @@ final public class LoginReactor: Reactor{
     
     public enum Action{
         case kakaoLogin
-        case appleLogin
+        case signWithApple(SignWithApple)
     }
     
     public enum Mutation{
-        case signWithKakao(String, String)
-        case signWithApple
+        case signed(String, String)
         case setLoading(Bool)
     }
     
@@ -50,31 +49,33 @@ final public class LoginReactor: Reactor{
         case .kakaoLogin:
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                loginUseCase.kakaoLogin()
+                loginUseCase.loginWithKakao()
                     .flatMap{ token -> Observable<(String, String)> in
-                        return self.loginUseCase.requestWithKakaoToken(kakaoAccessToken: token.accessToken)
+                        return self.loginUseCase.signWithKakao(kakaoAccessToken: token.accessToken)
                     }
                     .flatMap{ accessToken, refreshToken -> Observable<Mutation> in
-                        return Observable.just(Mutation.signWithKakao(accessToken, refreshToken))
+                        return Observable.just(Mutation.signed(accessToken, refreshToken))
                     }.catchAndReturn(Mutation.setLoading(false)),
                 Observable.just(Mutation.setLoading(false))
             ])
-        case .appleLogin:
-            return Observable.just(Mutation.signWithApple)
+        case .signWithApple(let requestModel):
+            return Observable.concat([
+                Observable.just(Mutation.setLoading(true)),
+                loginUseCase.signWithApple(requestModel: requestModel).debug().map{ Mutation.signed($0.0, $0.1) },
+                Observable.just(Mutation.setLoading(false))
+            ])
         }
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {
         var state = state
         switch mutation{
-        case .signWithKakao(let accessToken, let refreshToken):
+        case .signed(let accessToken, let refreshToken):
             UserDefaults.standard.setValue(accessToken, forKey: "accessToken")
             UserDefaults.standard.setValue(refreshToken, forKey: "refreshToken")
             state.successed = true
         case .setLoading(let value):
             state.isLoading = value
-        case .signWithApple:
-            print("appleLogin")
         }
         return state
     }

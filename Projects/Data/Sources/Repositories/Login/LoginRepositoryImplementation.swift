@@ -15,7 +15,7 @@ import Moya
 import RxMoya
 
 public class LoginRepositoryImplementation: LoginRepositoryProtocol{
-
+    
     private let service = MoyaProvider<LoginService>()
     
     public init(){
@@ -26,7 +26,7 @@ public class LoginRepositoryImplementation: LoginRepositoryProtocol{
         print("deinit LoginRepositoryImplementation")
     }
     
-    public func kakaoLogin() -> Observable<OAuthToken>{
+    public func loginWithKakao() -> Observable<OAuthToken>{
         return Observable.create{ emitter in
             let kakaoLoginObservable: Observable<OAuthToken>
             
@@ -52,10 +52,21 @@ public class LoginRepositoryImplementation: LoginRepositoryProtocol{
         }
     }
     
+    public func signWithKakao(kakaoAccessToken: String) -> Observable<(String, String)>{
+        return service.rx.request(.signWithKakao(SignWithKakao(kakaoToken: kakaoAccessToken)))
+            .filterSuccessfulStatusCodes()
+            .map{ response in
+                let accessToken = response.response?.allHeaderFields["Authorization"] as! String
+                let refreshToken = response.response?.allHeaderFields["Refresh-Token"] as! String
+                print("[Request]")
+                print("accessToken : \(accessToken)")
+                print("refreshToken: \(refreshToken)")
+                return (accessToken, refreshToken)
+            }.asObservable()
+    }
     
-    
-    public func requestWithKakaoToken(kakaoAccessToken: String) -> Observable<(String, String)>{
-        return service.rx.request(.loginKakao(LoginKakaoRequest(kakaoToken: kakaoAccessToken)))
+    public func signWithApple(requestModel: SignWithApple) -> Observable<(String, String)> {
+        return service.rx.request(.signWithApple(requestModel))
             .filterSuccessfulStatusCodes()
             .map{ response in
                 let accessToken = response.response?.allHeaderFields["Authorization"] as! String
@@ -67,4 +78,3 @@ public class LoginRepositoryImplementation: LoginRepositoryProtocol{
             }.asObservable()
     }
 }
-
