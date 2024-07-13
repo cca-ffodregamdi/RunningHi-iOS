@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Common
+import Domain
 
 final class FeedDetailRecordView: UIView {
     
@@ -16,6 +17,12 @@ final class FeedDetailRecordView: UIView {
         label.text = "기록"
         label.textColor = UIColor.colorWithRGB(r: 13, g: 13, b: 13)
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        return label
+    }()
+    
+    private lazy var difficultyLabel: DifficultyLabel = {
+        let label = DifficultyLabel()
+        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
         return label
     }()
     
@@ -95,6 +102,7 @@ final class FeedDetailRecordView: UIView {
         self.backgroundColor = .systemBackground
         
         self.addSubview(recordTitleLabel)
+        self.addSubview(difficultyLabel)
         [timeElementView, timeDistanceBreakLine, distanceElementView, distanceMeanPaceBreakLine, meanPaceElementView, meanPaceKcalBreakLine, kcalElementView].forEach{
             self.recordStackView.addArrangedSubview($0)
         }
@@ -103,6 +111,11 @@ final class FeedDetailRecordView: UIView {
         recordTitleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(20)
             make.left.equalToSuperview().offset(20)
+        }
+        
+        difficultyLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(20)
+            make.right.equalToSuperview().offset(-20)
         }
         
         recordStackView.snp.makeConstraints { make in
@@ -119,10 +132,11 @@ final class FeedDetailRecordView: UIView {
         }
     }
     
-    func configureModel(time: Int, distance: Float, meanPace: Int, kcal: Int){
+    func configureModel(difficulty: FeedDetailDifficultyType, time: Int, distance: Float, meanPace: Int, kcal: Int){
         timeElementView.configureModel(title: "시간", value: Date().formatSecondsToHHMMSS(seconds: time))
         distanceElementView.configureModel(title: "거리", value: "\(distance) km")
         meanPaceElementView.configureModel(title: "평균 페이스", value: Int.convertMeanPaceToString(meanPace: meanPace))
         kcalElementView.configureModel(title: "소모 칼로리", value: "\(kcal) kcal")
+        difficultyLabel.setTitle(difficulty: difficulty)
     }
 }

@@ -351,7 +351,7 @@ extension FeedDetailViewController: View{
             .bind{ [weak self] model in
                 guard let self = self else { return }
                 self.postView.configureModel(model: model)
-                self.recordView.configureModel(time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
+                self.recordView.configureModel(difficulty: model.difficulty, time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
             }.disposed(by: self.disposeBag)
         
         reactor.state.compactMap{$0.postModel?.imageUrl}

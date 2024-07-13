@@ -38,6 +38,7 @@ public struct FeedDetailModel: Decodable, Equatable{
     public var likeCount: Int
     public let isOwner: Bool
     public var isLiked: Bool
+    public var difficulty: FeedDetailDifficultyType
     
     enum CodingKeys: String, CodingKey {
         case nickname
@@ -56,25 +57,35 @@ public struct FeedDetailModel: Decodable, Equatable{
         case commentCount = "replyCnt"
         case isOwner = "owner"
         case isLiked
+        case difficulty
     }
     
     public static func == (lhs: FeedDetailModel, rhs: FeedDetailModel) -> Bool {
-          return lhs.nickname == rhs.nickname &&
-                 lhs.profileImageUrl == rhs.profileImageUrl &&
-                 lhs.level == rhs.level &&
-                 lhs.postContent == rhs.postContent &&
-                 lhs.role == rhs.role &&
-                 lhs.locationName == rhs.locationName &&
-                 lhs.distance == rhs.distance &&
-                 lhs.time == rhs.time &&
-                 lhs.meanPace == rhs.meanPace &&
-                 lhs.kcal == rhs.kcal &&
-                 lhs.imageUrl == rhs.imageUrl &&
-                 lhs.createDate == rhs.createDate &&
-                 lhs.commentCount == rhs.commentCount &&
-                 lhs.likeCount == rhs.likeCount &&
-                 lhs.isOwner == rhs.isOwner &&
-                 lhs.isLiked == rhs.isLiked
-      }
+        return lhs.nickname == rhs.nickname &&
+        lhs.profileImageUrl == rhs.profileImageUrl &&
+        lhs.level == rhs.level &&
+        lhs.postContent == rhs.postContent &&
+        lhs.role == rhs.role &&
+        lhs.locationName == rhs.locationName &&
+        lhs.distance == rhs.distance &&
+        lhs.time == rhs.time &&
+        lhs.meanPace == rhs.meanPace &&
+        lhs.kcal == rhs.kcal &&
+        lhs.imageUrl == rhs.imageUrl &&
+        lhs.createDate == rhs.createDate &&
+        lhs.commentCount == rhs.commentCount &&
+        lhs.likeCount == rhs.likeCount &&
+        lhs.isOwner == rhs.isOwner &&
+        lhs.isLiked == rhs.isLiked &&
+        lhs.difficulty == rhs.difficulty
+    }
     
+}
+
+public enum FeedDetailDifficultyType: String, Decodable{
+    case VERYEASY
+    case EASY
+    case NORMAL
+    case HARD
+    case VERYHARD
 }
