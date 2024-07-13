@@ -50,8 +50,7 @@ final public class FeedReactor: Reactor{
             guard currentState.pageNumber < currentState.totalPages else { return .empty()}
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                self.feedUseCase.fetchFeeds(page: currentState.pageNumber)
-                    .map{ Mutation.addFeeds($0.0, $0.1)},
+                self.feedUseCase.fetchFeeds(page: currentState.pageNumber).map{ Mutation.addFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false))
             ])
         case .refresh:

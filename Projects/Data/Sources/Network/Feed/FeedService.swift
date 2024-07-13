@@ -23,6 +23,7 @@ public enum FeedService{
     case editPost(postId: Int, editPostModel: EditFeedRequestDTO)
     case likePost(likePost: FeedLikeRequestDTO)
     case unLikePost(postId: Int)
+    case editComment(commentId: Int, editCommentModel: EditCommentRequestDTO)
 }
 
 extension FeedService: TargetType{
@@ -60,6 +61,8 @@ extension FeedService: TargetType{
             return "/like"
         case.unLikePost(let postId):
             return "/like/\(postId)"
+        case .editComment(let commentId, let editCommentModel):
+            return "/reply/update/\(commentId)"
         }
     }
     
@@ -79,7 +82,8 @@ extension FeedService: TargetType{
                 .unLikePost:
             return .delete
         case .deleteComment,
-                .editPost:
+                .editPost,
+                .editComment:
             return .put
         }
     }
@@ -94,6 +98,8 @@ extension FeedService: TargetType{
             return .requestJSONEncodable(reportCommentModel)
         case .editPost(_, let editPostModel):
             return .requestJSONEncodable(editPostModel)
+        case .editComment(let commentId, let editCommentModel):
+            return .requestJSONEncodable(editCommentModel)
         case .fetchPost,
                 .deleteBookmark,
                 .deleteComment,
@@ -122,7 +128,8 @@ extension FeedService: TargetType{
                 .deletePost,
                 .editPost,
                 .likePost,
-                .unLikePost:
+                .unLikePost,
+                .editComment:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]
         }

@@ -138,6 +138,14 @@ extension FeedViewController: View{
             .bind(to: self.feedCollectionView.rx.items(dataSource: self.dataSource))
             .disposed(by: self.disposeBag)
         
+        reactor.state
+            .map { $0.feeds }
+            .distinctUntilChanged()
+            .bind { [weak self] _ in
+                self?.feedCollectionView.collectionViewLayout.invalidateLayout()
+            }
+            .disposed(by: self.disposeBag)
+        
         feedRefreshControl.rx.controlEvent(.valueChanged)
             .map{Reactor.Action.refresh}
             .bind(to: reactor.action)

@@ -22,4 +22,5 @@ public protocol FeedRepositoryProtocol{
     func editPost(postId: Int, editPostModel: EditFeedRequestDTO) -> Observable<Any>
     func likePost(likePost: FeedLikeRequestDTO) -> Observable<FeedLikeResponseModel>
     func unLikePost(postId: Int) -> Observable<FeedLikeResponseModel>
+    func editComment(commentId: Int, editCommentModel: EditCommentRequestDTO) -> Observable<Any>
 }
