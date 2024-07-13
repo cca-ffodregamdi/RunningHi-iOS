@@ -198,7 +198,11 @@ final public class FeedDetailViewController: UIViewController {
         guard let reactor = reactor else { return }
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        let editComment = UIAlertAction(title: "수정", style: .default)
+        let editComment = UIAlertAction(title: "수정", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+            self.coordinator?.showEditComment(viewController: self, commentModel: commentModel)
+        }
         
         let deleteComment = UIAlertAction(title: "삭제", style: .destructive) { [weak self] _ in
             let deleteAlertController = UIAlertController(title: "댓글을 삭제하시겠습니까?", message: nil, preferredStyle: .alert)
@@ -507,5 +511,11 @@ extension FeedDetailViewController: UITableViewDelegate{
 extension FeedDetailViewController: EditFeedViewControllerDelegate{
     public func editedFeed() {
         reactor?.action.onNext(.fetchPost)
+    }
+}
+
+extension FeedDetailViewController: EditCommentViewControllerDelegate{
+    public func editComment() {
+        reactor?.action.onNext(.fetchComment)
     }
 }

@@ -7,6 +7,8 @@
 
 import UIKit
 import Presentation
+import Domain
+
 class FeedCoordinator: Coordinator{
     
     var childCoordinator: [Coordinator] = []
@@ -40,6 +42,12 @@ extension FeedCoordinator: FeedCoordinatorInterface{
     
     func showEditPost(viewController: FeedDetailViewController, postId: Int){
         let vc = feedDIContainer.makeEditPostViewController(postId: postId, coordinator: self)
+        vc.delegate = viewController
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showEditComment(viewController: FeedDetailViewController, commentModel: CommentModel) {
+        let vc = feedDIContainer.makeEditCommentViewController(commentModel: commentModel)
         vc.delegate = viewController
         self.navigationController.pushViewController(vc, animated: true)
     }

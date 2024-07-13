@@ -144,4 +144,12 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
                 return Observable.error(error)
             }
     }
+    
+    public func editComment(commentId: Int, editCommentModel: EditCommentRequestDTO) -> Observable<Any> {
+        return service.rx.request(.editComment(commentId: commentId, editCommentModel: editCommentModel))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
 }
