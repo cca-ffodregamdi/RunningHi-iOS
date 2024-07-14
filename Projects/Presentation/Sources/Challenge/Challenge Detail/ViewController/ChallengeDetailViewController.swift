@@ -207,7 +207,7 @@ extension ChallengeDetailViewController: View{
                 guard let self = self else { return }
                 if reactor.currentState.isParticipated{
                     guard let model = reactor.currentState.myChallengeDetailModel else { return }
-                    self.challengeDetailInfoView.configureModel(content: model.content, goal: model.goal, startDate: model.startDate, endDate: model.endDate, participatedCount: model.participantsCount)
+                    self.challengeDetailInfoView.configureModel(content: model.content, goalDetail: model.goalDetail, startDate: model.startDate, endDate: model.endDate, participatedCount: model.participantsCount)
                     self.stickyImageView.setImage(urlString: "https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20231102-1.JPG?alt=media")
                     self.title = model.title
                     self.rankTableView.snp.updateConstraints { make in
@@ -215,7 +215,7 @@ extension ChallengeDetailViewController: View{
                     }
                 }else{
                     guard let model = reactor.currentState.otherChallengeDetailModel else { return }
-                    self.challengeDetailInfoView.configureModel(content: model.content, goal: model.goal, startDate: model.startDate, endDate: model.endDate, participatedCount: model.participantsCount)
+                    self.challengeDetailInfoView.configureModel(content: model.content, goalDetail: model.goalDetail, startDate: model.startDate, endDate: model.endDate, participatedCount: model.participantsCount)
                     self.stickyImageView.setImage(urlString: "https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20231102-1.JPG?alt=media")
                     self.title = model.title
                 }

@@ -108,9 +108,9 @@ class ChallengeDetailInfoView: UIView {
         }
     }
     
-    func configureModel(content: String, goal: Float, startDate: String, endDate: String, participatedCount: Int){
+    func configureModel(content: String, goalDetail: String, startDate: String, endDate: String, participatedCount: Int){
         contentLabel.text = content
-        goalElementView.configureModel(title: "챌린지 목표", value: "\(goal)")
+        goalElementView.configureModel(title: "챌린지 목표", value: goalDetail)
         termElementView.configureModel(title: "기간", value: Date().formatChallengeTermToMd(dateString: startDate) + " ~ " + Date().formatChallengeTermToMd(dateString: endDate))
         participatedCountElementView.configureModel(title: "참여자", value: "\(participatedCount)명")
     }
