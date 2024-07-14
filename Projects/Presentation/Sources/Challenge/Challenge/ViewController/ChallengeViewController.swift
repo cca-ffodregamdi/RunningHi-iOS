@@ -107,7 +107,7 @@ final public class ChallengeViewController: UIViewController{
     }
 }
 
-extension ChallengeViewController: View, UITableViewDelegate{
+extension ChallengeViewController: View{
     
     public func bind(reactor: ChallengeReactor) {
         reactor.action.onNext(.fetchChallenge)
@@ -138,11 +138,11 @@ extension ChallengeViewController: View, UITableViewDelegate{
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
                 switch item{
                 case .participating(let myChallengeModel):
-                    challengeId = myChallengeModel.myChallengeId
-                    self.coordinator?.showChallengeDetailView(challengeId: challengeId, isParticipated: true)
+                    challengeId = myChallengeModel.challengeId
+                    self.coordinator?.showChallengeDetailView(viewController: self, challengeId: challengeId, isParticipated: true)
                 case .notParticipaing(let challengeModel):
                     challengeId = challengeModel.challengeId
-                    self.coordinator?.showChallengeDetailView(challengeId: challengeId, isParticipated: false)
+                    self.coordinator?.showChallengeDetailView(viewController: self, challengeId: challengeId, isParticipated: false)
                 }
             }.disposed(by: self.disposeBag)
         
@@ -155,9 +155,24 @@ extension ChallengeViewController: View, UITableViewDelegate{
             }.disposed(by: self.disposeBag)
     }
     
+   
+}
+extension ChallengeViewController: UITableViewDelegate{
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "challengeHeaderView") as! ChallengeHeaderFooterView
         headerView.configureModel(title: dataSource[section].header)
         return headerView
+    }
+    
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 50
+    }
+}
+
+
+extension ChallengeViewController: ChallengeDetailViewControllerDelegate{
+    public func joined() {
+        reactor?.action.onNext(.fetchChallenge)
+        reactor?.action.onNext(.fetchMyChallenge)
     }
 }

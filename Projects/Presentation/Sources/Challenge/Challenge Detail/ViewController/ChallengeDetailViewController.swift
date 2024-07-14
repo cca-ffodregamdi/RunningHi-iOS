@@ -14,11 +14,17 @@ import RxCocoa
 import ReactorKit
 import Common
 
+public protocol ChallengeDetailViewControllerDelegate: AnyObject{
+    func joined()
+}
+
 final public class ChallengeDetailViewController: UIViewController{
 
     // MARK: Properties
     public var disposeBag: DisposeBag = DisposeBag()
     public var coordinator: ChallengeCoordinatorInterface?
+    
+    public weak var delegate: ChallengeDetailViewControllerDelegate?
     
     private var stickyViewHeight: NSLayoutConstraint?
     

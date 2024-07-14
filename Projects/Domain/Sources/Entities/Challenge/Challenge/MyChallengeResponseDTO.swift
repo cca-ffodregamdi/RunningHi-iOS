@@ -16,6 +16,7 @@ public struct MyChallengeResponseDTO: Decodable{
 
 public struct MyChallengeModel: Decodable{
     public let myChallengeId: Int
+    public let challengeId: Int
     public let title: String
     public let imageUrl: String
     let startDate: String
@@ -25,6 +26,7 @@ public struct MyChallengeModel: Decodable{
     
     enum CodingKeys: String, CodingKey {
         case myChallengeId = "memberChallengeId"
+        case challengeId
         case title
         case imageUrl
         case startDate
