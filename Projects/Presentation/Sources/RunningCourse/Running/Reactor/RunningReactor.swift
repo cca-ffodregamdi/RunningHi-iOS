@@ -20,6 +20,7 @@ final public class RunningReactor: Reactor{
     private let timerSubject = PublishSubject<Void>()
     
     public enum Action{
+        case checkAuthorization
         case readyForRunning
         case startRunning
         case pauseRunning
@@ -27,14 +28,19 @@ final public class RunningReactor: Reactor{
     }
     
     public enum Mutation{
+        case setAuthorization(LocationAuthorizationStatus?)
         case setCountDown
         case setRunningTime
+        case setCurrentLocation(RouteInfo)
         case setPaused(Bool)
     }
     
     public struct State{
+        var authorization: LocationAuthorizationStatus?
         var readyTime = 3
         var isRunning = false
+        
+        var currentLocation: RouteInfo?
         
         var runningTime = 0
         var runningPace = 0
@@ -53,6 +59,10 @@ final public class RunningReactor: Reactor{
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
+        case .checkAuthorization:
+            return runningUseCase.checkUserCurrentLocationAuthorization()
+                .map { status in Mutation.setAuthorization(status) }
+                
         case .readyForRunning:
             return Observable<Int>.interval(.seconds(1), scheduler: MainScheduler.instance)
                 .take(3)
@@ -60,13 +70,12 @@ final public class RunningReactor: Reactor{
             
         case .startRunning:
             timerSubject.onNext(())
+            runningUseCase.startRunning()
             return Observable.just(Mutation.setPaused(false))
                 .observe(on:MainScheduler.asyncInstance)
             
-        case .pauseRunning:
-            return Observable.just(Mutation.setPaused(true))
-            
-        case .stopRunning:
+        case .pauseRunning, .stopRunning:
+            runningUseCase.stopRunning()
             return Observable.just(Mutation.setPaused(true))
         }
     }
@@ -74,6 +83,9 @@ final public class RunningReactor: Reactor{
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation{
+        case let .setAuthorization(status):
+            newState.authorization = status
+            
         case .setCountDown:
             newState.readyTime -= 1
             
@@ -87,6 +99,9 @@ final public class RunningReactor: Reactor{
             
         case .setRunningTime:
             newState.runningTime += 1
+            
+        case let .setCurrentLocation(location):
+            newState.currentLocation = location
         }
         return newState
     }
@@ -103,6 +118,10 @@ final public class RunningReactor: Reactor{
                         return false
                     })
             }
-        return Observable.merge(mutation, timerMutation)
+        
+        let runningMutation = runningUseCase.getUserLocation()
+            .map { Mutation.setCurrentLocation($0) }
+        
+        return Observable.merge(mutation, timerMutation, runningMutation)
     }
 }

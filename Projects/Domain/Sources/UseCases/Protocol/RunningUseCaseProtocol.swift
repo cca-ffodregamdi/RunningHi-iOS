@@ -10,4 +10,8 @@ import RxSwift
 import KakaoSDKAuth
 
 protocol RunningUseCaseProtocol{
+    func checkUserCurrentLocationAuthorization() -> Observable<LocationAuthorizationStatus>
+    
+    func startRunning()
+    func stopRunning()
 }

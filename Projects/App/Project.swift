@@ -36,7 +36,11 @@ let project = Project(
                     ],
                     "NSAppTransportSecurity" : [
                         "NSAllowsArbitraryLoads": true
-                    ]
+                    ],
+                    "NSLocationAlwaysAndWhenInUseUsageDescription": "러닝하이에서 위치 정보 수집을 위해 동의가 필요합니다.",
+                    "NSLocationWhenInUseUsageDescription": "러닝하이에서 위치 정보 수집을 위해 동의가 필요합니다.",
+                    "NSMotionUsageDescription": "러닝하이에서 정확한 위치 정보 수집을 위해 동의가 필요합니다.",
+                    "UIBackgroundModes": ["location", "fetch", "remote-notification"]
                 ]
             ),
             sources: ["Sources/**"],

@@ -124,26 +124,12 @@ class RunningRecordView: UIView {
     
     //MARK: - Helpers
     
-    func initRunningData(time: Int = 0, averagePace: Int = 0, calorie: Int = 0) {
-        timeLabel.setData(data: "\(time)")
-        averagePaceLabel.setData(data: "\(averagePace)")
-        calorieLabel.setData(data: "\(calorie)")
-        
-        toggleRunningState(isRunning: true)
+    func setRunningData(time: Int = 0) {
+        timeLabel.setData(data: TimeUtil.convertSecToTimeFormat(sec: time))
     }
     
-    func setRunningData(time: Int?, averagePace: Int?, calorie: Int?) {
-        if let time = time {
-            timeLabel.setData(data: "\(time)")
-        }
-        
-        if let averagePace = averagePace {
-            averagePaceLabel.setData(data: "\(averagePace)")
-        }
-        
-        if let calorie = calorie {
-            calorieLabel.setData(data: "\(calorie)")
-        }
+    func setRunningData(distance: Int = 0) {
+        distanceLabel.text = String(format: "%.2f", distance / 1000)
     }
     
     func toggleRunningState(isRunning: Bool) {
