@@ -100,5 +100,13 @@ final public class MyViewController: UIViewController, View{
         reactor.state.map{[MyPageSection(items: $0.items)]}
             .bind(to: settingTableView.rx.items(dataSource: dataSource))
             .disposed(by: self.disposeBag)
+        
+        settingTableView.rx.observe(CGSize.self, "contentSize")
+            .bind{ [weak self] size in
+                guard let size = size, let self = self else { return }
+                settingTableView.snp.updateConstraints { make in
+                    make.height.equalTo(size.height)
+                }
+            }.disposed(by: self.disposeBag)
     }
 }
