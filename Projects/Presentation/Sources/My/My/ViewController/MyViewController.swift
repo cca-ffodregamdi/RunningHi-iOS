@@ -39,8 +39,6 @@ final public class MyViewController: UIViewController, View{
         return tableView
     }()
     
-    
-    
     // MARK: LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,9 +46,9 @@ final public class MyViewController: UIViewController, View{
         initTableView()
     }
     
-    public init() {
+    public init(reactor: MyReactor) {
         super.init(nibName: nil, bundle: nil)
-        self.reactor = MyReactor()
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -72,7 +70,6 @@ final public class MyViewController: UIViewController, View{
             make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
             make.left.right.equalToSuperview()
         }
-        
         
         self.myProfileHeaderView.snp.makeConstraints { make in
             make.top.equalToSuperview()

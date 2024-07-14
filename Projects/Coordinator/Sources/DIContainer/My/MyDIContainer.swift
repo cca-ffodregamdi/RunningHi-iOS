@@ -12,9 +12,16 @@ import Domain
 
 class MyDIContainer{
     
+    private lazy var myRepository: MyRepositoryImplementation = {
+        return MyRepositoryImplementation()
+    }()
+    
+    private lazy var myUsecase: MyUseCase = {
+        return MyUseCase(repository: myRepository)
+    }()
     
     func makeMyViewController(coordinator: MyCoordinator) -> MyViewController{
-        let vc = MyViewController()
+        let vc = MyViewController(reactor: MyReactor(myUseCase: myUsecase))
         vc.coordinator = coordinator
         return vc
     }
