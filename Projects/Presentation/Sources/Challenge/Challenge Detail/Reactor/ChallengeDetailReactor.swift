@@ -20,6 +20,7 @@ public class ChallengeDetailReactor: Reactor{
         case setOtherChallengeModel(OtherChallengeDetailModel)
         case setMyChallengeModel(MyChallengeDetailModel)
         case setFetched(Bool)
+        case updateIsJoined(Bool)
         case resetRank
     }
     
@@ -32,6 +33,7 @@ public class ChallengeDetailReactor: Reactor{
         var myRank: RankModel?
         var myChallengeDetailModel: MyChallengeDetailModel?
         var otherChallengeDetailModel: OtherChallengeDetailModel?
+        var isJoined: Bool = false
     }
     
     public var initialState: State
@@ -64,6 +66,7 @@ public class ChallengeDetailReactor: Reactor{
             return Observable.concat([
                 Observable.just(Mutation.setFetched(false)),
                 challengeUseCase.joinChallenge(joinChallengeRequestModel: joinChallengeRequestModel).map{_ in Mutation.resetRank},
+                Observable.just(Mutation.updateIsJoined(true)),
                 challengeUseCase.fetchMyChallengeDetail(challengeId: currentState.challengeId).map{Mutation.setMyChallengeModel($0)},
                 Observable.just(Mutation.setFetched(true))
             ])
@@ -85,6 +88,7 @@ public class ChallengeDetailReactor: Reactor{
             newState.otherRank = otherRank
             newState.otherChallengeDetailModel = nil
             newState.isParticipated = true
+            newState.myRank = myChallengeModel.myRanking
         case .setOtherChallengeModel(let otherChallengeModel):
             newState.otherChallengeDetailModel = otherChallengeModel
             let topRank = otherChallengeModel.ranking.filter{$0.rank < 4}
@@ -95,6 +99,8 @@ public class ChallengeDetailReactor: Reactor{
             newState.isParticipated = false
         case .setFetched(let value):
             newState.isFetched = value
+        case .updateIsJoined(let value):
+            newState.isJoined = value
         }
         return newState
     }

@@ -14,10 +14,9 @@ class MyRankView: UIView{
     private lazy var rankLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        label.textColor = UIColor.colorWithRGB(r: 10, g: 10, b: 11)
+        label.textColor = UIColor.colorWithRGB(r: 250, g: 250, b: 250)
         return label
     }()
-    
     
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
@@ -28,20 +27,21 @@ class MyRankView: UIView{
     private lazy var nickNameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        label.textColor = UIColor.colorWithRGB(r: 10, g: 10, b: 11)
+        label.textColor = UIColor.colorWithRGB(r: 250, g: 250, b: 250)
         return label
     }()
     
     private lazy var recordLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
-        label.textColor = UIColor.colorWithRGB(r: 10, g: 10, b: 11)
+        label.textColor = UIColor.colorWithRGB(r: 250, g: 250, b: 250)
         return label
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureUI()
+        self.translatesAutoresizingMaskIntoConstraints = false 
     }
     
     required init(coder: NSCoder) {
@@ -49,6 +49,7 @@ class MyRankView: UIView{
     }
     
     private func configureUI(){
+        self.backgroundColor = UIColor.colorWithRGB(r: 34, g: 101, b: 201)
         self.addSubview(rankLabel)
         self.addSubview(profileImageView)
         self.addSubview(nickNameLabel)

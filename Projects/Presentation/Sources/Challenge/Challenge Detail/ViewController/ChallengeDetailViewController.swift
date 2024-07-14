@@ -14,11 +14,17 @@ import RxCocoa
 import ReactorKit
 import Common
 
+public protocol ChallengeDetailViewControllerDelegate: AnyObject{
+    func joined()
+}
+
 final public class ChallengeDetailViewController: UIViewController{
 
     // MARK: Properties
     public var disposeBag: DisposeBag = DisposeBag()
     public var coordinator: ChallengeCoordinatorInterface?
+    
+    public weak var delegate: ChallengeDetailViewControllerDelegate?
     
     private var stickyViewHeight: NSLayoutConstraint?
     
@@ -110,6 +116,7 @@ final public class ChallengeDetailViewController: UIViewController{
         self.scrollView.addSubview(infoRankBreakLine)
         self.scrollView.addSubview(rankTableView)
         self.view.addSubview(joinButton)
+        self.view.addSubview(myRankView)
         
         scrollView.snp.makeConstraints { make in
             make.top.equalToSuperview()
@@ -147,6 +154,12 @@ final public class ChallengeDetailViewController: UIViewController{
             make.left.equalToSuperview().offset(20)
             make.right.equalToSuperview().offset(-20)
             make.height.equalTo(45)
+        }
+        
+        myRankView.snp.makeConstraints { make in
+            make.bottom.equalToSuperview()
+            make.left.right.equalToSuperview()
+            make.height.equalTo(58)
         }
     }
     
@@ -198,7 +211,7 @@ extension ChallengeDetailViewController: View{
                     self.stickyImageView.setImage(urlString: "https://firebasestorage.googleapis.com/v0/b/weather-wear-a7674.appspot.com/o/20231102-1.JPG?alt=media")
                     self.title = model.title
                     self.rankTableView.snp.updateConstraints { make in
-                        make.bottom.equalToSuperview()
+                        make.bottom.equalToSuperview().offset(-30)
                     }
                 }else{
                     guard let model = reactor.currentState.otherChallengeDetailModel else { return }
@@ -267,25 +280,33 @@ extension ChallengeDetailViewController: View{
                 }
             }.disposed(by: self.disposeBag)
         
-//        reactor.state.map{$0.isParticipated}
-//            .filter{$0}
-//            .bind{ [weak self] _ in
-//                guard let self = self else { return }
-//                self.view.addSubview(myRankView)
-//                guard let model = reactor.currentState.myChallengeDetailModel else { return }
-//                self.myRankView.configureModel(model: model.myRanking, challengeCategory: model.challengeCategory)
-//                self.myRankView.snp.makeConstraints { make in
-//                    make.bottom.equalToSuperview()
-//                    make.left.right.equalToSuperview()
-//                    make.height.equalTo(30)
-//                }
-//            }.disposed(by: self.disposeBag)
+        reactor.state.map{$0.isParticipated}
+            .map{!$0}
+            .distinctUntilChanged()
+            .bind(to: myRankView.rx.isHidden)
+            .disposed(by: self.disposeBag)
+        
+        reactor.state.map{$0.isParticipated}
+            .filter{$0}
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                guard let model = reactor.currentState.myChallengeDetailModel else { return }
+                self.myRankView.configureModel(model: model.myRanking, challengeCategory: model.challengeCategory)
+            }.disposed(by: self.disposeBag)
         
         joinButton.rx.tap
             .map{ _ in
                 return Reactor.Action.joinChallenge(JoinChallengeRequestDTO(challengeId: reactor.currentState.challengeId))
             }.bind(to: reactor.action)
             .disposed(by: self.disposeBag)
+        
+        reactor.state.map{$0.isJoined}
+            .filter{$0}
+            .distinctUntilChanged()
+            .bind{ [weak self] _ in
+                guard let self = self else {return}
+                self.delegate?.joined()
+            }.disposed(by: self.disposeBag)
     }
 }
 
