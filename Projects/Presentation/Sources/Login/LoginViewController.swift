@@ -10,8 +10,6 @@ import RxCocoa
 import ReactorKit
 import SnapKit
 import Domain
-import AuthenticationServices
-import CryptoKit
 
 public protocol LoginViewControllerDelegate: AnyObject{
     func login()
@@ -73,16 +71,8 @@ extension LoginViewController: View{
             .disposed(by: self.disposeBag)
         
         loginView.appleLoginButton.rx.tap
-            .bind{ [weak self] _ in
-                let appleIDProvider = ASAuthorizationAppleIDProvider()
-                let request = appleIDProvider.createRequest()
-                request.requestedScopes = [.fullName, .email] //유저로 부터 알 수 있는 정보들(name, email)
-                
-                let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-                authorizationController.delegate = self
-                authorizationController.presentationContextProvider = self
-                authorizationController.performRequests()
-            }
+            .map{ Reactor.Action.appleLogin }
+            .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
         reactor.state
@@ -101,32 +91,4 @@ extension LoginViewController: View{
                 // TODO: activityIndicator
             }.disposed(by: self.disposeBag)
     }
-}
-extension LoginViewController: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding{
-    public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return self.view.window!
-    }
-    
-    public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-    
-        switch authorization.credential{
-        case let appleIDCredential as ASAuthorizationAppleIDCredential:
-            if let authorizaionCode = appleIDCredential.authorizationCode,
-               let identityToken = appleIDCredential.identityToken,
-               let authCodeString = String(data: authorizaionCode, encoding: .utf8),
-               let identityTokenString = String(data: identityToken, encoding: .utf8){
-                print("authCodeString = \(authCodeString)")
-                print("identityTokenString = \(identityTokenString)")
-                
-                reactor?.action.onNext(.signWithApple(SignWithApple(authorizationCode: authCodeString, identityCode: identityTokenString)))
-            }
-        default:
-            break
-        }
-    }
-    
-    public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: any Error) {
-        print("Error Apple Login: \(error.localizedDescription)")
-    }
-    
 }

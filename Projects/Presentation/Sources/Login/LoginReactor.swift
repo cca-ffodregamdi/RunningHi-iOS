@@ -19,7 +19,7 @@ final public class LoginReactor: Reactor{
     
     public enum Action{
         case kakaoLogin
-        case signWithApple(SignWithApple)
+        case appleLogin
     }
     
     public enum Mutation{
@@ -58,10 +58,15 @@ final public class LoginReactor: Reactor{
                     }.catchAndReturn(Mutation.setLoading(false)),
                 Observable.just(Mutation.setLoading(false))
             ])
-        case .signWithApple(let requestModel):
+        case .appleLogin:
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                loginUseCase.signWithApple(requestModel: requestModel).debug().map{ Mutation.signed($0.0, $0.1) },
+                loginUseCase.loginWithApple()
+                    .flatMap { identityToken, authorizationCode -> Observable<(String, String)> in
+                        self.loginUseCase.signWithApple(requestModel: SignWithApple(authorizationCode: authorizationCode, identityCode: identityToken))
+                    }.flatMap{ accessToken, refreshToken -> Observable<Mutation> in
+                        return Observable.just(Mutation.signed(accessToken, refreshToken))
+                    }.catchAndReturn(Mutation.setLoading(false)),
                 Observable.just(Mutation.setLoading(false))
             ])
         }

@@ -13,4 +13,5 @@ protocol LoginUseCaseProtocol{
     func loginWithKakao() -> Observable<OAuthToken>
     func signWithKakao(kakaoAccessToken: String) -> Observable<(String, String)>
     func signWithApple(requestModel: SignWithApple) -> Observable<(String, String)>
+    func loginWithApple() -> Observable<(String, String)>
 }

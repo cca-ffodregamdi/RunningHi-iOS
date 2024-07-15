@@ -27,5 +27,9 @@ final public class LoginUseCase: LoginUseCaseProtocol{
     public func signWithApple(requestModel: SignWithApple) -> Observable<(String, String)> {
         return loginRepository.signWithApple(requestModel: requestModel)
     }
+    
+    public func loginWithApple() -> Observable<(String, String)> {
+        return loginRepository.loginWithApple()
+    }
 }
 
