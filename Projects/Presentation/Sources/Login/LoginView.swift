@@ -38,6 +38,12 @@ class LoginView: UIView {
         return button
     }()
     
+    lazy var appleLoginButton: UIButton = {
+        let button = UIButton()
+        button.setImage(CommonAsset.appleLoginButton.image, for: .normal)
+        return button
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureUI()
@@ -53,7 +59,9 @@ class LoginView: UIView {
         self.addSubview(logoImageView)
         self.addSubview(welcomeTextLabel)
         self.addSubview(loginButtonStackView)
-        self.loginButtonStackView.addArrangedSubview(kakaoLoginButton)
+        [kakaoLoginButton, appleLoginButton].forEach{
+            self.loginButtonStackView.addArrangedSubview($0)
+        }
         
         logoImageView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(60)
@@ -76,6 +84,11 @@ class LoginView: UIView {
         }
         
         kakaoLoginButton.snp.makeConstraints { make in
+            make.height.equalTo(45)
+            make.width.equalToSuperview()
+        }
+        
+        appleLoginButton.snp.makeConstraints { make in
             make.height.equalTo(45)
             make.width.equalToSuperview()
         }

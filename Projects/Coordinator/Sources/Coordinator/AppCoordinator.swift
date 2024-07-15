@@ -24,7 +24,7 @@ public class AppCoordinator: Coordinator{
         AuthManager.shared.isValidAccessToken()
             .bind{ bool in
                 print(UserDefaults.standard.object(forKey: "accessToken"))
-                if bool{
+                if false{
                     self.showBaseTabBarController()
                 }else{
                     self.showLoginViewController()

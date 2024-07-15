@@ -70,6 +70,11 @@ extension LoginViewController: View{
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
+        loginView.appleLoginButton.rx.tap
+            .map{ Reactor.Action.appleLogin }
+            .bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
+        
         reactor.state
             .map{$0.successed}
             .distinctUntilChanged()
