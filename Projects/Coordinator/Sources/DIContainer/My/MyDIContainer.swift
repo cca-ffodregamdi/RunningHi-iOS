@@ -25,4 +25,10 @@ class MyDIContainer{
         vc.coordinator = coordinator
         return vc
     }
+    
+    func makeNoticeViewController(coordinator: MyCoordinator) -> NoticeViewController{
+        let vc = NoticeViewController(reactor: NoticeReactor(myUseCase: myUsecase))
+        vc.coordinator = coordinator
+        return vc
+    }
 }
