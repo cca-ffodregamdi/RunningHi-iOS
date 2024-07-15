@@ -20,6 +20,7 @@ let project = Project(
             resources: ["Resources/**"],
             dependencies: [
                 .external(name: "Kingfisher"),
+                .project(target: "Domain", path: .relativeToRoot("Projects/Domain")),
             ]
         ),
     ]

@@ -26,5 +26,8 @@ class MyCoordinator: Coordinator{
 }
 
 extension MyCoordinator: MyCoordinatorInterface{
-    
+    func showNotice() {
+        let vc = myDIContainer.makeNoticeViewController(coordinator: self)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
 }
