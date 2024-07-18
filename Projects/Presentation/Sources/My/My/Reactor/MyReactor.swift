@@ -8,6 +8,7 @@
 import Foundation
 import ReactorKit
 import RxDataSources
+import Domain
 
 final public class MyReactor: Reactor{
     
@@ -24,9 +25,10 @@ final public class MyReactor: Reactor{
     }
     
     public var initialState: State
-    
-    public init(){
+    private let myUseCase: MyUseCase
+    public init(myUseCase: MyUseCase){
         self.initialState = State()
+        self.myUseCase = myUseCase
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {

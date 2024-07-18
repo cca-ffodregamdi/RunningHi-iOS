@@ -22,6 +22,7 @@ public struct MyChallengeDetailModel: Decodable{
     public let challengeCategory: String
     public let imageUrl: String
     public let goal: Float
+    public let goalDetail: String
     public let startDate: String
     public let endDate: String
     public let record: Float
@@ -37,6 +38,7 @@ public struct MyChallengeDetailModel: Decodable{
         case challengeCategory
         case imageUrl
         case goal
+        case goalDetail
         case startDate
         case endDate
         case record

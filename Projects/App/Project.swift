@@ -42,9 +42,11 @@ let project = Project(
                     "NSMotionUsageDescription": "러닝하이에서 정확한 위치 정보 수집을 위해 동의가 필요합니다.",
                     "UIBackgroundModes": ["location", "fetch", "remote-notification"]
                 ]
+                
             ),
             sources: ["Sources/**"],
             resources: ["Resources/**"],
+            entitlements: "RunningHi.entitlements",
             dependencies: [
                 .project(target: "Coordinator", path: .relativeToRoot("Projects/Coordinator")),
                 .project(target: "Presentation", path: .relativeToRoot("Projects/Presentation")),

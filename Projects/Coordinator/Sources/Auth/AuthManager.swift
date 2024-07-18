@@ -11,12 +11,12 @@ import RxMoya
 import RxSwift
 import Domain
 
-class AuthManager{
-    static let shared = AuthManager()
+public class AuthManager{
+    public static let shared = AuthManager()
     
     private let service: MoyaProvider<AuthService>
     
-    init(){
+    public init(){
         let authPlugIn = AccessTokenPlugin { _ in
             return UserDefaults.standard.object(forKey: "accessToken") as? String ?? ""
         }
@@ -24,7 +24,7 @@ class AuthManager{
     }
     
     
-    func isValidAccessToken() -> Observable<Bool>{
+    public func isValidAccessToken() -> Observable<Bool>{
         return service.rx.request(.isValidAccessToken)
             .asObservable()
             .flatMap{ [weak self] response -> Observable<Bool> in
@@ -42,7 +42,7 @@ class AuthManager{
             }
     }
     
-    func isValidRefreshToken() -> Observable<Bool>{
+    public func isValidRefreshToken() -> Observable<Bool>{
         return service.rx.request(.isValidRefreshToken)
             .map{ response in
                 let refreshReponse = try JSONDecoder().decode(RefreshTokenValidationResponseDTO.self, from: response.data)

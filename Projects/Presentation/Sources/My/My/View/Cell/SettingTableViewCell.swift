@@ -49,6 +49,7 @@ class SettingTableViewCell: UITableViewCell {
     }
     
     private func configureUI(){
+        self.selectionStyle = .none
         self.addSubview(typeImageView)
         self.addSubview(typeLabel)
         self.addSubview(arrowButtonImageView)

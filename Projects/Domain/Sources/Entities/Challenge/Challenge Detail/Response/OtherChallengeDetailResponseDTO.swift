@@ -21,6 +21,7 @@ public struct OtherChallengeDetailModel: Decodable{
     public let challengeCategory: String
     public let imageUrl: String
     public let goal: Float
+    public let goalDetail: String
     public let startDate: String
     public let endDate: String
     public let participantsCount: Int
@@ -33,6 +34,7 @@ public struct OtherChallengeDetailModel: Decodable{
         case challengeCategory
         case imageUrl
         case goal
+        case goalDetail
         case startDate
         case endDate
         case participantsCount
