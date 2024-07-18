@@ -9,15 +9,15 @@ import Foundation
 
 public struct SignWithApple: Codable{
     let authorizationCode: String
-    let identityCode: String
+    let identityToken: String
     
     enum CodingKeys: CodingKey {
         case authorizationCode
-        case identityCode
+        case identityToken
     }
     
-    public init(authorizationCode: String, identityCode: String) {
+    public init(authorizationCode: String, identityToken: String) {
         self.authorizationCode = authorizationCode
-        self.identityCode = identityCode
+        self.identityToken = identityToken
     }
 }
