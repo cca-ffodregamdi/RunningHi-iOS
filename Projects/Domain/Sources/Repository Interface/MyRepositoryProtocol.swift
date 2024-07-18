@@ -6,7 +6,8 @@
 //
 
 import Foundation
+import RxSwift
 
 public protocol MyRepositoryProtocol{
-    
+    func fetchNotice() -> Observable<[NoticeModel]>
 }

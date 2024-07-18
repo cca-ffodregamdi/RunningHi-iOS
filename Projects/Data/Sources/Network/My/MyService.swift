@@ -11,7 +11,7 @@ import RxSwift
 import Domain
 
 public enum MyService{
-    
+    case fetchNotice
 }
 
 extension MyService: TargetType{
@@ -25,26 +25,27 @@ extension MyService: TargetType{
     
     public var path: String{
         switch self{
-       
+        case .fetchNotice: "/notices"
         }
     }
     
     public var method: Moya.Method{
         switch self{
-      
+        case .fetchNotice: .get
         }
     }
     
     public var task: Task{
         switch self{
-    
+        case .fetchNotice: .requestPlain
         }
     }
     
     public var headers: [String : String]?{
         switch self{
-//            ["Content-type": "application/json",
-//                    "Authorization": accessToken]
+        case .fetchNotice:
+            ["Content-type": "application/json",
+                    "Authorization": accessToken]
         }
     }
 }

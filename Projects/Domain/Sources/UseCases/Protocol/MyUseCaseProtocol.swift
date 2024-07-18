@@ -6,7 +6,8 @@
 //
 
 import Foundation
+import RxSwift
 
 protocol MyUseCaseProtocol{
-    
+    func fetchNotice() -> Observable<[NoticeModel]>
 }

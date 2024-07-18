@@ -11,15 +11,15 @@ import Domain
 
 public class NoticeReactor: Reactor{
     public enum Action{
-        
+        case fetchNotice
     }
     
     public enum Mutation{
-        
+        case setNotices([NoticeModel])
     }
     
     public struct State{
-        
+        var notices: [NoticeModel] = []
     }
     
     public var initialState: State
@@ -31,10 +31,17 @@ public class NoticeReactor: Reactor{
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
-        
+        switch action{
+        case .fetchNotice: myUseCase.fetchNotice().map{ Mutation.setNotices($0) }
+        }
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {
-        
+        var newState = state
+        switch mutation{
+        case .setNotices(let notices):
+            newState.notices = notices
+        }
+        return newState
     }
 }

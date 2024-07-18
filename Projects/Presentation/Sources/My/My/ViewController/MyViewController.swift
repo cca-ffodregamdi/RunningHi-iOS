@@ -46,6 +46,16 @@ final public class MyViewController: UIViewController, View{
         initTableView()
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = false
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.tabBarController?.tabBar.isHidden = true
+    }
+    
     public init(reactor: MyReactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
@@ -107,6 +117,18 @@ final public class MyViewController: UIViewController, View{
                 settingTableView.snp.updateConstraints { make in
                     make.height.equalTo(size.height)
                 }
+            }.disposed(by: self.disposeBag)
+        
+        settingTableView.rx.itemSelected
+            .bind{ [weak self] indexPath in
+                guard let self = self else { return }
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                switch dataSource[indexPath]{
+                case .notices:
+                    self.coordinator?.showNotice()
+                default: break
+                }
+                
             }.disposed(by: self.disposeBag)
     }
 }

@@ -6,11 +6,16 @@
 //
 
 import Foundation
+import RxSwift
 
 public final class MyUseCase: MyUseCaseProtocol{
     private let repository:  MyRepositoryProtocol
     
     public init(repository: MyRepositoryProtocol) {
         self.repository = repository
+    }
+    
+    public func fetchNotice() -> Observable<[NoticeModel]> {
+        self.repository.fetchNotice()
     }
 }

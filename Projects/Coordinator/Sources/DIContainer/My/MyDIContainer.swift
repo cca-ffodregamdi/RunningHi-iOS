@@ -31,4 +31,9 @@ class MyDIContainer{
         vc.coordinator = coordinator
         return vc
     }
+    
+    func makeNoticeDetailViewController(noticeModel: NoticeModel) -> NoticeDetailViewController{
+        let vc = NoticeDetailViewController(noticeModel: noticeModel)
+        return vc
+    }
 }
