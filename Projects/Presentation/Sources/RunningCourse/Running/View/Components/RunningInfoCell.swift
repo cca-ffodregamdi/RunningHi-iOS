@@ -51,10 +51,12 @@ class RunningInfoCell: UIView {
         setupConstraints()
     }
     
-    required init(title: String) {
+    required init(title: String, initData: String = "") {
         super.init(frame: .zero)
         
         titleLabel.text = title
+        dataLabel.text = initData
+        
         setupViews()
         setupConstraints()
     }

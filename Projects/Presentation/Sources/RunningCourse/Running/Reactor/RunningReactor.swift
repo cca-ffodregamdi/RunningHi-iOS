@@ -101,7 +101,9 @@ final public class RunningReactor: Reactor{
             newState.runningTime += 1
             
         case let .setCurrentLocation(location):
-            newState.currentLocation = location
+            if state.isRunning {
+                newState.currentLocation = location
+            }
         }
         return newState
     }
@@ -120,7 +122,9 @@ final public class RunningReactor: Reactor{
             }
         
         let runningMutation = runningUseCase.getUserLocation()
-            .map { Mutation.setCurrentLocation($0) }
+            .flatMapLatest { location in
+                Observable.just(Mutation.setCurrentLocation(location))
+            }
         
         return Observable.merge(mutation, timerMutation, runningMutation)
     }

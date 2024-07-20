@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import Domain
 
 public protocol RunningCoordinatorInterface {
-    func showRunningResult()
+    func showRunningResult(runningModel: RunningModel)
     func finishRunning()
 }

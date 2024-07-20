@@ -11,7 +11,9 @@ import CoreLocation
 public struct RouteInfo: Codable, Equatable {
     public var latitude: Double
     public var longitude: Double
-    public var timestamp = Date()
+    public var timestamp: Date
+    
+    public var distance: Double = 0.0
     
     public init(latitude: Double, longitude: Double, timestamp: Date = Date()) {
         self.latitude = latitude

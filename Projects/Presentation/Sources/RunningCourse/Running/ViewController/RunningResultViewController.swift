@@ -11,6 +11,7 @@ import RxSwift
 import ReactorKit
 import RxRelay
 import RxDataSources
+import Domain
 
 final public class RunningResultViewController: UIViewController {
     
@@ -18,6 +19,7 @@ final public class RunningResultViewController: UIViewController {
     
     public var coordinator: RunningCoordinatorInterface?
     
+    public var runningModel: RunningModel?
     public var disposeBag = DisposeBag()
     
     private var runningResultView: RunningResultView = {
@@ -43,6 +45,8 @@ final public class RunningResultViewController: UIViewController {
         
         configureUI()
         configureNavigationBar()
+        
+        print(runningModel)
     }
     
     public override func viewWillAppear(_ animated: Bool) {

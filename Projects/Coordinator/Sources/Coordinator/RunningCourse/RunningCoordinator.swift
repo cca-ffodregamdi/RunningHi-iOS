@@ -7,6 +7,7 @@
 
 import UIKit
 import Presentation
+import Domain
 
 protocol RunningCoordinatorDelegate: AnyObject{
     func finishRunning(coordinator: RunningCoordinator)
@@ -39,8 +40,8 @@ class RunningCoordinator: Coordinator {
 }
 
 extension RunningCoordinator: RunningCoordinatorInterface {
-    func showRunningResult() {
-        let vc = runningDIContainer.makeRunningResultViewController(coordinator: self)
+    func showRunningResult(runningModel: RunningModel) {
+        let vc = runningDIContainer.makeRunningResultViewController(coordinator: self, runningModel: runningModel)
         self.navigationController.pushViewController(vc, animated: true)
     }
     
