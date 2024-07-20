@@ -33,7 +33,7 @@ final public class RunningSettingViewController: UIViewController {
     }
     
     deinit {
-        print("deinit RunningCourseViewController")
+        print("deinit RunningSettingViewController")
     }
     
     public override func viewDidLoad() {

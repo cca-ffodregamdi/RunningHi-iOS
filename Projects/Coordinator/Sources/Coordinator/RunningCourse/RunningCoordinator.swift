@@ -8,11 +8,16 @@
 import UIKit
 import Presentation
 
+protocol RunningCoordinatorDelegate: AnyObject{
+    func finishRunning(coordinator: RunningCoordinator)
+}
+
 class RunningCoordinator: Coordinator {
     
     private var navigationController: UINavigationController!
-    var childCoordinator: [Coordinator] = []
     
+    var childCoordinator: [Coordinator] = []
+    var delegate: RunningCoordinatorDelegate?
     let runningDIContainer: RunningDIContainer
     
     var isFreeCourse: Bool = true
@@ -37,5 +42,9 @@ extension RunningCoordinator: RunningCoordinatorInterface {
     func showRunningResult() {
         let vc = runningDIContainer.makeRunningResultViewController(coordinator: self)
         self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func finishRunning() {
+        delegate?.finishRunning(coordinator: self)
     }
 }

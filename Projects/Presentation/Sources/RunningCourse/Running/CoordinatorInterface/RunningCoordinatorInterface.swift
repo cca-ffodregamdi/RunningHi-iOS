@@ -9,4 +9,5 @@ import Foundation
 
 public protocol RunningCoordinatorInterface {
     func showRunningResult()
+    func finishRunning()
 }
