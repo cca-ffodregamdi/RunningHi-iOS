@@ -10,4 +10,6 @@ import RxSwift
 
 public protocol MyRepositoryProtocol{
     func fetchNotice() -> Observable<[NoticeModel]>
+    func fetchFAQ() -> Observable<[FAQModel]>
+    func fetchFeedback() -> Observable<[FeedbackModel]>
 }

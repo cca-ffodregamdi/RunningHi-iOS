@@ -12,6 +12,8 @@ import Domain
 
 public enum MyService{
     case fetchNotice
+    case fetchFAQ
+    case fetchFeedback
 }
 
 extension MyService: TargetType{
@@ -26,24 +28,26 @@ extension MyService: TargetType{
     public var path: String{
         switch self{
         case .fetchNotice: "/notices"
+        case .fetchFAQ: "/faq"
+        case .fetchFeedback: "/feedbacks"
         }
     }
     
     public var method: Moya.Method{
         switch self{
-        case .fetchNotice: .get
+        case .fetchNotice, .fetchFAQ, .fetchFeedback: .get
         }
     }
     
     public var task: Task{
         switch self{
-        case .fetchNotice: .requestPlain
+        case .fetchNotice, .fetchFAQ, .fetchFeedback: .requestPlain
         }
     }
     
     public var headers: [String : String]?{
         switch self{
-        case .fetchNotice:
+        case .fetchNotice, .fetchFAQ, .fetchFeedback:
             ["Content-type": "application/json",
                     "Authorization": accessToken]
         }

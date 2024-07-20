@@ -36,4 +36,9 @@ class MyDIContainer{
         let vc = NoticeDetailViewController(noticeModel: noticeModel)
         return vc
     }
+    
+    func makeCustomerCenterViewController() -> CustomerCenterViewController{
+        let vc = CustomerCenterViewController(reactor: CustomerCenterReactor(myUseCase: myUsecase))
+        return vc
+    }
 }

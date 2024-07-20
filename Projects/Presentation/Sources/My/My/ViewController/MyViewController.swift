@@ -126,6 +126,8 @@ final public class MyViewController: UIViewController, View{
                 switch dataSource[indexPath]{
                 case .notices:
                     self.coordinator?.showNotice()
+                case .customerCenter:
+                    self.coordinator?.showCustomerCenter()
                 default: break
                 }
                 

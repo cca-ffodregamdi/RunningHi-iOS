@@ -36,4 +36,9 @@ extension MyCoordinator: MyCoordinatorInterface{
         let vc = myDIContainer.makeNoticeDetailViewController(noticeModel: noticeModel)
         self.navigationController.pushViewController(vc, animated: true)
     }
+    
+    func showCustomerCenter() {
+        let vc = myDIContainer.makeCustomerCenterViewController()
+        self.navigationController.pushViewController(vc, animated: true)
+    }
 }
