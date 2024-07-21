@@ -17,20 +17,16 @@ final public class RunningViewController: UIViewController {
     
     public var coordinator: RunningCoordinatorInterface?
     
-    public var disposeBag = DisposeBag()
-    
-    private var runningModel = RunningModel()
+    private var runningResult = RunningResult()
     private var beforeLocation: RouteInfo?
+    
+    public var disposeBag = DisposeBag()
     
     private lazy var runningView: RunningView = {
         return RunningView()
     }()
     
     //MARK: - Lifecycle
-    
-    public init() {
-        super.init(nibName: nil, bundle: nil)
-    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -49,6 +45,7 @@ final public class RunningViewController: UIViewController {
         super.viewDidLoad()
         
         configureUI()
+        configureNotification()
     }
     
     //MARK: - Configure
@@ -61,15 +58,31 @@ final public class RunningViewController: UIViewController {
             make.edges.equalToSuperview()
         }
     }
+    
+    public func configureNotification() {
+        NotificationCenter.default.rx.notification(UIApplication.didEnterBackgroundNotification)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self, let reactor = self.reactor else { return }
+                reactor.action.onNext(.didEnterBackground)
+            })
+            .disposed(by: disposeBag)
+
+        NotificationCenter.default.rx.notification(UIApplication.willEnterForegroundNotification)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self, let reactor = self.reactor else { return }
+                reactor.action.onNext(.didEnterForeground)
+            })
+            .disposed(by: disposeBag)
+    }
 }
 
 // MARK: - Binding
 
-extension RunningViewController: View{
+extension RunningViewController: View {
     
     public func bind(reactor: RunningReactor) {
         bindingReadyView(reactor: reactor)
-        bindingRecordUpdateView(reactor: reactor)
+        bindingRecordView(reactor: reactor)
         bindingButtonEvent(reactor: reactor)
     }
     
@@ -100,15 +113,16 @@ extension RunningViewController: View{
             .bind{ [weak self] time in
                 guard let self = self else { return }
                 if time == 0 {
-                    self.runningModel.startTime = Date()
+                    self.runningResult.startTime = Date()
                     self.runningView.runningRecordView.toggleRunningState(isRunning: true)
+                    
                     reactor.action.onNext(.startRunning)
                 }
                 self.runningView.setReadyView(time: time)
             }.disposed(by: self.disposeBag)
     }
     
-    private func bindingRecordUpdateView(reactor: RunningReactor) {
+    private func bindingRecordView(reactor: RunningReactor) {
         
         // 러닝 상태 변화 감지
         reactor.state
@@ -120,7 +134,7 @@ extension RunningViewController: View{
                 self.runningView.runningRecordView.toggleRunningState(isRunning: isRunning)
             }.disposed(by: self.disposeBag)
         
-        // 러닝시간 1초마다 카운트업
+        // 러닝 시간 1초마다 카운트업
         reactor.state
             .map{$0.runningTime}
             .distinctUntilChanged()
@@ -128,11 +142,11 @@ extension RunningViewController: View{
             .bind{ [weak self] time in
                 guard let self = self else { return }
                 let calorie = Int.convertTimeToCalorie(time: time)
-                self.runningModel.calorie = calorie
+                self.runningResult.calorie = calorie
                 self.runningView.runningRecordView.setRunningData(time: time, calorie: calorie)
             }.disposed(by: self.disposeBag)
         
-        // 러닝위치 변경 감지
+        // 러닝 위치 변경 감지
         reactor.state
             .map{$0.currentLocation}
             .distinctUntilChanged()
@@ -141,19 +155,21 @@ extension RunningViewController: View{
             .bind{ [weak self] (location, runningTime) in
                 guard let self = self, var location = location else { return }
                 
-                var distance = self.runningModel.distance
+                var distance = self.runningResult.distance
                 if let before = beforeLocation {
                     distance += haversineDistance(from: before, to: location)
                 }
                 
+                print(location)
+                
                 location.distance = distance
                 location.runningTime = runningTime
-                self.runningModel.routeList.append(location)
-                self.runningModel.distance = distance
+                self.runningResult.routeList.append(location)
+                self.runningResult.distance = distance
                 self.beforeLocation = location
                 
                 let pace: Int = (distance == 0.0) ? 0 : Int.convertTimeAndDistanceToPace(time: runningTime, distance: distance)
-                self.runningModel.averagePace = pace
+                self.runningResult.averagePace = pace
                 self.runningView.runningRecordView.setRunningData(distance: distance, pace: pace)
             }.disposed(by: self.disposeBag)
     }
@@ -189,11 +205,11 @@ extension RunningViewController: View{
             .withLatestFrom(reactor.state.map { $0.runningTime }) { ($0, $1) }
             .bind { [weak self] (_, runningTime) in
                 guard let self = self else { return }
-                self.runningModel.endTime = Date()
-                self.runningModel.runningTime = runningTime
+                self.runningResult.endTime = Date()
+                self.runningResult.runningTime = runningTime
                 
                 reactor.action.onNext(.stopRunning)
-                self.coordinator?.showRunningResult(runningModel: runningModel)
+                self.coordinator?.showRunningResult(runningResult: runningResult)
             }
             .disposed(by: disposeBag)
     }

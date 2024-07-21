@@ -9,10 +9,13 @@ import Foundation
 import Domain
 import RxSwift
 import CoreLocation
+import Moya
+import RxMoya
 
 public class RunningRepositoryImplementation: RunningRepositoryProtocol {
 
-    private let service = LocationService()
+    private let locationService = LocationService()
+    private let networkService = MoyaProvider<RunningService>()
     
     public var authorizationStatus = PublishSubject<LocationAuthorizationStatus>()
     public var currentUserLocation = PublishSubject<RouteInfo>()
@@ -22,11 +25,11 @@ public class RunningRepositoryImplementation: RunningRepositoryProtocol {
     public init(){ }
     
     public func checkUserCurrentLocationAuthorization() {
-        self.service.observeUpdatedAuthorization()
+        self.locationService.observeUpdatedAuthorization()
             .subscribe(onNext: { [weak self] status in
                 switch status {
                 case .notDetermined:
-                    self?.service.requestAuthorization()
+                    self?.locationService.requestAuthorization()
                 case .authorizedAlways, .authorizedWhenInUse:
                     self?.authorizationStatus.onNext(.allowed)
                 case .denied, .restricted:
@@ -39,17 +42,31 @@ public class RunningRepositoryImplementation: RunningRepositoryProtocol {
     }
     
     public func startRunning() {
-        service.start()
+        locationService.start()
         observeUserLocation()
     }
     
     public func stopRunning() {
-        service.stop()
+        locationService.stop()
         stopUpdatingLocation()
     }
     
+    public func saveRunningResult(runningResult: RunningResult) -> Observable<Any> {
+        let runningResultDTO = RunningResultRequestDTO.fromEntity(runningResult)
+        return networkService.rx.request(.saveRunningResult(data: runningResultDTO))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+            .catch{ error in
+                return Observable.error(error)
+            }
+    }
+    
+    //MARK: - Helpers
+    
     private func observeUserLocation() {
-        self.service.observeUpdatedLocation()
+        self.locationService.observeUpdatedLocation()
             .compactMap({ $0.last })
             .subscribe(onNext: { [weak self] location in
                 let route = RouteInfo(coordinate: location.coordinate)
@@ -59,7 +76,6 @@ public class RunningRepositoryImplementation: RunningRepositoryProtocol {
     }
     
     private func stopUpdatingLocation() {
-        self.service.stop()
+        self.locationService.stop()
     }
 }
-

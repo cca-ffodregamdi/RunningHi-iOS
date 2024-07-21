@@ -40,8 +40,8 @@ class RunningCoordinator: Coordinator {
 }
 
 extension RunningCoordinator: RunningCoordinatorInterface {
-    func showRunningResult(runningModel: RunningModel) {
-        let vc = runningDIContainer.makeRunningResultViewController(coordinator: self, runningModel: runningModel)
+    func showRunningResult(runningResult: RunningResult) {
+        let vc = runningDIContainer.makeRunningResultViewController(coordinator: self, runningResult: runningResult)
         self.navigationController.pushViewController(vc, animated: true)
     }
     

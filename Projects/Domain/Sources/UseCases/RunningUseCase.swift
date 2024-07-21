@@ -37,4 +37,8 @@ public final class RunningUseCase: RunningUseCaseProtocol {
     public func stopRunning() {
         self.repository.stopRunning()
     }
+    
+    public func saveRunningResult(runningResult: RunningResult) -> Observable<Any> {
+        return self.repository.saveRunningResult(runningResult: runningResult)
+    }
 }

@@ -20,7 +20,8 @@ final public class RunningResultViewController: UIViewController {
     
     public var coordinator: RunningCoordinatorInterface?
     
-    public var runningModel = RunningModel()
+    public var runningResult = RunningResult()
+    
     public var disposeBag = DisposeBag()
     
     private var runningResultView: RunningResultView = {
@@ -37,10 +38,10 @@ final public class RunningResultViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public init(reactor: RunningResultReactor, runningModel: RunningModel){
+    public init(reactor: RunningResultReactor, runningResult: RunningResult){
         super.init(nibName: nil, bundle: nil)
         
-        self.runningModel = runningModel
+        self.runningResult = runningResult
         self.reactor = reactor
     }
     
@@ -51,8 +52,8 @@ final public class RunningResultViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        configureUI()
         configureNavigationBar()
+        configureUI()
         configureMap()
     }
     
@@ -66,18 +67,7 @@ final public class RunningResultViewController: UIViewController {
     
     //MARK: - Configure
     
-    private func configureUI() {
-        self.view.backgroundColor = .white
-        self.view.addSubview(runningResultView)
-        
-        runningResultView.snp.makeConstraints { make in
-            make.edges.equalTo(self.view.safeAreaLayoutGuide)
-        }
-        
-        runningResultView.setData(runningModel: runningModel)
-    }
-    
-    private func configureNavigationBar(){
+    private func configureNavigationBar() {
         self.title = "러닝 기록"
         self.navigationController?.navigationBar.tintColor = .black
         
@@ -89,8 +79,17 @@ final public class RunningResultViewController: UIViewController {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "삭제", style: .plain, target: self, action: #selector(deleteAction))
     }
     
+    private func configureUI() {
+        self.view.backgroundColor = .white
+        self.view.addSubview(runningResultView)
+        
+        runningResultView.snp.makeConstraints { make in
+            make.edges.equalTo(self.view.safeAreaLayoutGuide)
+        }
+    }
+    
     private func configureMap() {
-        let coordinates = runningModel.routeList.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+        let coordinates = runningResult.routeList.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
         let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
         runningResultView.mapArea.mapView.addOverlay(polyline)
 
@@ -124,10 +123,19 @@ extension RunningResultViewController: View {
     
     public func bind(reactor: RunningResultReactor) {
         bindingView(reactor: reactor)
-        bindingDifficultyAction(reactor: reactor)
+        bindingState(reactor: reactor)
+        bindingButtonAction(reactor: reactor)
+        bindingDifficultyButtonAction(reactor: reactor)
     }
     
     private func bindingView(reactor: RunningResultReactor) {
+        
+        Observable.just(true)
+            .bind { [weak self] _ in
+                guard let self = self else {return}
+                self.runningResultView.setData(runningModel: runningResult)
+            }
+            .disposed(by: disposeBag)
         
         Observable<[Double: RouteInfo]>.just(calculateTotalRunningTimePerKm())
             .bind(to: runningResultView.recordView.tableView.rx.items(cellIdentifier: RunningResultRecordTableViewCell.identifier, cellType: RunningResultRecordTableViewCell.self)) { index, model, cell in
@@ -149,7 +157,29 @@ extension RunningResultViewController: View {
             }.disposed(by: self.disposeBag)
     }
     
-    private func bindingDifficultyAction(reactor: RunningResultReactor) {
+    private func bindingState(reactor: RunningResultReactor) {
+        reactor.state
+            .map{$0.isSaveCompleted}
+            .distinctUntilChanged()
+            .skip(1)
+            .bind{ [weak self] level in
+                guard let self = self else { return }
+                print("isSaveCompleted -> finish")
+                coordinator?.finishRunning()
+            }.disposed(by: self.disposeBag)
+    }
+    
+    private func bindingButtonAction(reactor: RunningResultReactor) {
+        runningResultView.saveButton.rx.tap
+            .bind { [weak self] _ in
+                guard let self = self else { return }
+                
+                reactor.action.onNext(.saveRunningRecord(runningResult))
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindingDifficultyButtonAction(reactor: RunningResultReactor) {
         let difficulty1Tap = runningResultView.difficultyArea.difficulty1Button.rx.tap
             .map { Reactor.Action.tapDifficultyButton(1) }
 
@@ -182,7 +212,7 @@ extension RunningResultViewController: View {
     //MARK: - Helpers
     
     func calculateTotalRunningTimePerKm() -> [Double: RouteInfo] {
-        let groupedByDistance = Dictionary(grouping: runningModel.routeList) { Int($0.distance) }
+        let groupedByDistance = Dictionary(grouping: runningResult.routeList) { Int($0.distance) }
         var routeInfoPerKm: [Double: RouteInfo] = [:]
         
         for (km, values) in groupedByDistance {

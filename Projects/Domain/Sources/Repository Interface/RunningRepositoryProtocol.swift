@@ -16,4 +16,6 @@ public protocol RunningRepositoryProtocol{
     func checkUserCurrentLocationAuthorization()
     func startRunning()
     func stopRunning()
+    
+    func saveRunningResult(runningResult: RunningResult) -> Observable<Any>
 }

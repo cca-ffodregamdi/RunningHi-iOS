@@ -56,7 +56,7 @@ final class LocationService: NSObject {
                 .compactMap({ $0.last as? [CLLocation] })
                 .subscribe(onNext: { location in
                     // 뛸 때만 위치기록 보내기
-                    if self.motionManager.checkMotionActivity() == .running {
+                    if self.motionManager.checkMotionActivity() != .stationary {
                         emitter.onNext(location)
                     }
                 })

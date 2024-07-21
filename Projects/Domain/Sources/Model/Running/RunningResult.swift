@@ -1,5 +1,5 @@
 //
-//  RunningModel.swift
+//  RunningResult.swift
 //  Domain
 //
 //  Created by najin on 7/20/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct RunningModel {
+public struct RunningResult {
     public var startTime = Date()
     public var endTime = Date()
     

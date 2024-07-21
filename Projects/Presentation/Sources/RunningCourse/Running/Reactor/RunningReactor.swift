@@ -18,6 +18,7 @@ final public class RunningReactor: Reactor{
     private let runningUseCase: RunningUseCase
     
     private let timerSubject = PublishSubject<Void>()
+    private var backgroundEntryTime: Date?
     
     public enum Action{
         case checkAuthorization
@@ -25,6 +26,9 @@ final public class RunningReactor: Reactor{
         case startRunning
         case pauseRunning
         case stopRunning
+        
+        case didEnterBackground
+        case didEnterForeground
     }
     
     public enum Mutation{
@@ -33,6 +37,7 @@ final public class RunningReactor: Reactor{
         case setRunningTime
         case setCurrentLocation(RouteInfo)
         case setPaused(Bool)
+        case setElapsedSeconds
     }
     
     public struct State{
@@ -77,13 +82,20 @@ final public class RunningReactor: Reactor{
         case .pauseRunning, .stopRunning:
             runningUseCase.stopRunning()
             return Observable.just(Mutation.setPaused(true))
+        
+        case .didEnterBackground:
+            backgroundEntryTime = Date()
+            return Observable.empty()
+            
+        case .didEnterForeground:
+            return Observable.just(Mutation.setElapsedSeconds)
         }
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation{
-        case let .setAuthorization(status):
+        case .setAuthorization(let status):
             newState.authorization = status
             
         case .setCountDown:
@@ -94,15 +106,24 @@ final public class RunningReactor: Reactor{
                 newState.isRunning = true
             }
             
-        case let .setPaused(isPaused):
+        case .setPaused(let isPaused):
             newState.isRunning = !isPaused
             
         case .setRunningTime:
             newState.runningTime += 1
             
-        case let .setCurrentLocation(location):
+        case .setCurrentLocation(let location):
             if state.isRunning {
                 newState.currentLocation = location
+            }
+            
+        case .setElapsedSeconds:
+            if state.isRunning {
+                if let backgroundEntryTime = self.backgroundEntryTime {
+                    newState.runningTime += Int(Date().timeIntervalSince(backgroundEntryTime))
+                    self.backgroundEntryTime = nil
+                    timerSubject.onNext(())
+                }
             }
         }
         return newState
@@ -117,6 +138,7 @@ final public class RunningReactor: Reactor{
                     .map { _ in Mutation.setRunningTime }
                     .take(until: self.action.filter {
                         if case .pauseRunning = $0 { return true }
+                        guard let _ = self.backgroundEntryTime else { return true }
                         return false
                     })
             }

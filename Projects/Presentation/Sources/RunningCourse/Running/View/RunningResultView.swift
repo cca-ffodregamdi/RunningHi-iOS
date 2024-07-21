@@ -38,8 +38,8 @@ class RunningResultView: UIView {
         return scrollView
     }()
     
-    private var saveButton = RunningResultButton(title: "기록 저장하기", isActive: false)
-    private var shareButton = RunningResultButton(title: "피드 공유하기", isActive: true)
+    var saveButton = RunningResultButton(title: "기록 저장하기", isActive: false)
+    var shareButton = RunningResultButton(title: "피드 공유하기", isActive: true)
     
     private lazy var buttonStackView = {
         let stackView = UIStackView()
@@ -101,7 +101,7 @@ class RunningResultView: UIView {
     
     //MARK: - Helpers
     
-    func setData(runningModel: RunningModel) {
+    func setData(runningModel: RunningResult) {
         titleArea.setData(startTime: runningModel.startTime,
                           endTime: runningModel.endTime
         )
