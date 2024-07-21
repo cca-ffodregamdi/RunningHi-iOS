@@ -21,7 +21,7 @@ class RunningResultMapView: UIView {
         return label
     }()
     
-    private var mapView: MKMapView = {
+    var mapView: MKMapView = {
         let mapView = MKMapView()
         mapView.layer.cornerRadius = 20
         mapView.layer.shadowRadius = 3

@@ -23,4 +23,12 @@ public extension Int{
         }
         return meanPaceMin+meanPaceSec
     }
+    
+    static func convertTimeToCalorie(time: Int) -> Int {
+        return Int(((3.5 / 60) * 7 * 60 * Double(time) / 1000) * 5)
+    }
+    
+    static func convertTimeAndDistanceToPace(time: Int, distance: Double) -> Int {
+        return distance == 0 ? 0 : Int(Double(time) / distance)
+    }
 }

@@ -18,23 +18,34 @@ final public class RunningReactor: Reactor{
     private let runningUseCase: RunningUseCase
     
     private let timerSubject = PublishSubject<Void>()
+    private var backgroundEntryTime: Date?
     
     public enum Action{
+        case checkAuthorization
         case readyForRunning
         case startRunning
         case pauseRunning
         case stopRunning
+        
+        case didEnterBackground
+        case didEnterForeground
     }
     
     public enum Mutation{
+        case setAuthorization(LocationAuthorizationStatus?)
         case setCountDown
         case setRunningTime
+        case setCurrentLocation(RouteInfo)
         case setPaused(Bool)
+        case setElapsedSeconds
     }
     
     public struct State{
+        var authorization: LocationAuthorizationStatus?
         var readyTime = 3
         var isRunning = false
+        
+        var currentLocation: RouteInfo?
         
         var runningTime = 0
         var runningPace = 0
@@ -53,6 +64,10 @@ final public class RunningReactor: Reactor{
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
+        case .checkAuthorization:
+            return runningUseCase.checkUserCurrentLocationAuthorization()
+                .map { status in Mutation.setAuthorization(status) }
+                
         case .readyForRunning:
             return Observable<Int>.interval(.seconds(1), scheduler: MainScheduler.instance)
                 .take(3)
@@ -60,20 +75,29 @@ final public class RunningReactor: Reactor{
             
         case .startRunning:
             timerSubject.onNext(())
+            runningUseCase.startRunning()
             return Observable.just(Mutation.setPaused(false))
                 .observe(on:MainScheduler.asyncInstance)
             
-        case .pauseRunning:
+        case .pauseRunning, .stopRunning:
+            runningUseCase.stopRunning()
             return Observable.just(Mutation.setPaused(true))
+        
+        case .didEnterBackground:
+            backgroundEntryTime = Date()
+            return Observable.empty()
             
-        case .stopRunning:
-            return Observable.just(Mutation.setPaused(true))
+        case .didEnterForeground:
+            return Observable.just(Mutation.setElapsedSeconds)
         }
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation{
+        case .setAuthorization(let status):
+            newState.authorization = status
+            
         case .setCountDown:
             newState.readyTime -= 1
             
@@ -82,11 +106,25 @@ final public class RunningReactor: Reactor{
                 newState.isRunning = true
             }
             
-        case let .setPaused(isPaused):
+        case .setPaused(let isPaused):
             newState.isRunning = !isPaused
             
         case .setRunningTime:
             newState.runningTime += 1
+            
+        case .setCurrentLocation(let location):
+            if state.isRunning {
+                newState.currentLocation = location
+            }
+            
+        case .setElapsedSeconds:
+            if state.isRunning {
+                if let backgroundEntryTime = self.backgroundEntryTime {
+                    newState.runningTime += Int(Date().timeIntervalSince(backgroundEntryTime))
+                    self.backgroundEntryTime = nil
+                    timerSubject.onNext(())
+                }
+            }
         }
         return newState
     }
@@ -100,9 +138,16 @@ final public class RunningReactor: Reactor{
                     .map { _ in Mutation.setRunningTime }
                     .take(until: self.action.filter {
                         if case .pauseRunning = $0 { return true }
+                        guard let _ = self.backgroundEntryTime else { return true }
                         return false
                     })
             }
-        return Observable.merge(mutation, timerMutation)
+        
+        let runningMutation = runningUseCase.getUserLocation()
+            .flatMapLatest { location in
+                Observable.just(Mutation.setCurrentLocation(location))
+            }
+        
+        return Observable.merge(mutation, timerMutation, runningMutation)
     }
 }

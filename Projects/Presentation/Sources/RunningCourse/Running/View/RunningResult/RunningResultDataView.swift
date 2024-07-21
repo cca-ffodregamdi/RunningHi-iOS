@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Common
 
 class RunningResultDataView: UIView {
     
@@ -22,7 +23,6 @@ class RunningResultDataView: UIView {
         stackView.axis = .vertical
         stackView.spacing = 5
         stackView.alignment = .fill
-//        stackView.distribution = .fillEqually
         return stackView
     }()
     
@@ -58,5 +58,14 @@ class RunningResultDataView: UIView {
             make.top.bottom.equalToSuperview()
             make.left.right.equalToSuperview().inset(RunningResultView.horizontalPadding)
         }
+    }
+    
+    //MARK: - Helpers
+    
+    func setData(time: Int, calorie: Int, distance: Double, pace: Int) {
+        timeLabel.setData(data: TimeUtil.convertSecToTimeFormat(sec: time))
+        distanceLabel.setData(data: String(format: "%.2fkm", distance))
+        averagePaceLabel.setData(data: "\(Int.convertMeanPaceToString(meanPace: pace))")
+        calorieLabel.setData(data: "\(calorie) kcal")
     }
 }

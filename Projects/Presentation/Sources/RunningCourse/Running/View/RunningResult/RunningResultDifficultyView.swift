@@ -21,11 +21,11 @@ class RunningResultDifficultyView: UIView {
         return label
     }()
     
-    private var difficulty1Button = RunningDifficultyButton(title: "매우 쉬움")
-    private var difficulty2Button = RunningDifficultyButton(title: "")
-    private var difficulty3Button = RunningDifficultyButton(title: "보통")
-    private var difficulty4Button = RunningDifficultyButton(title: "")
-    private var difficulty5Button = RunningDifficultyButton(title: "매우 어려움")
+    var difficulty1Button = RunningDifficultyButton(title: "매우 쉬움")
+    var difficulty2Button = RunningDifficultyButton(title: "")
+    var difficulty3Button = RunningDifficultyButton(title: "보통")
+    var difficulty4Button = RunningDifficultyButton(title: "")
+    var difficulty5Button = RunningDifficultyButton(title: "매우 어려움")
     
     private var difficultyLineView = CustomLineView(color: .Neutrals300)
     
@@ -63,6 +63,8 @@ class RunningResultDifficultyView: UIView {
     //MARK: - Configure
     
     private func setupViews() {
+        addSubview(difficultyLineView)
+        
         runningDifficultyButtonStackView.addArrangedSubview(difficulty1Button)
         runningDifficultyButtonStackView.addArrangedSubview(difficulty2Button)
         runningDifficultyButtonStackView.addArrangedSubview(difficulty3Button)
@@ -72,8 +74,6 @@ class RunningResultDifficultyView: UIView {
         addSubview(runningDifficultyStackView)
         runningDifficultyStackView.addArrangedSubview(titleLabel)
         runningDifficultyStackView.addArrangedSubview(runningDifficultyButtonStackView)
-        
-        addSubview(difficultyLineView)
     }
     
     private func setupConstraints() {
@@ -85,6 +85,15 @@ class RunningResultDifficultyView: UIView {
         difficultyLineView.snp.makeConstraints { make in
             make.centerY.equalToSuperview().offset(8)
             make.left.right.equalToSuperview().inset(RunningDifficultyButton.width / 2 + RunningResultView.horizontalPadding)
+        }
+    }
+    
+    //MARK: - Helpers
+    
+    func setDifficulty(level: Int) {
+        let difficultyButtons = [difficulty1Button, difficulty2Button, difficulty3Button, difficulty4Button, difficulty5Button]
+        for i in 0..<5 {
+            difficultyButtons[i].setActiveColor(isActive: i == level - 1)
         }
     }
 }

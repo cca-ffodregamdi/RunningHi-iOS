@@ -13,9 +13,9 @@ class RunningRecordView: UIView {
     
     //MARK: - Properties
     
-    private var timeLabel = RunningInfoCell(title: "시간")
-    private var averagePaceLabel = RunningInfoCell(title: "평균 페이스")
-    private var calorieLabel = RunningInfoCell(title: "소모 칼로리")
+    private var timeLabel = RunningInfoCell(title: "시간", initData: "00:00:00")
+    private var averagePaceLabel = RunningInfoCell(title: "평균 페이스", initData: Int.convertMeanPaceToString(meanPace: 0))
+    private var calorieLabel = RunningInfoCell(title: "소모 칼로리", initData: "0 kcal")
     
     private var recordInfoStackView = {
         let stackView = UIStackView()
@@ -124,26 +124,14 @@ class RunningRecordView: UIView {
     
     //MARK: - Helpers
     
-    func initRunningData(time: Int = 0, averagePace: Int = 0, calorie: Int = 0) {
-        timeLabel.setData(data: "\(time)")
-        averagePaceLabel.setData(data: "\(averagePace)")
-        calorieLabel.setData(data: "\(calorie)")
-        
-        toggleRunningState(isRunning: true)
+    func setRunningData(time: Int = 0, calorie: Int = 0) {
+        timeLabel.setData(data: TimeUtil.convertSecToTimeFormat(sec: time))
+        calorieLabel.setData(data: "\(calorie) kcal")
     }
     
-    func setRunningData(time: Int?, averagePace: Int?, calorie: Int?) {
-        if let time = time {
-            timeLabel.setData(data: "\(time)")
-        }
-        
-        if let averagePace = averagePace {
-            averagePaceLabel.setData(data: "\(averagePace)")
-        }
-        
-        if let calorie = calorie {
-            calorieLabel.setData(data: "\(calorie)")
-        }
+    func setRunningData(distance: Double = 0.0, pace: Int = 0) {
+        distanceLabel.text = String(format: "%.2f", distance)
+        averagePaceLabel.setData(data: "\(Int.convertMeanPaceToString(meanPace: pace))")
     }
     
     func toggleRunningState(isRunning: Bool) {

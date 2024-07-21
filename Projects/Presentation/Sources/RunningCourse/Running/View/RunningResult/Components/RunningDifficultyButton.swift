@@ -64,4 +64,10 @@ class RunningDifficultyButton: UIButton {
             make.width.equalTo(RunningDifficultyButton.width)
         }
     }
+    
+    //MARK: - Helpers
+    
+    func setActiveColor(isActive: Bool) {
+        circleView.backgroundColor = isActive ? .Primary : .Neutrals300
+    }
 }

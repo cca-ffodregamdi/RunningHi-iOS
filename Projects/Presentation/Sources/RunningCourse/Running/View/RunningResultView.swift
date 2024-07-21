@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Domain
 
 class RunningResultView: UIView {
     
@@ -14,10 +15,10 @@ class RunningResultView: UIView {
     
     static var horizontalPadding = 20
     
-    private var titleArea = RunningResultTitleView()
-    private var dataArea = RunningResultDataView()
-    private var mapArea = RunningResultMapView()
-    private var difficultyArea = RunningResultDifficultyView()
+    var titleArea = RunningResultTitleView()
+    var dataArea = RunningResultDataView()
+    var mapArea = RunningResultMapView()
+    var difficultyArea = RunningResultDifficultyView()
     var recordView = RunningResultRecordView()
     
     private lazy var runningResultStackView = {
@@ -37,8 +38,8 @@ class RunningResultView: UIView {
         return scrollView
     }()
     
-    private var saveButton = RunningResultButton(title: "기록 저장하기", isActive: false)
-    private var shareButton = RunningResultButton(title: "피드 공유하기", isActive: true)
+    var saveButton = RunningResultButton(title: "기록 저장하기", isActive: false)
+    var shareButton = RunningResultButton(title: "피드 공유하기", isActive: true)
     
     private lazy var buttonStackView = {
         let stackView = UIStackView()
@@ -46,6 +47,7 @@ class RunningResultView: UIView {
         stackView.spacing = 8
         stackView.alignment = .fill
         stackView.distribution = .fillEqually
+        stackView.backgroundColor = .white
         return stackView
     }()
     
@@ -93,7 +95,20 @@ class RunningResultView: UIView {
         
         buttonStackView.snp.makeConstraints { make in
             make.left.right.equalToSuperview().inset(21)
-            make.bottom.equalToSuperview().inset(16)
+            make.bottom.equalToSuperview().inset(0)
         }
+    }
+    
+    //MARK: - Helpers
+    
+    func setData(runningModel: RunningResult) {
+        titleArea.setData(startTime: runningModel.startTime,
+                          endTime: runningModel.endTime
+        )
+        dataArea.setData(time: runningModel.runningTime,
+                         calorie: runningModel.calorie,
+                         distance: runningModel.distance,
+                         pace: runningModel.averagePace
+        )
     }
 }

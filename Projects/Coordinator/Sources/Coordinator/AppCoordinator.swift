@@ -52,6 +52,7 @@ public class AppCoordinator: Coordinator{
         let coordinator = RunningCoordinator(navigationController: self.navigationController)
         coordinator.isFreeCourse = isFreeCourse
         coordinator.start()
+        coordinator.delegate = self
         self.childCoordinator.append(coordinator)
     }
 }
@@ -66,5 +67,12 @@ extension AppCoordinator: LoginCoordinatorDelegate{
 extension AppCoordinator: BaseTabBarCoordinatorDelegate{
     func showRunning(isFreeCourse: Bool) {
         self.showRunningViewController(isFreeCourse: isFreeCourse)
+    }
+}
+
+extension AppCoordinator: RunningCoordinatorDelegate{
+    func finishRunning(coordinator: RunningCoordinator) {
+        self.childCoordinator = self.childCoordinator.filter{$0 !== coordinator}
+        self.navigationController.popToRootViewController(animated: true)
     }
 }
