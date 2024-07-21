@@ -71,4 +71,34 @@ public extension Date{
         dateFormatter.timeZone = TimeZone(abbreviation: "KST")
         return dateFormatter.string(from: self)
     }
+    
+    func formatNoticeCreateDate(dateString: String) -> String{
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        dateFormatter.locale = Locale(identifier: "ko_KR")
+        dateFormatter.timeZone = TimeZone(abbreviation: "KST")
+        
+        if let data = dateFormatter.date(from: dateString){
+            let resultDate = DateFormatter()
+            resultDate.dateFormat = "YYYY.MM.dd"
+            return resultDate.string(from: data)
+        }
+        
+        return "알 수 없음"
+    }
+    
+    func formatFeedbackCreateDate(dateString: String) -> String{
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        dateFormatter.locale = Locale(identifier: "ko_KR")
+        dateFormatter.timeZone = TimeZone(abbreviation: "KST")
+        
+        if let data = dateFormatter.date(from: dateString){
+            let resultDate = DateFormatter()
+            resultDate.dateFormat = "YYYY.MM.dd HH:mm:ss"
+            return resultDate.string(from: data)
+        }
+        
+        return "알 수 없음"
+    }
 }

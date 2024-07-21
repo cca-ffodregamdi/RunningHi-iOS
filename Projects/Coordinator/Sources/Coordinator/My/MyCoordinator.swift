@@ -7,6 +7,7 @@
 
 import UIKit
 import Presentation
+import Domain
 
 class MyCoordinator: Coordinator{
     var childCoordinator: [Coordinator] = []
@@ -28,6 +29,16 @@ class MyCoordinator: Coordinator{
 extension MyCoordinator: MyCoordinatorInterface{
     func showNotice() {
         let vc = myDIContainer.makeNoticeViewController(coordinator: self)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showNoticeDetail(noticeModel: NoticeModel) {
+        let vc = myDIContainer.makeNoticeDetailViewController(noticeModel: noticeModel)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showCustomerCenter() {
+        let vc = myDIContainer.makeCustomerCenterViewController()
         self.navigationController.pushViewController(vc, animated: true)
     }
 }
