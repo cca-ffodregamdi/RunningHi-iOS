@@ -73,7 +73,10 @@ class BaseTabBarCoordinator: Coordinator {
         case .Course:
             return
         case .Record:
-            return
+            let recordCoordinator: RecordCoordinator = RecordCoordinator(navigationController: tabNavigationController)
+            self.childCoordinator.append(recordCoordinator)
+            recordCoordinator.start()
+            tabNavigationController.viewControllers.first?.title = TabBarItemType.Record.getTitle()
         case .My:
             let myCoordinator: MyCoordinator = MyCoordinator(navigationController: tabNavigationController)
             self.childCoordinator.append(myCoordinator)
