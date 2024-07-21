@@ -7,7 +7,6 @@
 
 import Foundation
 import RxSwift
-import KakaoSDKAuth
 
 public protocol RunningRepositoryProtocol{
     var authorizationStatus: PublishSubject<LocationAuthorizationStatus> { get }
