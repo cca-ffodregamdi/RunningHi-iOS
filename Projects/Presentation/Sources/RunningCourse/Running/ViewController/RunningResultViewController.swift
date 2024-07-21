@@ -12,6 +12,7 @@ import ReactorKit
 import RxRelay
 import RxDataSources
 import Domain
+import MapKit
 
 final public class RunningResultViewController: UIViewController {
     
@@ -19,7 +20,7 @@ final public class RunningResultViewController: UIViewController {
     
     public var coordinator: RunningCoordinatorInterface?
     
-    public var runningModel: RunningModel?
+    public var runningModel = RunningModel()
     public var disposeBag = DisposeBag()
     
     private var runningResultView: RunningResultView = {
@@ -36,6 +37,13 @@ final public class RunningResultViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    public init(reactor: RunningResultReactor, runningModel: RunningModel){
+        super.init(nibName: nil, bundle: nil)
+        
+        self.runningModel = runningModel
+        self.reactor = reactor
+    }
+    
     deinit {
         print("deinit RunningResultViewController")
     }
@@ -45,8 +53,7 @@ final public class RunningResultViewController: UIViewController {
         
         configureUI()
         configureNavigationBar()
-        
-        print(runningModel)
+        configureMap()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -66,6 +73,8 @@ final public class RunningResultViewController: UIViewController {
         runningResultView.snp.makeConstraints { make in
             make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
+        
+        runningResultView.setData(runningModel: runningModel)
     }
     
     private func configureNavigationBar(){
@@ -80,6 +89,21 @@ final public class RunningResultViewController: UIViewController {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "삭제", style: .plain, target: self, action: #selector(deleteAction))
     }
     
+    private func configureMap() {
+        let coordinates = runningModel.routeList.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+        let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        runningResultView.mapArea.mapView.addOverlay(polyline)
+
+        let region = MKCoordinateRegion(
+            center: coordinates[0],
+            latitudinalMeters: 5000,
+            longitudinalMeters: 5000
+        )
+        
+        runningResultView.mapArea.mapView.delegate = self
+        runningResultView.mapArea.mapView.setRegion(region, animated: true)
+    }
+    
     //MARK: - Helpers
     
     @objc func customBackAction() {
@@ -88,20 +112,26 @@ final public class RunningResultViewController: UIViewController {
     
     @objc func deleteAction() {
     }
+    
+    private func initData() {
+        
+    }
 }
 
 // MARK: - Binding
 
 extension RunningResultViewController: View {
     
-    public func bind(reactor: RunningReactor) {
-        binding(reactor: reactor)
+    public func bind(reactor: RunningResultReactor) {
+        bindingView(reactor: reactor)
+        bindingDifficultyAction(reactor: reactor)
     }
     
-    private func binding(reactor: RunningReactor) {
-        Observable<[Int]>.just([1,2,3,4,5])
+    private func bindingView(reactor: RunningResultReactor) {
+        
+        Observable<[Double: RouteInfo]>.just(calculateTotalRunningTimePerKm())
             .bind(to: runningResultView.recordView.tableView.rx.items(cellIdentifier: RunningResultRecordTableViewCell.identifier, cellType: RunningResultRecordTableViewCell.self)) { index, model, cell in
-                cell.setData(distance: 0, averagePace: 0, calorie: 0)
+                cell.setData(distance: model.key, time: Int(model.value.runningTime))
                 
                 // 마지막줄 라인 제거
                 if index == 4 {
@@ -117,5 +147,64 @@ extension RunningResultViewController: View {
                     make.height.equalTo(size.height)
                 }
             }.disposed(by: self.disposeBag)
+    }
+    
+    private func bindingDifficultyAction(reactor: RunningResultReactor) {
+        let difficulty1Tap = runningResultView.difficultyArea.difficulty1Button.rx.tap
+            .map { Reactor.Action.tapDifficultyButton(1) }
+
+        let difficulty2Tap = runningResultView.difficultyArea.difficulty2Button.rx.tap
+            .map { Reactor.Action.tapDifficultyButton(2) }
+        
+        let difficulty3Tap = runningResultView.difficultyArea.difficulty3Button.rx.tap
+            .map { Reactor.Action.tapDifficultyButton(3) }
+        
+        let difficulty4Tap = runningResultView.difficultyArea.difficulty4Button.rx.tap
+            .map { Reactor.Action.tapDifficultyButton(4) }
+        
+        let difficulty5Tap = runningResultView.difficultyArea.difficulty5Button.rx.tap
+            .map { Reactor.Action.tapDifficultyButton(5) }
+
+        Observable.merge(difficulty1Tap, difficulty2Tap, difficulty3Tap, difficulty4Tap, difficulty5Tap)
+            .bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
+        
+        reactor.state
+            .map{$0.difficultyLevel}
+            .distinctUntilChanged()
+            .skip(1)
+            .bind{ [weak self] level in
+                guard let self = self else { return }
+                runningResultView.difficultyArea.setDifficulty(level: level)
+            }.disposed(by: self.disposeBag)
+    }
+    
+    //MARK: - Helpers
+    
+    func calculateTotalRunningTimePerKm() -> [Double: RouteInfo] {
+        let groupedByDistance = Dictionary(grouping: runningModel.routeList) { Int($0.distance) }
+        var routeInfoPerKm: [Double: RouteInfo] = [:]
+        
+        for (km, values) in groupedByDistance {
+            if let routeInfo = values.max(by: { $0.timestamp < $1.timestamp }) {
+                routeInfoPerKm[Double(km)] = routeInfo
+            }
+        }
+        return routeInfoPerKm
+    }
+}
+
+// MARK: - Map Extension
+
+extension RunningResultViewController: MKMapViewDelegate {
+    public func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        if let polyline = overlay as? MKPolyline {
+            let renderer = MKPolylineRenderer(polyline: polyline)
+            renderer.strokeColor = .blue
+            renderer.lineWidth = 3
+
+            return renderer
+        }
+        return MKOverlayRenderer(overlay: overlay)
     }
 }

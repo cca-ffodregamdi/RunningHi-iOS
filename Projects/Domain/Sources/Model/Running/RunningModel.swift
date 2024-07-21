@@ -12,11 +12,11 @@ public struct RunningModel {
     public var endTime = Date()
     
     public var runningTime = 0
+    public var distance = 0.0
     public var averagePace = 0
     public var calorie = 0
     
     public var routeList: [RouteInfo] = []
-    public var distance = 0.0
     
     public init() { }
 }

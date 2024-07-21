@@ -138,7 +138,7 @@ extension RunningViewController: View{
             .distinctUntilChanged()
             .skip(1)
             .withLatestFrom(reactor.state.map { $0.runningTime }) { ($0, $1) }
-            .bind{ [weak self] (location, time) in
+            .bind{ [weak self] (location, runningTime) in
                 guard let self = self, var location = location else { return }
                 
                 var distance = self.runningModel.distance
@@ -147,11 +147,12 @@ extension RunningViewController: View{
                 }
                 
                 location.distance = distance
-                self.runningModel.distance = distance
+                location.runningTime = runningTime
                 self.runningModel.routeList.append(location)
+                self.runningModel.distance = distance
                 self.beforeLocation = location
                 
-                let pace: Int = (distance == 0.0) ? 0 : Int.convertTimeAndDistanceToPace(time: time, distance: distance)
+                let pace: Int = (distance == 0.0) ? 0 : Int.convertTimeAndDistanceToPace(time: runningTime, distance: distance)
                 self.runningModel.averagePace = pace
                 self.runningView.runningRecordView.setRunningData(distance: distance, pace: pace)
             }.disposed(by: self.disposeBag)

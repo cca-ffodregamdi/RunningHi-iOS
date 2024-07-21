@@ -9,10 +9,12 @@ import Foundation
 import CoreLocation
 
 public struct RouteInfo: Codable, Equatable {
-    public var latitude: Double
-    public var longitude: Double
     public var timestamp: Date
     
+    public var latitude: Double
+    public var longitude: Double
+    
+    public var runningTime: Int = 0
     public var distance: Double = 0.0
     
     public init(latitude: Double, longitude: Double, timestamp: Date = Date()) {

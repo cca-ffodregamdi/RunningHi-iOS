@@ -29,6 +29,6 @@ public extension Int{
     }
     
     static func convertTimeAndDistanceToPace(time: Int, distance: Double) -> Int {
-        return Int(Double(time) / distance)
+        return distance == 0 ? 0 : Int(Double(time) / distance)
     }
 }

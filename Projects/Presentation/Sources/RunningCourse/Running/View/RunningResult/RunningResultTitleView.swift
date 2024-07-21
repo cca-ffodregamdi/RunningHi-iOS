@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Common
 
 class RunningResultTitleView: UIView {
     
@@ -63,6 +64,13 @@ class RunningResultTitleView: UIView {
             make.top.bottom.equalToSuperview()
             make.left.right.equalToSuperview().inset(RunningResultView.horizontalPadding)
         }
+    }
+    
+    //MARK: - Helpers
+    
+    func setData(startTime: Date, endTime: Date) {
+        runningNameLabel.text = startTime.convertDateToFormat(format: "M월 d일 러닝")
+        runningDateLabel.text = startTime.convertDateToFormat(format: "yyyy년 M월 d일 HH:mm") + "~ " + endTime.convertDateToFormat(format: "HH:mm")
     }
 }
 

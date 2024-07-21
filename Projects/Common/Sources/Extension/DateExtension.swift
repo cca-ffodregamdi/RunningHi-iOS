@@ -63,4 +63,12 @@ public extension Date{
         }
         return "알 수 없음"
     }
+    
+    func convertDateToFormat(format: String) -> String{
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        dateFormatter.locale = Locale(identifier: "ko_KR")
+        dateFormatter.timeZone = TimeZone(abbreviation: "KST")
+        return dateFormatter.string(from: self)
+    }
 }

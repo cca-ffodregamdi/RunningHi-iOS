@@ -32,8 +32,7 @@ class RunningDIContainer{
     }
     
     func makeRunningResultViewController(coordinator: RunningCoordinator, runningModel: RunningModel) -> RunningResultViewController{
-        let vc = RunningResultViewController()
-        vc.runningModel = runningModel
+        let vc = RunningResultViewController(reactor: RunningResultReactor(runningUseCase: runningUseCase), runningModel: runningModel)
         vc.coordinator = coordinator
         return vc
     }
