@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Common
 
 class RunningPopupView: UIView {
     
@@ -16,6 +17,12 @@ class RunningPopupView: UIView {
     
     lazy var freeRunningButton = RunningPopupButton(frame: .zero, title: "자유러닝")
     lazy var myRunningButton = RunningPopupButton(frame: .zero, title: "목표러닝")
+    
+    private var cancelButton: UIButton = {
+        let button = UIButton()
+        button.setImage(CommonAsset.xCircle.image, for: .normal)
+        return button
+    }()
     
     lazy var popupStackView = {
         let stackView = UIStackView()
@@ -53,6 +60,8 @@ class RunningPopupView: UIView {
         addSubview(popupStackView)
         popupStackView.addArrangedSubview(freeRunningButton)
         popupStackView.addArrangedSubview(myRunningButton)
+        
+        addSubview(cancelButton)
     }
     
     private func setupConstraints() {
@@ -60,6 +69,11 @@ class RunningPopupView: UIView {
             make.bottom.equalToSuperview().inset(tabBarHeight + 10)
             make.leading.right.equalToSuperview().inset(20)
             make.height.equalTo(130)
+        }
+        
+        cancelButton.snp.makeConstraints { make in
+            make.bottom.equalToSuperview().inset(tabBarHeight - 50)
+            make.centerX.equalToSuperview()
         }
     }
 }
