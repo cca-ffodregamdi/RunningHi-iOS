@@ -22,6 +22,7 @@ let project = Project(
                             ]
                         ]
                     ],
+                    "CFBundleIconName" : "AppIcon",
                     "LSApplicationQueriesSchemes": [
                         "kakaokompassauth",
                         "kakaolink"
