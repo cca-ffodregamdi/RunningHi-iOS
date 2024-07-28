@@ -32,6 +32,8 @@ final class LocationService: NSObject {
         self.locationManager?.distanceFilter = CLLocationDistance(3)
         self.locationManager?.delegate = self
         self.locationManager?.desiredAccuracy = kCLLocationAccuracyBest
+        self.locationManager?.allowsBackgroundLocationUpdates = true
+        self.locationManager?.pausesLocationUpdatesAutomatically = false
     }
     
     func observeUpdatedAuthorization() -> Observable<CLAuthorizationStatus> {

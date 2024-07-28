@@ -150,6 +150,7 @@ extension RunningViewController: View {
         reactor.state
             .map{$0.currentLocation}
             .distinctUntilChanged()
+            .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance)
             .skip(1)
             .withLatestFrom(reactor.state.map { $0.runningTime }) { ($0, $1) }
             .bind{ [weak self] (location, runningTime) in
