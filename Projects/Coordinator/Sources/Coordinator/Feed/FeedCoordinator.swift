@@ -51,4 +51,15 @@ extension FeedCoordinator: FeedCoordinatorInterface{
         vc.delegate = viewController
         self.navigationController.pushViewController(vc, animated: true)
     }
+    
+    func showBookmarkedFeed() {
+        let vc = feedDIContainer.makeBookmarkedFeedViewController(coordinator: self)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showFeedDetailByBookmarkedFeed(viewController: BookmarkedFeedViewController, postId: Int) {
+        let vc = feedDIContainer.makeFeedDetailViewController(postId: postId, coordinator: self)
+        vc.delegate = viewController
+        self.navigationController.pushViewController(vc, animated: true)
+    }
 }

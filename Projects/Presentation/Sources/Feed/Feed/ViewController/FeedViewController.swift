@@ -175,6 +175,13 @@ extension FeedViewController: View{
             }.map{ _ in Reactor.Action.fetchFeeds }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
+        
+        showBookMarkButton.rx.tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showBookmarkedFeed()
+            }.disposed(by: self.disposeBag)
     }
 }
 

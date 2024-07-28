@@ -50,4 +50,10 @@ class FeedDIContainer{
         let vc = EditCommentViewController(reactor: EditCommentReactor(feedUseCase: feedUseCase, commentModel: commentModel))
         return vc
     }
+    
+    func makeBookmarkedFeedViewController(coordinator: FeedCoordinator) -> BookmarkedFeedViewController{
+        let vc = BookmarkedFeedViewController(reactor: BookmarkedReactor(feedUseCase: feedUseCase))
+        vc.coordinator = coordinator
+        return vc
+    }
 }
