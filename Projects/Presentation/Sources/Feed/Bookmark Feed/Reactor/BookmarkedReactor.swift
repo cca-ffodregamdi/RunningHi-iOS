@@ -16,6 +16,7 @@ public class BookmarkedReactor: Reactor{
         case refresh
         case makeBookmark(BookmarkRequestDTO, Int)
         case deleteBookmark(Int, Int)
+        case deleteFeed(Int)
     }
     
     public enum Mutation{
@@ -24,6 +25,7 @@ public class BookmarkedReactor: Reactor{
         case setRefreshing(Bool)
         case setLoading(Bool)
         case updateBookmarked(Int, Bool)
+        case removeFeed(Int)
     }
     
     public struct State{
@@ -67,6 +69,8 @@ public class BookmarkedReactor: Reactor{
             return feedUseCase.makeBookmark(post: bookmarkRequest).map{ _ in Mutation.updateBookmarked(index, true) }
         case .deleteBookmark(let postId, let index):
             return feedUseCase.deleteBookmark(postId: postId).map{_ in Mutation.updateBookmarked(index, false) }
+        case .deleteFeed(let postId):
+            return Observable.just(Mutation.removeFeed(postId))
         }
     }
     
@@ -87,6 +91,8 @@ public class BookmarkedReactor: Reactor{
             newState.isLoading = value
         case .updateBookmarked(let index, let isBookmarked):
             newState.feeds[index].isBookmarked = isBookmarked
+        case .removeFeed(let postId):
+            newState.feeds.removeAll{ $0.postId == postId }
         }
         return newState
     }

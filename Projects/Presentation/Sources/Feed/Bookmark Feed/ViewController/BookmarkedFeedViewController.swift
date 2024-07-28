@@ -87,7 +87,7 @@ extension BookmarkedFeedViewController: View{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "bookmarkedCell", for: indexPath) as! FeedCollectionViewCell
             
             cell.configureModel(model: model)
-            
+            cell.disposeBag = DisposeBag()
             cell.bookmarkButton.rx
                 .tap
                 .map{ _ in
@@ -147,8 +147,8 @@ extension BookmarkedFeedViewController: View{
 }
 
 extension BookmarkedFeedViewController: FeedDetailViewControllerDelegate{
-    public func deleteFeed() {
-        reactor?.action.onNext(.refresh)
+    public func deleteFeed(postId: Int) {
+        reactor?.action.onNext(.deleteFeed(postId))
     }
 }
 

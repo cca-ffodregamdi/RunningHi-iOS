@@ -119,6 +119,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         resetModelForReuse()
+        disposeBag = DisposeBag()
     }
     
     private func configureUI(){
@@ -234,7 +235,6 @@ class FeedCollectionViewCell: UICollectionViewCell {
     }
 
     private func resetModelForReuse(){
-        disposeBag = DisposeBag()
         self.thumbnailImageView.kf.cancelDownloadTask()
         self.thumbnailImageView.image = nil
         
