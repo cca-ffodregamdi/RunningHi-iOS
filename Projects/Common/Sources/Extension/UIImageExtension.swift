@@ -83,4 +83,10 @@ public extension UIImage {
 
             return UIColor(red: CGFloat(avgRed) / 255.0, green: CGFloat(avgGreen) / 255.0, blue: CGFloat(avgBlue) / 255.0, alpha: 1.0)
         }
+    
+    func resized(to size: CGSize) -> UIImage {
+        return UIGraphicsImageRenderer(size: size).image { _ in
+            draw(in: CGRect(origin: .zero, size: size))
+        }
+    }
 }

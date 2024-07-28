@@ -80,7 +80,15 @@ final public class RunningPopupViewController: UIViewController {
         runningPopupView.myRunningButton.rx.tap
             .bind {
                 self.dismissPopupView()
-                self.coordinator?.showRunning(isFreeCourse: false)
+                //TODO: 목표코스 구현 시 변경하기
+//                self.coordinator?.showRunning(isFreeCourse: false)
+                self.coordinator?.showRunning(isFreeCourse: true)
+            }
+            .disposed(by: disposeBag)
+        
+        runningPopupView.cancelButton.rx.tap
+            .bind {
+                self.dismissPopupView()
             }
             .disposed(by: disposeBag)
     }

@@ -48,9 +48,9 @@ class RunningRecordView: UIView {
         return stackView
     }()
     
-    var pauseButton = RunningRecordButton(frame: .zero, image: CommonAsset.pause.image)
-    var playButton = RunningRecordButton(frame: .zero, image: CommonAsset.play.image)
-    var stopButton = RunningRecordButton(frame: .zero, image: CommonAsset.stop.image)
+    var pauseButton = RunningRecordButton(frame: .zero, image: CommonAsset.pauseLBlue.image.resized(to: .init(width: 88, height: 88)))
+    var playButton = RunningRecordButton(frame: .zero, image: CommonAsset.playSBlue.image.resized(to: .init(width: 72, height: 72)))
+    var stopButton = RunningRecordButton(frame: .zero, image: CommonAsset.stopSBlack.image.resized(to: .init(width: 72, height: 72)))
     
     let stopButtonlongPressGesture = UILongPressGestureRecognizer()
     
@@ -112,13 +112,13 @@ class RunningRecordView: UIView {
         pauseButton.snp.makeConstraints { make in
             make.top.equalTo(currentDistanceStackView.snp.bottom).offset(130)
             make.centerX.equalToSuperview()
-            make.height.width.equalTo(100)
+//            make.height.width.equalTo(100)
         }
         
         runningButtonStackView.snp.makeConstraints { make in
             make.top.equalTo(currentDistanceStackView.snp.bottom).offset(130)
             make.centerX.equalToSuperview()
-            make.height.width.equalTo(100)
+//            make.height.width.equalTo(100)
         }
     }
     

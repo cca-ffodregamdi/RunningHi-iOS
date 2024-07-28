@@ -137,7 +137,7 @@ extension RunningResultViewController: View {
             }
             .disposed(by: disposeBag)
         
-        Observable<[Double: RouteInfo]>.just(calculateTotalRunningTimePerKm())
+        Observable<Array<(key: Double, value: RouteInfo)>>.just(calculateTotalRunningTimePerKm())
             .bind(to: runningResultView.recordView.tableView.rx.items(cellIdentifier: RunningResultRecordTableViewCell.identifier, cellType: RunningResultRecordTableViewCell.self)) { index, model, cell in
                 cell.setData(distance: model.key, time: Int(model.value.runningTime))
                 
@@ -211,7 +211,7 @@ extension RunningResultViewController: View {
     
     //MARK: - Helpers
     
-    func calculateTotalRunningTimePerKm() -> [Double: RouteInfo] {
+    func calculateTotalRunningTimePerKm() -> Array<(key: Double, value: RouteInfo)> {
         let groupedByDistance = Dictionary(grouping: runningResult.routeList) { Int($0.distance) }
         var routeInfoPerKm: [Double: RouteInfo] = [:]
         
@@ -220,7 +220,8 @@ extension RunningResultViewController: View {
                 routeInfoPerKm[Double(km)] = routeInfo
             }
         }
-        return routeInfoPerKm
+        
+        return routeInfoPerKm.sorted { $0.key < $1.key }
     }
 }
 
