@@ -10,4 +10,5 @@ import RxSwift
 import KakaoSDKAuth
 
 public protocol RecordUseCaseProtocol{
+    func fetchRecordData(type: RecordChartType, date: Date) -> Observable<RecordData>
 }

@@ -7,12 +7,14 @@
 
 import UIKit
 import SnapKit
+import Domain
+import Common
 
 class RecordChartView: UIView {
     
     //MARK: - Properties
     
-    private lazy var distanceLabel: UILabel = {
+    lazy var distanceLabel: UILabel = {
         let label = UILabel()
         label.text = "0.0km"
         label.font = .Display1
@@ -20,7 +22,7 @@ class RecordChartView: UIView {
         return label
     }()
     
-    private lazy var runningCountLabel: UILabel = {
+    lazy var runningCountLabel: UILabel = {
         let label = UILabel()
         label.text = "/0번"
         label.font = .Subhead
@@ -28,7 +30,7 @@ class RecordChartView: UIView {
         return label
     }()
     
-    private lazy var recordDistanceStackView = {
+    lazy var recordDistanceStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 5
@@ -39,9 +41,9 @@ class RecordChartView: UIView {
         return stackView
     }()
     
-    private lazy var timeView = RecordDataView(title: "시간")
-    private lazy var paceView = RecordDataView(title: "평균 페이스")
-    private lazy var calorieView = RecordDataView(title: "소비 칼로리")
+    lazy var timeView = RecordDataView(title: "시간")
+    lazy var paceView = RecordDataView(title: "평균 페이스")
+    lazy var calorieView = RecordDataView(title: "소비 칼로리")
     
     private lazy var recordDataStackView = {
         let stackView = UIStackView()
@@ -113,5 +115,16 @@ class RecordChartView: UIView {
             make.centerX.equalToSuperview()
             make.bottom.equalToSuperview()
         }
+    }
+    
+    //MARK: - Helpers
+    
+    func setData(data: RecordData) {
+        self.distanceLabel.text = "\(data.chartDatas.reduce(0,+))km"
+        self.runningCountLabel.text = "/\(data.chartDatas.filter {$0 > 0.0}.count)번"
+        
+        self.timeView.setData(data: TimeUtil.convertSecToTimeFormat(sec: data.totalTime))
+        self.paceView.setData(data: Int.convertMeanPaceToString(meanPace: data.meanPace))
+        self.calorieView.setData(data: "\(Int.formatNumberWithComma(number: data.totalKcal))kcal")
     }
 }

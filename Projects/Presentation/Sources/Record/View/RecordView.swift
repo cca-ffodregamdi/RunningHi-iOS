@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Domain
 
 class RecordView: UIView {
     
@@ -67,6 +68,12 @@ class RecordView: UIView {
             make.top.equalToSuperview().inset(16)
             make.bottom.equalToSuperview()
         }
+    }
+    
+    //MARK: - Helpers
+    
+    func setData(data: RecordData) {
+        self.chartView.setData(data: data)
     }
 }
 
