@@ -119,10 +119,12 @@ extension FeedViewController: View{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
             
             cell.configureModel(model: feed)
-            
+            cell.disposeBag = DisposeBag()
             cell.bookmarkButton.rx
                 .tap
                 .map{ _ in
+                    print(feed)
+                    print("index: \(indexPath.item)")
                     if cell.bookmarkButton.isSelected{
                         return Reactor.Action.deleteBookmark(feed.postId, indexPath.item)
                     }else{
@@ -175,12 +177,19 @@ extension FeedViewController: View{
             }.map{ _ in Reactor.Action.fetchFeeds }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
+        
+        showBookMarkButton.rx.tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showBookmarkedFeed()
+            }.disposed(by: self.disposeBag)
     }
 }
 
 extension FeedViewController: FeedDetailViewControllerDelegate{
-    public func deleteFeed() {
-        reactor?.action.onNext(.refresh)
+    public func deleteFeed(postId: Int) {
+        reactor?.action.onNext(.deleteFeed(postId))
     }
 }
 

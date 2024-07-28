@@ -1,8 +1,8 @@
 //
-//  FeedReactor.swift
+//  BookmarkedReactor.swift
 //  Presentation
 //
-//  Created by 유현진 on 5/21/24.
+//  Created by 유현진 on 7/27/24.
 //
 
 import Foundation
@@ -10,8 +10,7 @@ import ReactorKit
 import Domain
 import RxSwift
 
-final public class FeedReactor: Reactor{
-    
+public class BookmarkedReactor: Reactor{
     public enum Action{
         case fetchFeeds
         case refresh
@@ -52,7 +51,7 @@ final public class FeedReactor: Reactor{
             guard currentState.pageNumber < currentState.totalPages else { return .empty()}
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                self.feedUseCase.fetchFeeds(page: currentState.pageNumber).map{ Mutation.addFeeds($0.0, $0.1)},
+                self.feedUseCase.fetchBookmarkedFeeds(page: currentState.pageNumber).map{ Mutation.addFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false))
             ])
         case .refresh:
@@ -61,7 +60,7 @@ final public class FeedReactor: Reactor{
             return Observable.concat([
                 Observable.just(Mutation.setRefreshing(true)),
                 Observable.just(Mutation.setLoading(true)),
-                feedUseCase.fetchFeeds(page: 0)
+                feedUseCase.fetchBookmarkedFeeds(page: 0)
                     .map{ Mutation.setFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false)),
                 Observable.just(Mutation.setRefreshing(false)),

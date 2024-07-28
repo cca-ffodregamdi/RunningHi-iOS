@@ -24,6 +24,7 @@ public enum FeedService{
     case likePost(likePost: FeedLikeRequestDTO)
     case unLikePost(postId: Int)
     case editComment(commentId: Int, editCommentModel: EditCommentRequestDTO)
+    case fetchBookmarkedFeeds(pages: Int, size: Int = 10)
 }
 
 extension FeedService: TargetType{
@@ -63,6 +64,8 @@ extension FeedService: TargetType{
             return "/like/\(postId)"
         case .editComment(let commentId, let editCommentModel):
             return "/reply/update/\(commentId)"
+        case .fetchBookmarkedFeeds:
+            return "/posts/bookmarked"
         }
     }
     
@@ -70,7 +73,8 @@ extension FeedService: TargetType{
         switch self{
         case .fetchFeeds,
                 .fetchPost,
-                .fetchComment:
+                .fetchComment,
+                .fetchBookmarkedFeeds:
             return .get
         case .writeComment,
                 .makeBookmark,
@@ -91,7 +95,7 @@ extension FeedService: TargetType{
     public var task: Moya.Task {
         switch self{
         case .fetchFeeds(let page, let size):
-            return .requestParameters(parameters: ["page" : page + 1, "size" : size, "sort" : "recommended", "distance" : 100], encoding: URLEncoding.queryString)
+            return .requestParameters(parameters: ["page" : page + 1, "size" : size, "sort" : "latest", "distance" : 100], encoding: URLEncoding.queryString)
         case .fetchComment(let postId):
             return .requestParameters(parameters: ["postNo" : postId], encoding: URLEncoding.queryString)
         case .reportComment(let reportCommentModel):
@@ -112,6 +116,8 @@ extension FeedService: TargetType{
             return .requestJSONEncodable(postModel)
         case .likePost(let likePost):
             return .requestJSONEncodable(likePost)
+        case .fetchBookmarkedFeeds(let page, let size):
+            return .requestParameters(parameters: ["page" : page + 1, "size" : size], encoding: URLEncoding.queryString)
         }
     }
     
@@ -129,7 +135,8 @@ extension FeedService: TargetType{
                 .editPost,
                 .likePost,
                 .unLikePost,
-                .editComment:
+                .editComment,
+                .fetchBookmarkedFeeds:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]
         }

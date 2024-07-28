@@ -67,4 +67,8 @@ public final class FeedUseCase: FeedUseCaseProtocol{
     public func editComment(commentId: Int, editCommentModel: EditCommentRequestDTO) -> Observable<Any> {
         return repository.editComment(commentId: commentId, editCommentModel: editCommentModel)
     }
+    
+    public func fetchBookmarkedFeeds(page: Int) -> Observable<([FeedModel], Int)> {
+        return repository.fetchBookmarkedFeeds(page: page)
+    }
 }
