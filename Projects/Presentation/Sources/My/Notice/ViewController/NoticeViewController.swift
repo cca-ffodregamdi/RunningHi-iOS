@@ -29,6 +29,7 @@ public class NoticeViewController: UIViewController {
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = true
     }
     
     public init(reactor: NoticeReactor){

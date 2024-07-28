@@ -27,6 +27,11 @@ public class CustomerCenterViewController: UIViewController {
         configureNavigationBar()
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = true
+    }
+    
     public init(reactor: CustomerCenterReactor){
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor

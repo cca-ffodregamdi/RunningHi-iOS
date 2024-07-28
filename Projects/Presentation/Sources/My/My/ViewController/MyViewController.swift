@@ -51,11 +51,6 @@ final public class MyViewController: UIViewController, View{
         self.tabBarController?.tabBar.isHidden = false
     }
     
-    public override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.tabBarController?.tabBar.isHidden = true
-    }
-    
     public init(reactor: MyReactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
