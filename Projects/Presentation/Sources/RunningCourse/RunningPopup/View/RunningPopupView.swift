@@ -18,7 +18,7 @@ class RunningPopupView: UIView {
     lazy var freeRunningButton = RunningPopupButton(frame: .zero, title: "자유러닝")
     lazy var myRunningButton = RunningPopupButton(frame: .zero, title: "목표러닝")
     
-    private var cancelButton: UIButton = {
+    lazy var cancelButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.xCircle.image, for: .normal)
         return button
