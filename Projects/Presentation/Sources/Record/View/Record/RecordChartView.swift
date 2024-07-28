@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 import Domain
 import Common
+import Charts
 
 class RecordChartView: UIView {
     
@@ -57,10 +58,21 @@ class RecordChartView: UIView {
         return stackView
     }()
     
-    private lazy var chartView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .Secondary100
-        return view
+    private lazy var chartView: BarChartView = {
+        let chartView = BarChartView()
+        chartView.doubleTapToZoomEnabled = false
+        chartView.legend.enabled = false
+        
+        chartView.xAxis.drawGridLinesEnabled = false
+        chartView.xAxis.drawAxisLineEnabled = false
+        chartView.rightAxis.enabled = false
+        chartView.leftAxis.drawAxisLineEnabled = false
+        chartView.xAxis.labelPosition = .bottom
+        
+        chartView.rightAxis.axisLineColor = .white
+        chartView.rightAxis.axisLineColor = .white
+        
+        return chartView
     }()
     
     private lazy var chartRangeView = RecordChartRangeView()
@@ -126,5 +138,25 @@ class RecordChartView: UIView {
         self.timeView.setData(data: TimeUtil.convertSecToTimeFormat(sec: data.totalTime))
         self.paceView.setData(data: Int.convertMeanPaceToString(meanPace: data.meanPace))
         self.calorieView.setData(data: "\(Int.formatNumberWithComma(number: data.totalKcal))kcal")
+        
+        //TODO: Chart 구현하기
+        
+        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        var unitsSold = [20.0, 4.0, 6.0, 3.0, 12.0, 16.0, 4.0, 18.0, 2.0, 4.0, 5.0, 4.0]
+        
+        var dataEntries: [BarChartDataEntry] = []
+        for i in 0..<months.count {
+            let dataEntry = BarChartDataEntry(x: Double(i), y: Double(unitsSold[i]))
+            dataEntries.append(dataEntry)
+        }
+
+        let chartDataSet = BarChartDataSet(entries: dataEntries, label: "판매량")
+
+        // 차트 컬러
+        chartDataSet.colors = [.red]
+
+        // 데이터 삽입
+        let chartData = BarChartData(dataSet: chartDataSet)
+        chartView.data = chartData
     }
 }

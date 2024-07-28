@@ -67,11 +67,11 @@ extension RecordViewController: View {
     }
     
     private func binding(reactor: RecordReactor) {
-        Observable.just(true)
+        self.rx.viewDidLoad
             .bind { [weak self] _ in
                 guard let self = self else {return}
-                self.recordView.chartTypeView.setChartType(type: .weekly)
-                reactor.action.onNext(.tapChartType(.weekly))
+                self.recordView.chartTypeView.setChartType(type: .yearly)
+                reactor.action.onNext(.tapChartType(.yearly))
             }
             .disposed(by: disposeBag)
         
@@ -114,7 +114,6 @@ extension RecordViewController: View {
     private func bindingState(reactor: RecordReactor) {
         reactor.state
             .compactMap{ $0.recordData }
-            .skip(1)
             .bind{ [weak self] data in
                 guard let self = self else { return }
                 print(data)
