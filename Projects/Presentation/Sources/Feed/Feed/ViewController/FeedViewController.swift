@@ -23,12 +23,6 @@ final public class FeedViewController: UIViewController{
     
     private var dataSource: RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>!
     
-    private lazy var filterButton: UIButton = {
-        let button = UIButton()
-        button.setImage(CommonAsset.adjustmentsOutline.image, for: .normal)
-        return button
-    }()
-    
     private lazy var showBookMarkButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bookmarkOutline.image, for: .normal)
@@ -89,7 +83,6 @@ final public class FeedViewController: UIViewController{
         var barButtonItems: [UIBarButtonItem] = []
         barButtonItems.append(UIBarButtonItem(customView: notificationButton))
         barButtonItems.append(UIBarButtonItem(customView: showBookMarkButton))
-        barButtonItems.append(UIBarButtonItem(customView: filterButton))
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
     
