@@ -75,14 +75,14 @@ class RankHeaderFooterView: UITableViewHeaderFooterView {
     
     func configureModel(models: [RankModel], challengeCategory: String){
         self.titleLabel.text = "랭킹"
-        models.forEach{
-            if $0.rank == 1{
+        for (offset, model) in models.enumerated(){
+            if offset == 0{
                 self.centerRankView.isFirstRanker()
-                self.centerRankView.configureModel(model: $0, challengeCategory: challengeCategory)
-            }else if $0.rank == 2{
-                self.leftRankView.configureModel(model: $0, challengeCategory: challengeCategory)
+                self.centerRankView.configureModel(model: model, challengeCategory: challengeCategory)
+            }else if offset == 1{
+                self.leftRankView.configureModel(model: model, challengeCategory: challengeCategory)
             }else{
-                self.rightRankView.configureModel(model: $0, challengeCategory: challengeCategory)
+                self.rightRankView.configureModel(model: model, challengeCategory: challengeCategory)
             }
         }
     }

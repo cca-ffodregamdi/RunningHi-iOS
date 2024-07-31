@@ -58,14 +58,14 @@ class MyRankView: UIView{
         rankLabel.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(20)
             make.top.equalToSuperview().offset(10)
+            make.width.equalTo(30)
             make.bottom.equalToSuperview().offset(-10)
         }
         
         profileImageView.snp.makeConstraints { make in
             make.left.equalTo(rankLabel.snp.right).offset(10)
-            make.top.equalToSuperview().offset(10)
-            make.bottom.equalToSuperview().offset(-10)
-            make.width.equalTo(profileImageView.snp.height)
+            make.centerY.equalToSuperview()
+            make.width.height.equalTo(26)
         }
         
         nickNameLabel.snp.makeConstraints { make in
