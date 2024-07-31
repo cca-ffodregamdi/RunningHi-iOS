@@ -58,6 +58,7 @@ class RankTableViewCell: UITableViewCell {
         rankLabel.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(20)
             make.top.equalToSuperview().offset(10)
+            make.width.equalTo(30)
             make.bottom.equalToSuperview().offset(-10)
         }
         
