@@ -123,8 +123,6 @@ extension FeedViewController: View{
             cell.bookmarkButton.rx
                 .tap
                 .map{ _ in
-                    print(feed)
-                    print("index: \(indexPath.item)")
                     if cell.bookmarkButton.isSelected{
                         return Reactor.Action.deleteBookmark(feed.postId, indexPath.item)
                     }else{
