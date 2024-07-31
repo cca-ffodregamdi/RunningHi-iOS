@@ -35,15 +35,8 @@ final public class FeedViewController: UIViewController{
         return button
     }()
     
-    private lazy var feedCollectionView: UICollectionView = {
-        let layout = PinterestLayout()
-        layout.delegate = self
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.contentInset = UIEdgeInsets(top: 9, left: 9, bottom: 9, right: 9)
-        collectionView.backgroundColor = .clear
-        collectionView.register(FeedCollectionViewCell.self, forCellWithReuseIdentifier: "feedCell")
-        collectionView.alwaysBounceVertical = true
-        return collectionView
+    private lazy var feedView: FeedView = {
+        return FeedView()
     }()
     
     private lazy var feedRefreshControl: UIRefreshControl = {
@@ -56,6 +49,7 @@ final public class FeedViewController: UIViewController{
         configureUI()
         configureNavigationBarItem()
         addRefreshControl()
+        setFeedCollectionView()
     }
     
     deinit{
@@ -70,13 +64,22 @@ final public class FeedViewController: UIViewController{
     private func configureUI(){
         self.view.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
         
-        self.view.addSubview(feedCollectionView)
-        
-        feedCollectionView.snp.makeConstraints { make in
+        self.view.addSubview(feedView)
+        feedView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
             make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
             make.left.right.equalToSuperview()
         }
+    }
+    
+    private func setFeedCollectionView(){
+        let layout = PinterestLayout()
+        layout.delegate = self
+        feedView.feedCollectionView.collectionViewLayout = layout
+        
+        feedView.feedCollectionView.register(FeedCollectionViewCell.self, forCellWithReuseIdentifier: "feedCell")
+        
+        addRefreshControl()
     }
     
     private func configureNavigationBarItem(){
@@ -87,7 +90,7 @@ final public class FeedViewController: UIViewController{
     }
     
     private func addRefreshControl(){
-        feedCollectionView.refreshControl = feedRefreshControl
+        feedView.feedCollectionView.refreshControl = feedRefreshControl
         feedRefreshControl.endRefreshing()
     }
     
@@ -128,14 +131,14 @@ extension FeedViewController: View{
 
         reactor.state
             .map{[AnimatableSectionModel(model: "feedModel", items: $0.feeds)]}
-            .bind(to: self.feedCollectionView.rx.items(dataSource: self.dataSource))
+            .bind(to: self.feedView.feedCollectionView.rx.items(dataSource: self.dataSource))
             .disposed(by: self.disposeBag)
         
         reactor.state
             .map { $0.feeds }
             .distinctUntilChanged()
             .bind { [weak self] _ in
-                self?.feedCollectionView.collectionViewLayout.invalidateLayout()
+                self?.feedView.feedCollectionView.collectionViewLayout.invalidateLayout()
             }
             .disposed(by: self.disposeBag)
         
@@ -151,7 +154,7 @@ extension FeedViewController: View{
                 self.feedRefreshControl.endRefreshing()
             }.disposed(by: self.disposeBag)
         
-        self.feedCollectionView.rx.itemSelected
+        self.feedView.feedCollectionView.rx.itemSelected
             .bind{ [weak self] indexPath in
                 guard let self = self else { return }
                 let model = self.dataSource[indexPath]
@@ -159,12 +162,12 @@ extension FeedViewController: View{
                 self.coordinator?.showFeedDetail(viewController: self, postId: model.postId)
             }.disposed(by: self.disposeBag)
         
-        self.feedCollectionView.rx.contentOffset
+        self.feedView.feedCollectionView.rx.contentOffset
             .map{$0.y}
             .distinctUntilChanged()
             .filter{ [weak self] offset in
                 guard let self = self else { return false }
-                return offset + self.feedCollectionView.frame.size.height + 100 > self.feedCollectionView.contentSize.height
+                return offset + self.feedView.feedCollectionView.frame.size.height + 100 > self.feedView.feedCollectionView.contentSize.height
             }.map{ _ in Reactor.Action.fetchFeeds }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
