@@ -56,4 +56,9 @@ class FeedDIContainer{
         vc.coordinator = coordinator
         return vc
     }
+    
+    func makeDistanceFilterViewController(distanceState: DistanceFilter) -> DistanceFilterViewController{
+        let vc = DistanceFilterViewController(distanceState: distanceState)
+        return vc
+    }
 }

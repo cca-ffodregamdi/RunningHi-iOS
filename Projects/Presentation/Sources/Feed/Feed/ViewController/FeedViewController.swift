@@ -35,8 +35,8 @@ final public class FeedViewController: UIViewController{
         return button
     }()
     
-    private lazy var feedView: FeedView = {
-        return FeedView()
+    private lazy var feedView: TestFeedView = {
+        return TestFeedView()
     }()
     
     private lazy var feedRefreshControl: UIRefreshControl = {
@@ -177,6 +177,20 @@ extension FeedViewController: View{
                 guard let self = self else { return }
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
                 self.coordinator?.showBookmarkedFeed()
+            }.disposed(by: self.disposeBag)
+        
+        feedView.feedFilterView.sortButton.rx
+            .tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                
+            }.disposed(by: self.disposeBag)
+        
+        feedView.feedFilterView.distanceButton.rx
+            .tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.coordinator?.showDistanceFilter(distanceState: reactor.currentState.distanceState)
             }.disposed(by: self.disposeBag)
     }
 }

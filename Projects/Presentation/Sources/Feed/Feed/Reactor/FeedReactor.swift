@@ -18,6 +18,8 @@ final public class FeedReactor: Reactor{
         case makeBookmark(BookmarkRequestDTO, Int)
         case deleteBookmark(Int, Int)
         case deleteFeed(Int)
+        case updateSortFilter(SortFilter)
+        case updateDistanceFilter(DistanceFilter)
     }
     
     public enum Mutation{
@@ -27,6 +29,8 @@ final public class FeedReactor: Reactor{
         case setLoading(Bool)
         case updateBookmarked(Int, Bool)
         case removeFeed(Int)
+        case setSortFilter(SortFilter)
+        case setDistanceFilter(DistanceFilter)
     }
     
     public struct State{
@@ -35,6 +39,8 @@ final public class FeedReactor: Reactor{
         var isLoading: Bool = false
         var pageNumber: Int = 0
         var totalPages: Int = 1
+        var sortState: SortFilter = .latest
+        var distanceState: DistanceFilter = .around5
     }
 
     public let initialState: State
@@ -72,6 +78,10 @@ final public class FeedReactor: Reactor{
             return feedUseCase.deleteBookmark(postId: postId).map{_ in Mutation.updateBookmarked(index, false) }
         case .deleteFeed(let postId):
             return Observable.just(Mutation.removeFeed(postId))
+        case .updateSortFilter(let sort):
+            return Observable.just(Mutation.setSortFilter(sort))
+        case .updateDistanceFilter(let distance):
+            return Observable.just(Mutation.setDistanceFilter(distance))
         }
     }
     
@@ -94,6 +104,10 @@ final public class FeedReactor: Reactor{
             newState.feeds[index].isBookmarked = isBookmarked
         case .removeFeed(let postId):
             newState.feeds.removeAll{ $0.postId == postId }
+        case .setSortFilter(let sort):
+            newState.sortState = sort
+        case .setDistanceFilter(let distance):
+            newState.distanceState = distance
         }
         return newState
     }
