@@ -1,5 +1,5 @@
 //
-//  TestFeedView.swift
+//  FeedAndFilterView.swift
 //  Presentation
 //
 //  Created by 유현진 on 7/31/24.
@@ -8,17 +8,16 @@
 import UIKit
 import SnapKit
 
-class TestFeedView: UIView {
+class FeedAndFilterView: UIView {
+    
     lazy var feedFilterView: FeedFilterView = {
         return FeedFilterView()
     }()
     
-    lazy var feedCollectionView: UICollectionView = {
-        var collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init())
-        collectionView.contentInset = UIEdgeInsets(top: 4, left: 9, bottom: 9, right: 9)
-        collectionView.backgroundColor = .clear
-        collectionView.showsVerticalScrollIndicator = false
-        return collectionView
+    lazy var feedView: FeedView = {
+        var feedView = FeedView()
+        feedView.feedCollectionView.contentInset = UIEdgeInsets(top: 4, left: 9, bottom: 9, right: 9)
+        return feedView
     }()
     
     public override init(frame: CGRect) {
@@ -32,7 +31,7 @@ class TestFeedView: UIView {
     
     private func configureUI(){
         self.addSubview(feedFilterView)
-        self.addSubview(feedCollectionView)
+        self.addSubview(feedView)
         
         feedFilterView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(10)
@@ -40,7 +39,7 @@ class TestFeedView: UIView {
             make.height.equalTo(32)
         }
         
-        feedCollectionView.snp.makeConstraints { make in
+        feedView.snp.makeConstraints { make in
             make.top.equalTo(feedFilterView.snp.bottom).offset(10)
             make.left.right.bottom.equalToSuperview()
         }
