@@ -34,7 +34,7 @@ final public class FeedDetailViewController: UIViewController {
     private lazy var bookmarkButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bookmarkOutline.image, for: .normal)
-        button.setImage(CommonAsset.bookmarkFilled.image, for: .selected)
+        button.setImage(CommonAsset.bookmarkBlue.image, for: .selected)
         return button
     }()
     

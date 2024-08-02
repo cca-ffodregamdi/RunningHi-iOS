@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol FeedUseCaseProtocol{
-    func fetchFeeds(page: Int) -> Observable<([FeedModel], Int)>
+    func fetchFeeds(page: Int, sort: String, distance: Int) -> Observable<([FeedModel], Int)>
     func fetchPost(postId: Int) -> Observable<FeedDetailModel>
     func fetchComment(postId: Int) -> Observable<[CommentModel]>
     func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentResponseModel>

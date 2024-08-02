@@ -11,7 +11,7 @@ import RxSwift
 import Domain
 
 public enum FeedService{
-    case fetchFeeds(page: Int, size: Int = 10)
+    case fetchFeeds(page: Int, size: Int = 10, sort: String, distance: Int)
     case fetchPost(postId: Int)
     case fetchComment(postId: Int)
     case writeComment(commentModel: WriteCommentReqesutDTO)
@@ -94,8 +94,8 @@ extension FeedService: TargetType{
     
     public var task: Moya.Task {
         switch self{
-        case .fetchFeeds(let page, let size):
-            return .requestParameters(parameters: ["page" : page + 1, "size" : size, "sort" : "latest", "distance" : 100], encoding: URLEncoding.queryString)
+        case .fetchFeeds(let page, let size, let sort, let distance):
+            return .requestParameters(parameters: ["page" : page + 1, "size" : size, "sort" : sort, "distance" : distance], encoding: URLEncoding.queryString)
         case .fetchComment(let postId):
             return .requestParameters(parameters: ["postNo" : postId], encoding: URLEncoding.queryString)
         case .reportComment(let reportCommentModel):

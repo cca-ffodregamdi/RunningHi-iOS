@@ -25,7 +25,7 @@ public class BookmarkedFeedViewController: UIViewController {
     private lazy var feedView: FeedView = {
         return FeedView()
     }()
-   
+    
     private lazy var feedRefreshControl: UIRefreshControl = {
         return UIRefreshControl()
     }()
@@ -52,7 +52,9 @@ public class BookmarkedFeedViewController: UIViewController {
         self.view.addSubview(feedView)
         
         feedView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
+            make.left.right.equalToSuperview()
         }
     }
     

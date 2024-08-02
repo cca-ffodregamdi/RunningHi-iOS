@@ -38,6 +38,7 @@ public struct FeedDetailModel: Decodable, Equatable{
     public var likeCount: Int
     public let isOwner: Bool
     public var isLiked: Bool
+    public var isBookmarked: Bool
     public var difficulty: FeedDetailDifficultyType
     
     enum CodingKeys: String, CodingKey {
@@ -58,6 +59,7 @@ public struct FeedDetailModel: Decodable, Equatable{
         case isOwner = "owner"
         case isLiked
         case difficulty
+        case isBookmarked
     }
     
     public static func == (lhs: FeedDetailModel, rhs: FeedDetailModel) -> Bool {
@@ -77,7 +79,8 @@ public struct FeedDetailModel: Decodable, Equatable{
         lhs.likeCount == rhs.likeCount &&
         lhs.isOwner == rhs.isOwner &&
         lhs.isLiked == rhs.isLiked &&
-        lhs.difficulty == rhs.difficulty
+        lhs.difficulty == rhs.difficulty &&
+        lhs.isBookmarked == rhs.isBookmarked
     }
     
 }

@@ -17,8 +17,8 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
     
     public init(){ }
     
-    public func fetchFeeds(page: Int) -> Observable<([FeedModel], Int)> {
-        return service.rx.request(.fetchFeeds(page: page))
+    public func fetchFeeds(page: Int, sort: String, distance: Int) -> Observable<([FeedModel], Int)> {
+        return service.rx.request(.fetchFeeds(page: page, sort: sort, distance: distance))
             .filterSuccessfulStatusCodes()
             .map{ response -> ([FeedModel], Int) in
                 let feedResponse = try JSONDecoder().decode(FeedResponseDTO.self, from: response.data)
