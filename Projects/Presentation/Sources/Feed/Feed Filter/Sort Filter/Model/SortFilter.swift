@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum SortFilter{
+public enum SortFilter: String{
     case latest
     case recommended
     case like

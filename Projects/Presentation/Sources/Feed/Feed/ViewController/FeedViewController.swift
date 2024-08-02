@@ -204,6 +204,18 @@ extension FeedViewController: View{
                 guard let self = self else { return }
                 self.coordinator?.showDistanceFilter(viewController: self, distanceState: reactor.currentState.distanceState)
             }.disposed(by: self.disposeBag)
+        
+        
+        Observable.combineLatest(
+            [reactor.state.map { $0.isRefreshing },
+             reactor.state.map { $0.feeds.isEmpty }])
+        .distinctUntilChanged()
+        .skip(1)
+        .filter{ !$0[0] && !$0[1] }
+        .bind{ [weak self] _ in
+            guard let self = self else { return }
+            self.feedView.feedCollectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: true)
+        }.disposed(by: self.disposeBag)
     }
 }
 
@@ -216,12 +228,14 @@ extension FeedViewController: FeedDetailViewControllerDelegate{
 extension FeedViewController: DistanceFilterViewControllerDelegate{
     public func updatedDistanceState(distanceState: DistanceFilter) {
         reactor?.action.onNext(.updateDistanceFilter(distanceState))
+        reactor?.action.onNext(.refresh)
     }
 }
 
 extension FeedViewController: SortfilterViewControllerDelegate{
     public func updatedSortState(sortState: SortFilter) {
         reactor?.action.onNext(.updateSortFilter(sortState))
+        reactor?.action.onNext(.refresh)
     }
 }
 

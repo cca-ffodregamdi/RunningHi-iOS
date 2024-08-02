@@ -44,6 +44,10 @@ public class SortFilterViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit{
+        print("deinit SortFilterViewController")
+    }
+    
     private func configureUI(){
         self.view.addSubview(sortFilterView)
         

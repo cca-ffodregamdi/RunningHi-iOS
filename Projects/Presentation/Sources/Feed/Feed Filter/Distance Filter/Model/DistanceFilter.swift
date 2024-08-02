@@ -30,4 +30,13 @@ public enum DistanceFilter{
         case .all: 3.0
         }
     }
+    
+    var value: Int{
+        switch self{
+        case .around: 3
+        case .around5: 5
+        case .around10: 10
+        case .all: 500
+        }
+    }
 }

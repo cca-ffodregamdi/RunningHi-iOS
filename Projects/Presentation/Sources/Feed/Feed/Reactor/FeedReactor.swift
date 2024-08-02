@@ -40,7 +40,7 @@ final public class FeedReactor: Reactor{
         var pageNumber: Int = 0
         var totalPages: Int = 1
         var sortState: SortFilter = .latest
-        var distanceState: DistanceFilter = .around5
+        var distanceState: DistanceFilter = .all
     }
 
     public let initialState: State
@@ -58,7 +58,7 @@ final public class FeedReactor: Reactor{
             guard currentState.pageNumber < currentState.totalPages else { return .empty()}
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                self.feedUseCase.fetchFeeds(page: currentState.pageNumber).map{ Mutation.addFeeds($0.0, $0.1)},
+                self.feedUseCase.fetchFeeds(page: currentState.pageNumber, sort: currentState.sortState.rawValue, distance: currentState.distanceState.value).map{ Mutation.addFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false))
             ])
         case .refresh:
@@ -67,7 +67,7 @@ final public class FeedReactor: Reactor{
             return Observable.concat([
                 Observable.just(Mutation.setRefreshing(true)),
                 Observable.just(Mutation.setLoading(true)),
-                feedUseCase.fetchFeeds(page: 0)
+                self.feedUseCase.fetchFeeds(page: currentState.pageNumber, sort: currentState.sortState.rawValue, distance: currentState.distanceState.value)
                     .map{ Mutation.setFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false)),
                 Observable.just(Mutation.setRefreshing(false)),
