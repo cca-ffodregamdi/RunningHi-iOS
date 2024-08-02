@@ -22,7 +22,7 @@ public enum DistanceFilter{
         }
     }
     
-    var value: Float{
+    var silderOffset: Float{
         switch self{
         case .around: 0.0
         case .around5: 1.0

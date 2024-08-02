@@ -61,4 +61,9 @@ class FeedDIContainer{
         let vc = DistanceFilterViewController(distanceState: distanceState)
         return vc
     }
+    
+    func makeSortFilterViewController(sortState: SortFilter) -> SortFilterViewController{
+        let vc = SortFilterViewController(sortState: sortState)
+        return vc
+    }
 }

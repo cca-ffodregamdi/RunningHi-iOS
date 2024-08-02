@@ -59,7 +59,7 @@ extension DistanceFilterViewController: View{
     public func bind(reactor: DistanceFilterReactor) {
         
         reactor.state.map{$0.distanceState}
-            .map{$0.value}
+            .map{$0.silderOffset}
             .take(1)
             .bind(to: distanceFilterView.distanceSlider.rx.value)
             .disposed(by: self.disposeBag)
@@ -88,7 +88,7 @@ extension DistanceFilterViewController: View{
         distanceFilterView.resetButton.rx.tap
             .bind{ [weak self] _ in
                 guard let self = self else { return }
-                distanceFilterView.distanceSlider.value = reactor.currentState.distanceState.value
+                distanceFilterView.distanceSlider.value = reactor.currentState.distanceState.silderOffset
                 reactor.action.onNext(.reset)
             }.disposed(by: self.disposeBag)
     

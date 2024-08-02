@@ -68,4 +68,10 @@ extension FeedCoordinator: FeedCoordinatorInterface{
         vc.distanceFilterDelegate = viewController
         self.navigationController.present(vc, animated: true)
     }
+    
+    func showSortFilter(viewController: FeedViewController, sortState: SortFilter){
+        let vc = feedDIContainer.makeSortFilterViewController(sortState: sortState)
+        vc.sortFilterDelegate = viewController
+        self.navigationController.present(vc, animated: true)
+    }
 }

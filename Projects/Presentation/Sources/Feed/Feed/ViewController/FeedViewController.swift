@@ -179,11 +179,17 @@ extension FeedViewController: View{
                 self.coordinator?.showBookmarkedFeed()
             }.disposed(by: self.disposeBag)
         
+        reactor.state.map{$0.sortState.title}
+            .bind{ [weak self] title in
+                guard let self = self else { return }
+                self.feedView.feedFilterView.sortButton.configuration?.attributedTitle = .init(title, attributes: .init([.font: UIFont.CaptionRegular, .foregroundColor: UIColor.BaseBlack]))
+            }.disposed(by: self.disposeBag)
+        
         feedView.feedFilterView.sortButton.rx
             .tap
             .bind{ [weak self] _ in
                 guard let self = self else { return }
-                
+                self.coordinator?.showSortFilter(viewController: self, sortState: reactor.currentState.sortState)
             }.disposed(by: self.disposeBag)
         
         reactor.state.map{$0.distanceState.title}
@@ -210,6 +216,12 @@ extension FeedViewController: FeedDetailViewControllerDelegate{
 extension FeedViewController: DistanceFilterViewControllerDelegate{
     public func updatedDistanceState(distanceState: DistanceFilter) {
         reactor?.action.onNext(.updateDistanceFilter(distanceState))
+    }
+}
+
+extension FeedViewController: SortfilterViewControllerDelegate{
+    public func updatedSortState(sortState: SortFilter) {
+        reactor?.action.onNext(.updateSortFilter(sortState))
     }
 }
 
