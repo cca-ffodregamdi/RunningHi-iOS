@@ -186,11 +186,17 @@ extension FeedViewController: View{
                 
             }.disposed(by: self.disposeBag)
         
+        reactor.state.map{$0.distanceState.title}
+            .bind{[weak self] title in
+                guard let self = self else { return }
+                self.feedView.feedFilterView.distanceButton.configuration?.attributedTitle = .init(title, attributes: .init([.font: UIFont.CaptionRegular, .foregroundColor: UIColor.BaseBlack]))
+            }.disposed(by: self.disposeBag)
+        
         feedView.feedFilterView.distanceButton.rx
             .tap
             .bind{ [weak self] _ in
                 guard let self = self else { return }
-                self.coordinator?.showDistanceFilter(distanceState: reactor.currentState.distanceState)
+                self.coordinator?.showDistanceFilter(viewController: self, distanceState: reactor.currentState.distanceState)
             }.disposed(by: self.disposeBag)
     }
 }
@@ -198,6 +204,12 @@ extension FeedViewController: View{
 extension FeedViewController: FeedDetailViewControllerDelegate{
     public func deleteFeed(postId: Int) {
         reactor?.action.onNext(.deleteFeed(postId))
+    }
+}
+
+extension FeedViewController: DistanceFilterViewControllerDelegate{
+    public func updatedDistanceState(distanceState: DistanceFilter) {
+        reactor?.action.onNext(.updateDistanceFilter(distanceState))
     }
 }
 

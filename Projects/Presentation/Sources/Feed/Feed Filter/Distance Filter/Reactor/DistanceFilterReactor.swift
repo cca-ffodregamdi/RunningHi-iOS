@@ -13,11 +13,13 @@ public class DistanceFilterReactor: Reactor{
     public enum Action{
         case changedValue
         case reset
+        case applyChangedValue(Float)
     }
     
     public enum Mutation{
         case updateValueChangedState(Bool)
         case resetValueChangeState(Bool)
+        case updateDistanceState(DistanceFilter)
     }
     
     public struct State{
@@ -33,8 +35,18 @@ public class DistanceFilterReactor: Reactor{
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
-        case .changedValue: Observable.just(Mutation.updateValueChangedState(true))
-        case .reset: Observable.just(Mutation.resetValueChangeState(false))
+        case .changedValue: return Observable.just(Mutation.updateValueChangedState(true))
+        case .reset: return Observable.just(Mutation.resetValueChangeState(false))
+        case .applyChangedValue(let value):
+            var newDistanceFilter: DistanceFilter
+            switch value{
+            case 0.0: newDistanceFilter = .around
+            case 1.0: newDistanceFilter = .around5
+            case 2.0: newDistanceFilter = .around10
+            case 3.0: newDistanceFilter = .all
+            default: return Observable.just(Mutation.updateDistanceState(currentState.distanceState))
+            }
+            return Observable.just(Mutation.updateDistanceState(newDistanceFilter))
         }
     }
     
@@ -45,6 +57,8 @@ public class DistanceFilterReactor: Reactor{
             newState.valueChangedState = value
         case .resetValueChangeState(let value):
             newState.valueChangedState = value
+        case .updateDistanceState(let state):
+            newState.distanceState = state
         }
         return newState
     }

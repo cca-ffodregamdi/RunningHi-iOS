@@ -11,6 +11,10 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
+public protocol DistanceFilterViewControllerDelegate: AnyObject{
+    func updatedDistanceState(distanceState: DistanceFilter)
+}
+
 public class DistanceFilterViewController: UIViewController {
     
     public var disposeBag: DisposeBag = DisposeBag()
@@ -19,8 +23,9 @@ public class DistanceFilterViewController: UIViewController {
         return DistanceFilterView()
     }()
     
-    private let customTransitioningDelegate: CustomTransitioningDelegate
+    public var distanceFilterDelegate: DistanceFilterViewControllerDelegate?
     
+    private let customTransitioningDelegate: CustomTransitioningDelegate
     
     public init(distanceState: DistanceFilter){
         customTransitioningDelegate = CustomTransitioningDelegate(modalHeight: 230)
@@ -44,6 +49,10 @@ public class DistanceFilterViewController: UIViewController {
         distanceFilterView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    deinit{
+        print("deinit DistanceFilterViewController")
     }
 }
 extension DistanceFilterViewController: View{
@@ -82,7 +91,13 @@ extension DistanceFilterViewController: View{
                 distanceFilterView.distanceSlider.value = reactor.currentState.distanceState.value
                 reactor.action.onNext(.reset)
             }.disposed(by: self.disposeBag)
-        
-        // TODO: 적용 후
+    
+        distanceFilterView.applyButton.rx.tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                reactor.action.onNext(.applyChangedValue(distanceFilterView.distanceSlider.value))
+                self.distanceFilterDelegate?.updatedDistanceState(distanceState: reactor.currentState.distanceState)
+                self.dismiss(animated: true)
+            }.disposed(by: self.disposeBag)
     }
 }
