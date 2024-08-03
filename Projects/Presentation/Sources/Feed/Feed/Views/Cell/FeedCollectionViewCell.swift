@@ -39,7 +39,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
     lazy var bookmarkButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bookmarkOutline.image, for: .normal)
-        button.setImage(CommonAsset.bookmarkFilled.image, for: .selected)
+        button.setImage(CommonAsset.bookmarkBlue.image, for: .selected)
         button.backgroundColor = UIColor.colorWithRGB(r: 255, g: 255, b: 255, alpha: 0.6)
         button.clipsToBounds = false
         return button
@@ -119,6 +119,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         resetModelForReuse()
+        disposeBag = DisposeBag()
     }
     
     private func configureUI(){
@@ -234,7 +235,6 @@ class FeedCollectionViewCell: UICollectionViewCell {
     }
 
     private func resetModelForReuse(){
-        disposeBag = DisposeBag()
         self.thumbnailImageView.kf.cancelDownloadTask()
         self.thumbnailImageView.image = nil
         

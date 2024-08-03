@@ -50,4 +50,20 @@ class FeedDIContainer{
         let vc = EditCommentViewController(reactor: EditCommentReactor(feedUseCase: feedUseCase, commentModel: commentModel))
         return vc
     }
+    
+    func makeBookmarkedFeedViewController(coordinator: FeedCoordinator) -> BookmarkedFeedViewController{
+        let vc = BookmarkedFeedViewController(reactor: BookmarkedReactor(feedUseCase: feedUseCase))
+        vc.coordinator = coordinator
+        return vc
+    }
+    
+    func makeDistanceFilterViewController(distanceState: DistanceFilter) -> DistanceFilterViewController{
+        let vc = DistanceFilterViewController(distanceState: distanceState)
+        return vc
+    }
+    
+    func makeSortFilterViewController(sortState: SortFilter) -> SortFilterViewController{
+        let vc = SortFilterViewController(sortState: sortState)
+        return vc
+    }
 }

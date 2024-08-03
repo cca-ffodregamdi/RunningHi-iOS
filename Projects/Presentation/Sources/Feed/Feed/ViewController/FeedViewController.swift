@@ -23,12 +23,6 @@ final public class FeedViewController: UIViewController{
     
     private var dataSource: RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>!
     
-    private lazy var filterButton: UIButton = {
-        let button = UIButton()
-        button.setImage(CommonAsset.adjustmentsOutline.image, for: .normal)
-        return button
-    }()
-    
     private lazy var showBookMarkButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bookmarkOutline.image, for: .normal)
@@ -41,15 +35,8 @@ final public class FeedViewController: UIViewController{
         return button
     }()
     
-    private lazy var feedCollectionView: UICollectionView = {
-        let layout = PinterestLayout()
-        layout.delegate = self
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.contentInset = UIEdgeInsets(top: 9, left: 9, bottom: 9, right: 9)
-        collectionView.backgroundColor = .clear
-        collectionView.register(FeedCollectionViewCell.self, forCellWithReuseIdentifier: "feedCell")
-        collectionView.alwaysBounceVertical = true
-        return collectionView
+    private lazy var feedAndFilterView: FeedAndFilterView = {
+        return FeedAndFilterView()
     }()
     
     private lazy var feedRefreshControl: UIRefreshControl = {
@@ -62,6 +49,7 @@ final public class FeedViewController: UIViewController{
         configureUI()
         configureNavigationBarItem()
         addRefreshControl()
+        setFeedCollectionView()
     }
     
     deinit{
@@ -76,25 +64,33 @@ final public class FeedViewController: UIViewController{
     private func configureUI(){
         self.view.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
         
-        self.view.addSubview(feedCollectionView)
-        
-        feedCollectionView.snp.makeConstraints { make in
+        self.view.addSubview(feedAndFilterView)
+        feedAndFilterView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
             make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
             make.left.right.equalToSuperview()
         }
     }
     
+    private func setFeedCollectionView(){
+        let layout = PinterestLayout()
+        layout.delegate = self
+        feedAndFilterView.feedView.feedCollectionView.collectionViewLayout = layout
+        
+        feedAndFilterView.feedView.feedCollectionView.register(FeedCollectionViewCell.self, forCellWithReuseIdentifier: "feedCell")
+        
+        addRefreshControl()
+    }
+    
     private func configureNavigationBarItem(){
         var barButtonItems: [UIBarButtonItem] = []
         barButtonItems.append(UIBarButtonItem(customView: notificationButton))
         barButtonItems.append(UIBarButtonItem(customView: showBookMarkButton))
-        barButtonItems.append(UIBarButtonItem(customView: filterButton))
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
     
     private func addRefreshControl(){
-        feedCollectionView.refreshControl = feedRefreshControl
+        feedAndFilterView.feedView.feedCollectionView.refreshControl = feedRefreshControl
         feedRefreshControl.endRefreshing()
     }
     
@@ -119,7 +115,7 @@ extension FeedViewController: View{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
             
             cell.configureModel(model: feed)
-            
+            cell.disposeBag = DisposeBag()
             cell.bookmarkButton.rx
                 .tap
                 .map{ _ in
@@ -135,14 +131,14 @@ extension FeedViewController: View{
 
         reactor.state
             .map{[AnimatableSectionModel(model: "feedModel", items: $0.feeds)]}
-            .bind(to: self.feedCollectionView.rx.items(dataSource: self.dataSource))
+            .bind(to: self.feedAndFilterView.feedView.feedCollectionView.rx.items(dataSource: self.dataSource))
             .disposed(by: self.disposeBag)
         
         reactor.state
             .map { $0.feeds }
             .distinctUntilChanged()
             .bind { [weak self] _ in
-                self?.feedCollectionView.collectionViewLayout.invalidateLayout()
+                self?.feedAndFilterView.feedView.feedCollectionView.collectionViewLayout.invalidateLayout()
             }
             .disposed(by: self.disposeBag)
         
@@ -158,7 +154,7 @@ extension FeedViewController: View{
                 self.feedRefreshControl.endRefreshing()
             }.disposed(by: self.disposeBag)
         
-        self.feedCollectionView.rx.itemSelected
+        self.feedAndFilterView.feedView.feedCollectionView.rx.itemSelected
             .bind{ [weak self] indexPath in
                 guard let self = self else { return }
                 let model = self.dataSource[indexPath]
@@ -166,20 +162,79 @@ extension FeedViewController: View{
                 self.coordinator?.showFeedDetail(viewController: self, postId: model.postId)
             }.disposed(by: self.disposeBag)
         
-        self.feedCollectionView.rx.contentOffset
+        self.feedAndFilterView.feedView.feedCollectionView.rx.contentOffset
             .map{$0.y}
             .distinctUntilChanged()
             .filter{ [weak self] offset in
                 guard let self = self else { return false }
-                return offset + self.feedCollectionView.frame.size.height + 100 > self.feedCollectionView.contentSize.height
+                return offset + self.feedAndFilterView.feedView.feedCollectionView.frame.size.height + 100 > self.feedAndFilterView.feedView.feedCollectionView.contentSize.height
             }.map{ _ in Reactor.Action.fetchFeeds }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
+        
+        showBookMarkButton.rx.tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showBookmarkedFeed()
+            }.disposed(by: self.disposeBag)
+        
+        reactor.state.map{$0.sortState.title}
+            .bind{ [weak self] title in
+                guard let self = self else { return }
+                self.feedAndFilterView.feedFilterView.sortButton.configuration?.attributedTitle = .init(title, attributes: .init([.font: UIFont.CaptionRegular, .foregroundColor: UIColor.BaseBlack]))
+            }.disposed(by: self.disposeBag)
+        
+        feedAndFilterView.feedFilterView.sortButton.rx
+            .tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.coordinator?.showSortFilter(viewController: self, sortState: reactor.currentState.sortState)
+            }.disposed(by: self.disposeBag)
+        
+        reactor.state.map{$0.distanceState.title}
+            .bind{[weak self] title in
+                guard let self = self else { return }
+                self.feedAndFilterView.feedFilterView.distanceButton.configuration?.attributedTitle = .init(title, attributes: .init([.font: UIFont.CaptionRegular, .foregroundColor: UIColor.BaseBlack]))
+            }.disposed(by: self.disposeBag)
+        
+        feedAndFilterView.feedFilterView.distanceButton.rx
+            .tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.coordinator?.showDistanceFilter(viewController: self, distanceState: reactor.currentState.distanceState)
+            }.disposed(by: self.disposeBag)
+        
+        
+        Observable.combineLatest(
+            [reactor.state.map { $0.isRefreshing },
+             reactor.state.map { $0.feeds.isEmpty }])
+        .distinctUntilChanged()
+        .skip(1)
+        .filter{ !$0[0] && !$0[1] }
+        .bind{ [weak self] _ in
+            guard let self = self else { return }
+            self.feedAndFilterView.feedView.feedCollectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: true)
+        }.disposed(by: self.disposeBag)
     }
 }
 
 extension FeedViewController: FeedDetailViewControllerDelegate{
-    public func deleteFeed() {
+    public func deleteFeed(postId: Int) {
+        reactor?.action.onNext(.deleteFeed(postId))
+    }
+}
+
+extension FeedViewController: DistanceFilterViewControllerDelegate{
+    public func updatedDistanceState(distanceState: DistanceFilter) {
+        reactor?.action.onNext(.updateDistanceFilter(distanceState))
+        reactor?.action.onNext(.refresh)
+    }
+}
+
+extension FeedViewController: SortfilterViewControllerDelegate{
+    public func updatedSortState(sortState: SortFilter) {
+        reactor?.action.onNext(.updateSortFilter(sortState))
         reactor?.action.onNext(.refresh)
     }
 }

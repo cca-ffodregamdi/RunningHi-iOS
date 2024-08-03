@@ -1,8 +1,8 @@
 //
-//  FeedReactor.swift
+//  BookmarkedReactor.swift
 //  Presentation
 //
-//  Created by 유현진 on 5/21/24.
+//  Created by 유현진 on 7/27/24.
 //
 
 import Foundation
@@ -10,16 +10,13 @@ import ReactorKit
 import Domain
 import RxSwift
 
-final public class FeedReactor: Reactor{
-    
+public class BookmarkedReactor: Reactor{
     public enum Action{
         case fetchFeeds
         case refresh
         case makeBookmark(BookmarkRequestDTO, Int)
         case deleteBookmark(Int, Int)
         case deleteFeed(Int)
-        case updateSortFilter(SortFilter)
-        case updateDistanceFilter(DistanceFilter)
     }
     
     public enum Mutation{
@@ -29,8 +26,6 @@ final public class FeedReactor: Reactor{
         case setLoading(Bool)
         case updateBookmarked(Int, Bool)
         case removeFeed(Int)
-        case setSortFilter(SortFilter)
-        case setDistanceFilter(DistanceFilter)
     }
     
     public struct State{
@@ -39,8 +34,6 @@ final public class FeedReactor: Reactor{
         var isLoading: Bool = false
         var pageNumber: Int = 0
         var totalPages: Int = 1
-        var sortState: SortFilter = .latest
-        var distanceState: DistanceFilter = .all
     }
 
     public let initialState: State
@@ -58,7 +51,7 @@ final public class FeedReactor: Reactor{
             guard currentState.pageNumber < currentState.totalPages else { return .empty()}
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                self.feedUseCase.fetchFeeds(page: currentState.pageNumber, sort: currentState.sortState.rawValue, distance: currentState.distanceState.value).map{ Mutation.addFeeds($0.0, $0.1)},
+                self.feedUseCase.fetchBookmarkedFeeds(page: currentState.pageNumber).map{ Mutation.addFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false))
             ])
         case .refresh:
@@ -67,7 +60,7 @@ final public class FeedReactor: Reactor{
             return Observable.concat([
                 Observable.just(Mutation.setRefreshing(true)),
                 Observable.just(Mutation.setLoading(true)),
-                self.feedUseCase.fetchFeeds(page: currentState.pageNumber, sort: currentState.sortState.rawValue, distance: currentState.distanceState.value)
+                feedUseCase.fetchBookmarkedFeeds(page: 0)
                     .map{ Mutation.setFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false)),
                 Observable.just(Mutation.setRefreshing(false)),
@@ -78,10 +71,6 @@ final public class FeedReactor: Reactor{
             return feedUseCase.deleteBookmark(postId: postId).map{_ in Mutation.updateBookmarked(index, false) }
         case .deleteFeed(let postId):
             return Observable.just(Mutation.removeFeed(postId))
-        case .updateSortFilter(let sort):
-            return Observable.just(Mutation.setSortFilter(sort))
-        case .updateDistanceFilter(let distance):
-            return Observable.just(Mutation.setDistanceFilter(distance))
         }
     }
     
@@ -104,10 +93,6 @@ final public class FeedReactor: Reactor{
             newState.feeds[index].isBookmarked = isBookmarked
         case .removeFeed(let postId):
             newState.feeds.removeAll{ $0.postId == postId }
-        case .setSortFilter(let sort):
-            newState.sortState = sort
-        case .setDistanceFilter(let distance):
-            newState.distanceState = distance
         }
         return newState
     }

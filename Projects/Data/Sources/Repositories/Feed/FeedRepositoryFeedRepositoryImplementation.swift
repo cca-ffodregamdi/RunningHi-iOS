@@ -17,8 +17,8 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
     
     public init(){ }
     
-    public func fetchFeeds(page: Int) -> Observable<([FeedModel], Int)> {
-        return service.rx.request(.fetchFeeds(page: page))
+    public func fetchFeeds(page: Int, sort: String, distance: Int) -> Observable<([FeedModel], Int)> {
+        return service.rx.request(.fetchFeeds(page: page, sort: sort, distance: distance))
             .filterSuccessfulStatusCodes()
             .map{ response -> ([FeedModel], Int) in
                 let feedResponse = try JSONDecoder().decode(FeedResponseDTO.self, from: response.data)
@@ -151,5 +151,19 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             .map{ _ in
                 return Observable.just(())
             }.asObservable()
+    }
+    
+    public func fetchBookmarkedFeeds(page: Int) -> Observable<([FeedModel], Int)> {
+        return service.rx.request(.fetchBookmarkedFeeds(pages: page, size: 10))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> ([FeedModel], Int) in
+                let feedResponse = try JSONDecoder().decode(FeedResponseDTO.self, from: response.data)
+                return (feedResponse.data.content, feedResponse.data.totalPages)
+            }
+            .asObservable()
+            .catch{ error in
+                print("FeedRepositoryImplementation fetchBookmarkedFeeds error = \(error)")
+                return Observable.error(error)
+            }
     }
 }

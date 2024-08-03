@@ -15,7 +15,7 @@ import RxSwift
 import RxCocoa
 
 public protocol FeedDetailViewControllerDelegate: AnyObject{
-    func deleteFeed()
+    func deleteFeed(postId: Int)
 }
 
 final public class FeedDetailViewController: UIViewController {
@@ -34,7 +34,7 @@ final public class FeedDetailViewController: UIViewController {
     private lazy var bookmarkButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bookmarkOutline.image, for: .normal)
-        button.setImage(CommonAsset.bookmarkFilled.image, for: .selected)
+        button.setImage(CommonAsset.bookmarkBlue.image, for: .selected)
         return button
     }()
     
@@ -459,7 +459,7 @@ extension FeedDetailViewController: View{
             .filter{$0}
             .bind{ [weak self] _ in
                 guard let self = self else { return }
-                self.delegate?.deleteFeed()
+                self.delegate?.deleteFeed(postId: reactor.currentState.postId)
                 self.navigationController?.popViewController(animated: true)
             }.disposed(by: self.disposeBag)
         

@@ -70,7 +70,7 @@ final class PostView: UIView {
     lazy var likeButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.thumbUpOutline.image, for: .normal)
-        button.setImage(CommonAsset.thumbUpFilled.image, for: .selected)
+        button.setImage(CommonAsset.thumbupBlue.image, for: .selected)
         return button
     }()
     

@@ -116,6 +116,7 @@ public class FeedDetailReactor: Reactor{
         case .setPost(let model):
             newState.postModel = model
             newState.isLike = model.isLiked
+            newState.isBookmark = model.isBookmarked
         case .setComment(let models):
             newState.commentModels = models
         case .setLoading(let value):
