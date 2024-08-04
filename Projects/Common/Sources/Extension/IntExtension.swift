@@ -24,6 +24,12 @@ public extension Int{
         return meanPaceMin+meanPaceSec
     }
     
+    static func formatNumberWithComma(number: Int) -> String {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        return numberFormatter.string(from: NSNumber(value: number)) ?? ""
+    }
+    
     static func convertTimeToCalorie(time: Int) -> Int {
         return Int(((3.5 / 60) * 7 * 60 * Double(time) / 1000) * 5)
     }

@@ -9,4 +9,5 @@ import Foundation
 import RxSwift
 
 public protocol RecordRepositoryProtocol {
+    func fetchRecordData(type: RecordChartType, date: Date) -> Observable<RecordData>
 }

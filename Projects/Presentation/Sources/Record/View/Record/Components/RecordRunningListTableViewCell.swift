@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Common
+import Domain
 
 class RecordRunningListTableViewCell: UITableViewCell {
     
@@ -15,20 +16,20 @@ class RecordRunningListTableViewCell: UITableViewCell {
     
     static let identifier = "RecordRunningListTableViewCell"
     
-    private var containerView: UIView = {
+    private lazy var containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 24
         return view
     }()
     
-    private var mapView: UIView = {
+    private lazy var mapView: UIView = {
         let view = UIView()
         view.backgroundColor = .Neutrals500
         return view
     }()
     
-    private var titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .Subhead
         label.textColor = .black
@@ -36,7 +37,7 @@ class RecordRunningListTableViewCell: UITableViewCell {
         return label
     }()
     
-    private var descriptionLabel: UILabel = {
+    private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
         label.font = .CaptionRegular
         label.textColor = .black
@@ -44,11 +45,17 @@ class RecordRunningListTableViewCell: UITableViewCell {
         return label
     }()
     
-    private var locationLabel: UILabel = {
+    private lazy var locationLabel: UILabel = {
         let label = UILabel()
         label.font = .CaptionRegular
         label.textColor = .Secondary700
         label.text = "중구, 서울"
+        return label
+    }()
+
+    private lazy var difficultyLabel: DifficultyLabel = {
+        let label = DifficultyLabel()
+        label.font = .CaptionRegular
         return label
     }()
     
@@ -59,7 +66,7 @@ class RecordRunningListTableViewCell: UITableViewCell {
         return button
     }()
     
-    private var badgeImageView: UIImageView = {
+    private lazy var badgeImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = CommonAsset.badge.image
         return imageView
@@ -90,6 +97,7 @@ class RecordRunningListTableViewCell: UITableViewCell {
         containerView.addSubview(descriptionLabel)
         containerView.addSubview(locationLabel)
         containerView.addSubview(arrowButton)
+        containerView.addSubview(difficultyLabel)
         
         mapView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(2)
@@ -127,7 +135,12 @@ class RecordRunningListTableViewCell: UITableViewCell {
         descriptionLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(7)
             make.left.equalTo(mapView.snp.right).offset(16)
-            make.right.equalTo(arrowButton.snp.left)
+        }
+        
+        difficultyLabel.snp.makeConstraints { make in
+            make.top.equalTo(descriptionLabel.snp.top)
+            make.bottom.equalTo(descriptionLabel.snp.bottom)
+            make.left.equalTo(descriptionLabel.snp.right).offset(10)
         }
         
         locationLabel.snp.makeConstraints { make in
@@ -136,5 +149,16 @@ class RecordRunningListTableViewCell: UITableViewCell {
             make.bottom.equalToSuperview().offset(-16)
             make.right.equalTo(arrowButton.snp.left)
         }
+    }
+    
+    // MARK: - Helper
+    
+    func setData(data: RunningRecordData) {
+        self.titleLabel.text = "\(Date().formatChallengeTermToMd(dateString: data.createDate)) 러닝"
+        self.descriptionLabel.text = "\(data.distance)km · \(TimeUtil.convertSecToTimeFormat(sec: data.time))"
+        self.locationLabel.text = "\(data.locationName)"
+        
+        self.badgeImageView.isHidden = !data.status
+        self.difficultyLabel.setTitle(difficulty: FeedDetailDifficultyType.allCases.filter{$0.rawValue == data.difficulty}.first ?? .NORMAL)
     }
 }

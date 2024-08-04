@@ -7,20 +7,15 @@
 
 import UIKit
 import SnapKit
-
-enum RecordChartType {
-    case weekly
-    case monthly
-    case yearly
-}
+import Domain
 
 class RecordChartTypeView: UIView {
     
     //MARK: - Properties
     
-    private lazy var weeklyButton = RecordChartTypeButton(title: "주간")
-    private lazy var monthlyButton = RecordChartTypeButton(title: "월간")
-    private lazy var yearlyButton = RecordChartTypeButton(title: "연간")
+    lazy var weeklyButton = RecordChartTypeButton(title: "주간")
+    lazy var monthlyButton = RecordChartTypeButton(title: "월간")
+    lazy var yearlyButton = RecordChartTypeButton(title: "연간")
     
     private lazy var buttonStackView = {
         let stackView = UIStackView()

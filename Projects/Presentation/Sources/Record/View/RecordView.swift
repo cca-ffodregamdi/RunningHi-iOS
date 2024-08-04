@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Domain
 
 class RecordView: UIView {
     
@@ -25,7 +26,7 @@ class RecordView: UIView {
     }()
     
     lazy var chartTypeView = RecordChartTypeView()
-    lazy var chartView = RecordChartView()
+    lazy var chartArea = RecordChartView()
     var runningListView = RecordRunningListView()
     
     private lazy var recordStackView = {
@@ -33,10 +34,17 @@ class RecordView: UIView {
         stackView.axis = .vertical
         stackView.spacing = 24
         stackView.alignment = .fill
+        stackView.backgroundColor = .white
         stackView.addArrangedSubview(chartTypeView)
-        stackView.addArrangedSubview(chartView)
+        stackView.addArrangedSubview(chartArea)
         stackView.addArrangedSubview(runningListView)
         return stackView
+    }()
+    
+    private lazy var bottomBackgroundView = {
+        let view = UIView()
+        view.backgroundColor = .Secondary100
+        return view
     }()
     
     //MARK: - Lifecycle
@@ -56,8 +64,13 @@ class RecordView: UIView {
     //MARK: - Configure
     
     private func configureUI() {
-        addSubview(scrollView)
+        addSubview(bottomBackgroundView)
+        bottomBackgroundView.snp.makeConstraints { make in
+            make.height.equalTo(00)
+            make.left.right.bottom.equalToSuperview()
+        }
         
+        addSubview(scrollView)
         scrollView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -66,6 +79,20 @@ class RecordView: UIView {
             make.width.equalToSuperview()
             make.top.equalToSuperview().inset(16)
             make.bottom.equalToSuperview()
+        }
+        
+        bringSubviewToFront(scrollView)
+    }
+    
+    //MARK: - Helpers
+    
+    func setData(data: RecordData) {
+        self.chartArea.setData(data: data)
+        
+        self.runningListView.setNoneView(data.runningRecords.isEmpty)
+        
+        bottomBackgroundView.snp.updateConstraints { make in
+            make.height.equalTo(self.frame.size.height / 2)
         }
     }
 }

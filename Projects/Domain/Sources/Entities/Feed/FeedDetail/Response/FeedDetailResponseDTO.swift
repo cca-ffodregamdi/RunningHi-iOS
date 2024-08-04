@@ -85,7 +85,7 @@ public struct FeedDetailModel: Decodable, Equatable{
     
 }
 
-public enum FeedDetailDifficultyType: String, Decodable{
+public enum FeedDetailDifficultyType: String, Decodable, CaseIterable {
     case VERYEASY
     case EASY
     case NORMAL
