@@ -76,4 +76,9 @@ class RecordDataView: UIView {
     func setData(data: String) {
         dataLabel.text = data
     }
+    
+    func setHighlighted(_ isHighlited: Bool) {
+        dataLabel.textColor = isHighlited ? .white : .black
+        subTitleLabel.textColor = isHighlited ? .white : .Neutrals400
+    }
 }

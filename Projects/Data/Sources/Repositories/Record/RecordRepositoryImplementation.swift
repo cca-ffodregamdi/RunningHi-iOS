@@ -26,7 +26,16 @@ public class RecordRepositoryImplementation: RecordRepositoryProtocol {
             .filterSuccessfulStatusCodes()
             .map{ response -> RecordData in
                 let recordResponse = try JSONDecoder().decode(RecordResponseDTO.self, from: response.data)
-                return recordResponse.data.toEntity
+                var data = recordResponse.data.toEntity(chartType: type, date: date)
+                // TestCase
+//                if type == .weekly {
+//                    data.chartDatas = (0..<7).map { _ in Double.random(in: 0...5.0) }
+//                } else if type == .monthly {
+//                    data.chartDatas = (0..<31).map { _ in Double.random(in: 0...10.0) }
+//                } else {
+//                    data.chartDatas = (0..<12).map { _ in Double.random(in: 0...50.0) }
+//                }
+                return data
             }
             .asObservable()
             .catch{ error in

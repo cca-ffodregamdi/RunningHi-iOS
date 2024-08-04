@@ -13,7 +13,7 @@ class RecordChartRangeView: UIView {
     
     //MARK: - Properties
     
-    private lazy var leftButton: UIButton = {
+    lazy var leftButton: UIButton = {
         let button = UIButton()
         let image = CommonAsset.chevronLeft.image.withRenderingMode(.alwaysTemplate)
         button.setImage(image, for: .normal)
@@ -21,15 +21,16 @@ class RecordChartRangeView: UIView {
         return button
     }()
     
-    private lazy var rangeLabel: UILabel = {
-        let label = UILabel()
-        label.text = "-"
-        label.textAlignment = .center
-        label.font = .Body2Regular
-        return label
+    lazy var rangeButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("-", for: .normal)
+        button.titleLabel?.font = .Body2Regular
+        button.titleLabel?.textAlignment = .center
+        button.setTitleColor(.black, for: .normal)
+        return button
     }()
     
-    private lazy var rightButton: UIButton = {
+    lazy var rightButton: UIButton = {
         let button = UIButton()
         let image = CommonAsset.chevronRight.image.withRenderingMode(.alwaysTemplate)
         button.setImage(image, for: .normal)
@@ -40,10 +41,9 @@ class RecordChartRangeView: UIView {
     private lazy var rangeStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 17
-        stackView.distribution = .fillEqually
+        stackView.spacing = 10
         stackView.addArrangedSubview(leftButton)
-        stackView.addArrangedSubview(rangeLabel)
+        stackView.addArrangedSubview(rangeButton)
         stackView.addArrangedSubview(rightButton)
         return stackView
     }()
@@ -80,7 +80,6 @@ class RecordChartRangeView: UIView {
     //MARK: - Properties
     
     func setRange(range: String) {
-        rangeLabel.text = range
+        rangeButton.setTitle(range, for: .normal)
     }
 }
-

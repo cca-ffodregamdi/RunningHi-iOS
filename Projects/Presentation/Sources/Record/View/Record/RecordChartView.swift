@@ -55,27 +55,41 @@ class RecordChartView: UIView {
         stackView.addArrangedSubview(timeView)
         stackView.addArrangedSubview(paceView)
         stackView.addArrangedSubview(calorieView)
+        stackView.layoutMargins = .init(top: 10, left: 16, bottom: 10, right: 16)
+        stackView.isLayoutMarginsRelativeArrangement = true
         return stackView
     }()
     
-    private lazy var chartView: BarChartView = {
+    var chartViewRenderer: RecordBarChartRenderer?
+    
+    lazy var chartView: BarChartView = {
         let chartView = BarChartView()
-        chartView.doubleTapToZoomEnabled = false
-        chartView.legend.enabled = false
         
-        chartView.xAxis.drawGridLinesEnabled = false
-        chartView.xAxis.drawAxisLineEnabled = false
-        chartView.rightAxis.enabled = false
-        chartView.leftAxis.drawAxisLineEnabled = false
-        chartView.xAxis.labelPosition = .bottom
+        chartView.doubleTapToZoomEnabled = false // 더블탭 확대 비활성
+        chartView.scaleXEnabled = false // 좌우 확대 비활성
+        chartView.scaleYEnabled = false // 상하 확대 비활성
         
-        chartView.rightAxis.axisLineColor = .white
-        chartView.rightAxis.axisLineColor = .white
+        chartView.legend.enabled = false // 라벨링 hide
+        
+        chartView.xAxis.drawAxisLineEnabled = false // x축 값 그리드 선 없애기
+        chartView.leftAxis.drawAxisLineEnabled = false // y축 값 그리드 선 없애기
+        chartView.xAxis.drawGridLinesEnabled = false // 세로 그리드 선 없애기
+        chartView.leftAxis.drawGridLinesEnabled = false // 가로 그리드 선 없애기
+        
+        chartView.rightAxis.enabled = false // 오른쪽 y축 값 제거
+        chartView.xAxis.labelPosition = .bottom // x축 값 아래로 이동
+        
+        chartViewRenderer = RecordBarChartRenderer(dataProvider: chartView,
+                                                   animator: chartView.chartAnimator,
+                                                   viewPortHandler: chartView.viewPortHandler)
+        
+        // 차트 바 Custom
+        chartView.renderer = chartViewRenderer
         
         return chartView
     }()
     
-    private lazy var chartRangeView = RecordChartRangeView()
+    lazy var chartRangeView = RecordChartRangeView()
     
     //MARK: - Lifecycle
     
@@ -113,11 +127,11 @@ class RecordChartView: UIView {
         recordDataStackView.snp.makeConstraints { make in
             make.top.equalTo(distanceLabel.snp.bottom).offset(8)
             make.left.right.equalToSuperview().inset(RecordView.horizontalPadding)
-            make.height.equalTo(40)
+            make.height.equalTo(60)
         }
         
         chartView.snp.makeConstraints { make in
-            make.top.equalTo(recordDataStackView.snp.bottom).offset(8)
+            make.top.equalTo(recordDataStackView.snp.bottom).offset(-5)
             make.height.equalTo(170)
             make.left.right.equalToSuperview().inset(RecordView.horizontalPadding)
         }
@@ -132,31 +146,40 @@ class RecordChartView: UIView {
     //MARK: - Helpers
     
     func setData(data: RecordData) {
-        self.distanceLabel.text = "\(data.chartDatas.reduce(0,+))km"
+        self.distanceLabel.text = "\(String(format: "%.2f", data.chartDatas.reduce(0,+)))km"
         self.runningCountLabel.text = "/\(data.chartDatas.filter {$0 > 0.0}.count)번"
         
         self.timeView.setData(data: TimeUtil.convertSecToTimeFormat(sec: data.totalTime))
         self.paceView.setData(data: Int.convertMeanPaceToString(meanPace: data.meanPace))
         self.calorieView.setData(data: "\(Int.formatNumberWithComma(number: data.totalKcal))kcal")
         
-        //TODO: Chart 구현하기
+        self.setChartView(data: data)
         
-        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        var unitsSold = [20.0, 4.0, 6.0, 3.0, 12.0, 16.0, 4.0, 18.0, 2.0, 4.0, 5.0, 4.0]
+        self.chartRangeView.setRange(range: DateUtil.dateToChartRangeFormatByType(type: data.chartType.calendarType, date: data.date))
+    }
+    
+    func setChartView(data: RecordData) {
+        let weekXList = ["월", "화", "수", "목", "금", "토", "일"]
+        let dataXList = (0..<data.chartDatas.count).map { String($0+1) }
         
-        var dataEntries: [BarChartDataEntry] = []
-        for i in 0..<months.count {
-            let dataEntry = BarChartDataEntry(x: Double(i), y: Double(unitsSold[i]))
-            dataEntries.append(dataEntry)
+        if data.chartType != .monthly {
+            chartView.xAxis.setLabelCount(data.chartType == .weekly ? weekXList.count : dataXList.count, force: false)
+        } else {
+            chartView.xAxis.setLabelCount(10, force: true)
         }
-
-        let chartDataSet = BarChartDataSet(entries: dataEntries, label: "판매량")
-
-        // 차트 컬러
-        chartDataSet.colors = [.red]
-
-        // 데이터 삽입
-        let chartData = BarChartData(dataSet: chartDataSet)
-        chartView.data = chartData
+        
+        chartView.leftAxis.axisMinimum = 0
+        chartView.leftAxis.axisMaximum = data.chartDatas.filter({$0 > 0}).max() ?? 10
+        
+        chartView.highlightValue(x: 0, dataSetIndex: -1)
+        chartView.setBarChartData(xValues: data.chartType == .weekly ? weekXList : dataXList,
+                                  yValues: data.chartDatas, label: "")
+    }
+    
+    func highlightRunningRecordView(_ isHighlited: Bool) {
+        self.recordDataStackView.backgroundColor = isHighlited ? .Primary : .white
+        self.timeView.setHighlighted(isHighlited)
+        self.paceView.setHighlighted(isHighlited)
+        self.calorieView.setHighlighted(isHighlited)
     }
 }
