@@ -48,7 +48,7 @@ final public class RunningPopupViewController: UIViewController {
     //MARK: - Configure
     
     private func configureUI() {
-        self.view.backgroundColor = .black.withAlphaComponent(0.4)
+        self.view.backgroundColor = .black.withAlphaComponent(0.6)
         self.view.addSubview(runningPopupView)
         
         runningPopupView.snp.makeConstraints { make in
