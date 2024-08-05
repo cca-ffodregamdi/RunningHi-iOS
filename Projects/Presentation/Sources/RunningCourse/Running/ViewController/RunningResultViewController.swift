@@ -71,12 +71,15 @@ final public class RunningResultViewController: UIViewController {
         self.title = "러닝 기록"
         self.navigationController?.navigationBar.tintColor = .black
         
-        let backButton: UIButton = UIButton(type: .custom)
-        backButton.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
-        backButton.addTarget(self, action: #selector(customBackAction), for: .touchUpInside)
-
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        // Back Button 없애기로 의사결정됨
+        self.navigationItem.setHidesBackButton(true, animated: true)
+//        let backButton: UIButton = UIButton(type: .custom)
+//        backButton.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
+//        backButton.addTarget(self, action: #selector(customBackAction), for: .touchUpInside)
+//        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "삭제", style: .plain, target: self, action: #selector(deleteAction))
+        self.navigationItem.rightBarButtonItem?.tintColor = .Neutrals300
     }
     
     private func configureUI() {
