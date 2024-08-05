@@ -71,18 +71,19 @@ class AnnounceTableViewCell: UITableViewCell {
         self.addSubview(xmarkImageView)
         
         bellImageView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(16)
+            make.centerY.equalToSuperview()
             make.left.equalToSuperview().offset(20)
+            make.width.height.equalTo(24)
         }
         
         titleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(20)
-            make.left.equalTo(bellImageView.snp.right).offset(20)
+            make.left.equalTo(bellImageView.snp.right).offset(10)
         }
         
         dateLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(5)
-            make.left.equalToSuperview().offset(20)
+            make.left.equalTo(bellImageView.snp.right).offset(10)
             make.bottom.equalToSuperview().offset(-20)
         }
         
