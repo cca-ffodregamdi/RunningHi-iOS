@@ -66,4 +66,9 @@ class FeedDIContainer{
         let vc = SortFilterViewController(sortState: sortState)
         return vc
     }
+    
+    func showAnnounceViewController() -> AnnounceViewController{
+        let vc = AnnounceViewController(reactor: AnnounceReactor(announceUseCase: AnnounceUseCase(repository: AnnounceRepositoryImplementation())))
+        return vc
+    }
 }
