@@ -17,4 +17,5 @@ public protocol FeedCoordinatorInterface{
     func showFeedDetailByBookmarkedFeed(viewController: BookmarkedFeedViewController, postId: Int)
     func showDistanceFilter(viewController: FeedViewController, distanceState: DistanceFilter)
     func showSortFilter(viewController: FeedViewController, sortState: SortFilter)
+    func showAnnounce()
 }

@@ -29,7 +29,7 @@ final public class FeedViewController: UIViewController{
         return button
     }()
     
-    private lazy var notificationButton: UIButton = {
+    private lazy var announceButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bellOutline.image, for: .normal)
         return button
@@ -84,7 +84,7 @@ final public class FeedViewController: UIViewController{
     
     private func configureNavigationBarItem(){
         var barButtonItems: [UIBarButtonItem] = []
-        barButtonItems.append(UIBarButtonItem(customView: notificationButton))
+        barButtonItems.append(UIBarButtonItem(customView: announceButton))
         barButtonItems.append(UIBarButtonItem(customView: showBookMarkButton))
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
@@ -177,6 +177,13 @@ extension FeedViewController: View{
                 guard let self = self else { return }
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
                 self.coordinator?.showBookmarkedFeed()
+            }.disposed(by: self.disposeBag)
+        
+        announceButton.rx.tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showAnnounce()
             }.disposed(by: self.disposeBag)
         
         reactor.state.map{$0.sortState.title}

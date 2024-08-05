@@ -74,4 +74,9 @@ extension FeedCoordinator: FeedCoordinatorInterface{
         vc.sortFilterDelegate = viewController
         self.navigationController.present(vc, animated: true)
     }
+    
+    func showAnnounce() {
+        let vc = feedDIContainer.showAnnounceViewController()
+        self.navigationController.pushViewController(vc, animated: true)
+    }
 }
