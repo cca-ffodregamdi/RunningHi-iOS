@@ -55,9 +55,7 @@ final public class LoginViewController: UIViewController {
         self.view.addSubview(loginView)
         
         loginView.snp.makeConstraints { make in
-            make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
-            make.left.right.equalToSuperview()
-            make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
+            make.edges.equalToSuperview()
         }
     }
 }

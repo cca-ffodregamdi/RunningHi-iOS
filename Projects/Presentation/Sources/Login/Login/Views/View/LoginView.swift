@@ -11,15 +11,9 @@ import SnapKit
 
 class LoginView: UIView {
     
-    private lazy var logoImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "xmark")
-        return imageView
-    }()
-    
     private lazy var welcomeTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "간편하게 로그인하고, 다양한 서비스를 이용해보세요."
+        label.text = "러닝하이와 함께 뛰어볼까요?"
         label.numberOfLines = 0
         label.textAlignment = .center
         return label
@@ -28,19 +22,28 @@ class LoginView: UIView {
     private lazy var loginButtonStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 15
+        stackView.spacing = 10
+        stackView.alignment = .fill
+        stackView.distribution = .fillEqually
         return stackView
     }()
     
     lazy var kakaoLoginButton: UIButton = {
-        let button = UIButton()
-        button.setImage(CommonAsset.kakaoLoginButton.image, for: .normal)
+        var configure = UIButton.Configuration.plain()
+        configure.background.image = CommonAsset.kakaoLoginButton.image.withRenderingMode(.alwaysOriginal)
+        configure.background.imageContentMode = .scaleAspectFit
+        let button = UIButton(configuration: configure)
         return button
     }()
     
     lazy var appleLoginButton: UIButton = {
-        let button = UIButton()
-        button.setImage(CommonAsset.appleLoginButton.image, for: .normal)
+        var configure = UIButton.Configuration.plain()
+        configure.background.image = CommonAsset.appleLoginButton.image
+        configure.background.imageContentMode = .scaleAspectFill
+        let button = UIButton(configuration: configure)
+        button.contentHorizontalAlignment = .fill
+        button.contentVerticalAlignment = .fill
+        button.imageView?.contentMode = .scaleAspectFit
         return button
     }()
     
@@ -54,43 +57,36 @@ class LoginView: UIView {
     }
     
     func configureUI(){
-        self.backgroundColor = .systemBackground
+        self.backgroundColor = .colorWithRGB(r: 34, g: 101, b: 201, alpha: 0.3)
         
-        self.addSubview(logoImageView)
         self.addSubview(welcomeTextLabel)
         self.addSubview(loginButtonStackView)
+        
         [kakaoLoginButton, appleLoginButton].forEach{
             self.loginButtonStackView.addArrangedSubview($0)
         }
         
-        logoImageView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(60)
-            make.centerX.equalToSuperview()
-            make.width.equalTo(180)
-            make.height.equalTo(72)
-        }
-        
         welcomeTextLabel.snp.makeConstraints { make in
-            make.top.equalTo(logoImageView.snp.bottom).offset(60)
+            make.top.equalToSuperview().dividedBy(3.2)
             make.left.equalToSuperview().offset(40)
             make.right.equalToSuperview().offset(-40)
         }
         
         loginButtonStackView.snp.makeConstraints { make in
-            make.top.greaterThanOrEqualTo(welcomeTextLabel.snp.bottom).offset(50)
-            make.left.equalToSuperview().offset(20)
-            make.right.equalToSuperview().offset(-20)
-            make.bottom.equalToSuperview().offset(-40)
+            make.top.lessThanOrEqualTo(welcomeTextLabel.snp.bottom).offset(200)
+            make.left.equalToSuperview().offset(44)
+            make.right.equalToSuperview().offset(-44)
+            make.bottom.equalToSuperview().offset(-80)
         }
         
         kakaoLoginButton.snp.makeConstraints { make in
-            make.height.equalTo(45)
             make.width.equalToSuperview()
+            make.height.equalTo(44)
         }
         
         appleLoginButton.snp.makeConstraints { make in
-            make.height.equalTo(45)
             make.width.equalToSuperview()
+            make.height.equalTo(44)
         }
     }
 }

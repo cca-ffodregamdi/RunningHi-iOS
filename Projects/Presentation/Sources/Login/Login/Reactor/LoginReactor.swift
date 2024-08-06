@@ -64,8 +64,7 @@ final public class LoginReactor: Reactor{
                 loginUseCase.loginWithApple()
                     .flatMap { identityToken, authorizationCode -> Observable<(String, String)> in
                         self.loginUseCase.signWithApple(requestModel: SignWithApple(authorizationCode: authorizationCode, identityToken: identityToken))
-                    }.debug()
-                    .flatMap{ accessToken, refreshToken -> Observable<Mutation> in
+                    }.flatMap{ accessToken, refreshToken -> Observable<Mutation> in
                         return Observable.just(Mutation.signed(accessToken, refreshToken))
                     }.catchAndReturn(Mutation.setLoading(false)),
                 Observable.just(Mutation.setLoading(false))
