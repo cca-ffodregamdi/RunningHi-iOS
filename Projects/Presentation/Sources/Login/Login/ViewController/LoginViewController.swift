@@ -11,17 +11,12 @@ import ReactorKit
 import SnapKit
 import Domain
 
-public protocol LoginViewControllerDelegate: AnyObject{
-    func login()
-}
 
 final public class LoginViewController: UIViewController {
     
     // MARK: Properties
     
     public var disposeBag: DisposeBag = DisposeBag()
-    
-    weak var delegate: LoginViewControllerDelegate?
     
     public var coordinator: LoginCoordinatorInterface?
     
@@ -49,6 +44,10 @@ final public class LoginViewController: UIViewController {
         configureUI()
     }
     
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        reactor?.action.onNext(.resetSuccessed)
+    }
     
     func configureUI(){
         self.view.backgroundColor = .systemBackground
@@ -76,10 +75,11 @@ extension LoginViewController: View{
         reactor.state
             .map{$0.successed}
             .distinctUntilChanged()
-            .bind{ [weak self] isLogin in
-                if isLogin{
-                    self?.coordinator?.login()
-                }
+            .filter{$0}
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showAccess()
             }.disposed(by: self.disposeBag)
         
         reactor.state

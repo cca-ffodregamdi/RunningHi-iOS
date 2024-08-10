@@ -7,5 +7,7 @@
 
 import Foundation
 public protocol LoginCoordinatorInterface{
-    func login()
+    func successedSignIn()
+    func showAccess()
+    func showAccessDetail(index: Int)
 }

@@ -27,13 +27,23 @@ class LoginCoordinator: Coordinator{
     
     func start() {
         let vc = loginDiContainer.makeLoginViewController(coordinator: self)
-        navigationController.pushViewController(vc, animated: true)
+        self.navigationController.pushViewController(vc, animated: true)
     }
 }
 
 extension LoginCoordinator: LoginCoordinatorInterface{
-    func login(){
+    func successedSignIn(){
         self.delegate?.didLoggedIn(coordinator: self)
+    }
+    
+    func showAccess() {
+        let vc = loginDiContainer.makeAccessViewController(coordinator: self)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showAccessDetail(index: Int) {
+        let vc = loginDiContainer.makeAccessDetailViewController(coordinator: self, index: index)
+        self.navigationController.pushViewController(vc, animated: true)
     }
 }
 
