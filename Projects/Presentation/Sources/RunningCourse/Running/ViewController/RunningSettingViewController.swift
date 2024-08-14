@@ -18,8 +18,8 @@ final public class RunningSettingViewController: UIViewController {
     
     public var disposeBag = DisposeBag()
     
-    private lazy var runningView: UIView = {
-        return UIView()
+    private lazy var runningSettingView: RunningSettingView = {
+        return RunningSettingView()
     }()
     
     //MARK: - Lifecycle
@@ -39,22 +39,42 @@ final public class RunningSettingViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        configureNavigationBar()
         configureUI()
-        binding()
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.isNavigationBarHidden = false
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        self.navigationController?.isNavigationBarHidden = true
     }
     
     //MARK: - Configure
     
-    private func configureUI() {
-        self.view.backgroundColor = .BaseWhite
-        self.view.addSubview(runningView)
+    private func configureNavigationBar() {
+        self.title = "목표러닝"
+        self.navigationController?.navigationBar.tintColor = .black
         
-        runningView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        let backButton: UIButton = UIButton(type: .custom)
+        backButton.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
+        backButton.addTarget(self, action: #selector(customBackAction), for: .touchUpInside)
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+    }
+    
+    private func configureUI() {
+        self.view.backgroundColor = .white
+        self.view.addSubview(runningSettingView)
+        
+        runningSettingView.snp.makeConstraints { make in
+            make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
     
-    private func binding() {
-        
+    //MARK: - Helpers
+    
+    @objc func customBackAction() {
+        coordinator?.finishRunning()
     }
 }

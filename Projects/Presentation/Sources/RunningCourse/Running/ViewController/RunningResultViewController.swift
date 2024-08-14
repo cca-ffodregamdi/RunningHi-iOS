@@ -78,7 +78,7 @@ final public class RunningResultViewController: UIViewController {
 //        backButton.addTarget(self, action: #selector(customBackAction), for: .touchUpInside)
 //        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "삭제", style: .plain, target: self, action: #selector(deleteAction))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "삭제", style: .plain, target: self, action: #selector(customBackAction))
         self.navigationItem.rightBarButtonItem?.tintColor = .Neutrals300
     }
     
