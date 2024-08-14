@@ -21,12 +21,69 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
     private let service = MoyaProvider<LoginService>()
     private var appleLoginEmitter: AnyObserver<(String, String)>?
     
+    private lazy var locationService: LocationService = LocationService()
+    
+    public var authorizationStatus = PublishSubject<LocationAuthorizationStatus>()
+    public var currentUserLocation = PublishSubject<RouteInfo>()
+    
+    var disposeBag: DisposeBag = DisposeBag()
+    
     public override init() {
         super.init()
     }
     
     deinit{
         print("deinit LoginRepositoryImplementation")
+    }
+    
+    public func checkUserCurrentLocationAuthorization() {
+        self.locationService = LocationService()
+        self.locationService.observeUpdatedAuthorization()
+            .subscribe(onNext: { [weak self] status in
+                switch status {
+                case .notDetermined:
+                    self?.locationService.requestAuthorization()
+                case .authorizedAlways, .authorizedWhenInUse:
+                    self?.authorizationStatus.onNext(.allowed)
+                case .denied, .restricted:
+                    self?.authorizationStatus.onNext(.disallowed)
+                default:
+                    self?.authorizationStatus.onNext(.notDetermined)
+                }
+            })
+            .disposed(by: self.disposeBag)
+    }
+    
+    public func startRunning() {
+        locationService.start()
+        observeUserLocation()
+    }
+    
+    public func stopRunning() {
+        locationService.stop()
+        stopUpdatingLocation()
+    }
+    
+    private func observeUserLocation() {
+        self.locationService.observeUpdatedLocation()
+            .compactMap({ $0.last })
+            .subscribe(onNext: { [weak self] location in
+                let route = RouteInfo(coordinate: location.coordinate)
+                self?.currentUserLocation.onNext(route)
+            })
+            .disposed(by: self.disposeBag)
+    }
+    
+    private func stopUpdatingLocation() {
+        self.locationService.stop()
+    }
+    
+    public func setUserLocation(userLocationModel: UserLocation) -> Observable<Any> {
+        return service.rx.request(.setUserLocation(userLocationModel))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
     }
     
     public func loginWithKakao() -> Observable<OAuthToken>{
@@ -61,9 +118,6 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
             .map{ response in
                 let accessToken = response.response?.allHeaderFields["Authorization"] as! String
                 let refreshToken = response.response?.allHeaderFields["Refresh-Token"] as! String
-                print("[Request]")
-                print("accessToken : \(accessToken)")
-                print("refreshToken: \(refreshToken)")
                 return (accessToken, refreshToken)
             }.asObservable()
     }
@@ -74,12 +128,9 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
             .map{ response in
                 let accessToken = response.response?.allHeaderFields["Authorization"] as! String
                 let refreshToken = response.response?.allHeaderFields["Refresh-Token"] as! String
-                print("[Request]")
-                print("accessToken : \(accessToken)")
-                print("refreshToken: \(refreshToken)")
                 return (accessToken, refreshToken)
             }.asObservable()
-    }
+    } 
 }
 
 extension LoginRepositoryImplementation: ASAuthorizationControllerDelegate{

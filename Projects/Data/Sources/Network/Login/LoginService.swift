@@ -12,6 +12,7 @@ import Domain
 public enum LoginService{
     case signWithKakao(SignWithKakao)
     case signWithApple(SignWithApple)
+    case setUserLocation(UserLocation)
 }
 
 extension LoginService: TargetType{
@@ -19,10 +20,15 @@ extension LoginService: TargetType{
         return .init(string: "https://runninghi.store/api/v1")!
     }
     
+    public var accessToken: String{
+        return UserDefaults.standard.object(forKey: "accessToken") as! String
+    }
+    
     public var path: String{
         switch self{
         case .signWithKakao: "/login/kakao"
         case .signWithApple: "/login/apple"
+        case .setUserLocation:  "/member/geometry"
         }
     }
 
@@ -31,6 +37,8 @@ extension LoginService: TargetType{
         case .signWithKakao,
                 .signWithApple:
                 .post
+        case .setUserLocation:
+                .put
         }
     }
     
@@ -40,6 +48,8 @@ extension LoginService: TargetType{
                 .requestJSONEncodable(request)
         case .signWithApple(let request):
                 .requestJSONEncodable(request)
+        case .setUserLocation(let request):
+                .requestJSONEncodable(request)
         }
     }
     
@@ -47,7 +57,10 @@ extension LoginService: TargetType{
         switch self{
         case .signWithKakao,
                 .signWithApple:
-            ["Content-Type": "application/json"]
+            return ["Content-Type": "application/json"]
+        case .setUserLocation:
+            return ["Content-type": "application/json",
+                    "Authorization": accessToken]
         }
     }
 }

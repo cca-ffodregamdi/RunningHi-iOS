@@ -60,25 +60,67 @@ public final class AccessViewController: UIViewController {
     private func configureNavigationBar(){
         self.navigationController?.navigationBar.tintColor = .black
     }
+    
+    private func showRequestLocationServiceAlert() {
+        let requestLocationServiceAlert = UIAlertController(
+            title: "위치 정보 이용",
+            message: "위치 서비스를 사용할 수 없습니다.\n디바이스의 '설정 - 개인정보 보호'에서 위치 서비스를 켜주세요.",
+            preferredStyle: .alert
+        )
+        let goSetting = UIAlertAction(title: "설정으로 이동", style: .destructive) { _ in
+            
+            if let appSetting = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(appSetting)
+            }
+            
+            self.navigationController?.popViewController(animated: false)
+        }
+        let cancel = UIAlertAction(title: "취소", style: .default)
+        requestLocationServiceAlert.addAction(cancel)
+        requestLocationServiceAlert.addAction(goSetting)
+        
+        self.present(requestLocationServiceAlert, animated: true)
+    }
 }
 
 extension AccessViewController: View{
     public func bind(reactor: AccessReactor) {
+        
         reactor.state
             .map{$0.accessModel}
             .bind(to: accessView.accessTableView.rx.items(cellIdentifier: AccessTableViewCell.identifier, cellType: AccessTableViewCell.self)){ index, model, cell in
                 cell.configureModel(title: model)
                 
-                cell.checkButton.rx
-                    .tap
-                    .map{ Reactor.Action.checkRow(index) }
-                    .bind(to: reactor.action)
-                    .disposed(by: cell.disposeBag)
+                if index == 2{
+                    cell.checkButton.rx
+                        .tap
+                        .map{Reactor.Action.checkAuthorization}
+                        .bind(to: reactor.action)
+                        .disposed(by: cell.disposeBag)
+                }else{
+                    cell.checkButton.rx
+                        .tap
+                        .map{ Reactor.Action.checkRow(index) }
+                        .bind(to: reactor.action)
+                        .disposed(by: cell.disposeBag)
+                }
                 
                 reactor.state
                     .map{$0.checkArray[index]}
                     .bind(to: cell.checkButton.rx.isSelected)
                     .disposed(by: cell.disposeBag)
+            }.disposed(by: self.disposeBag)
+        
+        reactor.state
+            .map{$0.authorization}
+            .distinctUntilChanged()
+            .bind{ [weak self] status in
+                guard let self = self, let status = status else { return }
+                if status != .allowed {
+                    self.showRequestLocationServiceAlert()
+                }else{
+                    reactor.action.onNext(.readCurrentLocation)
+                }
             }.disposed(by: self.disposeBag)
         
         accessView.accessTableView.rx.itemSelected
