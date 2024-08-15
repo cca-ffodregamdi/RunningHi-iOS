@@ -14,6 +14,11 @@ public protocol LoginRepositoryProtocol{
     func signWithKakao(kakaoAccessToken: String) -> Observable<(String, String)>
     func signWithApple(requestModel: SignWithApple) -> Observable<(String, String)>
     func loginWithApple() -> Observable<(String, String)>
+    
+    func createKeyChain(key: KeyChainKeys, value: String)
+    func readKeyChain(key: KeyChainKeys) -> String?
+    func deleteKeyChain(key: KeyChainKeys)
+    
     func setUserLocation(userLocationModel: UserLocation) -> Observable<Any>
     var authorizationStatus: PublishSubject<LocationAuthorizationStatus> { get }
     var currentUserLocation: PublishSubject<RouteInfo> { get }

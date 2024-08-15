@@ -7,16 +7,11 @@
 
 import Foundation
 import Security
+import Domain
 
-public class KeyChain{
+public class KeyChainManager{
     
-    public enum Keys: String{
-        case kakaoLoginAccessTokenKey = "kakaoLoginAccessToken"
-        case appleLoginAuthorizationCodeKey = "appleLoginAuthorizationCode"
-        case appleLoginIdentityTokenKey = "appleLoginIdentityToken"
-    }
-    
-    public class func create(key: Keys, token: String){
+    public class func create(key: KeyChainKeys, token: String){
         let query: NSDictionary = [
             kSecClass : kSecClassGenericPassword,
             kSecAttrAccount : key.rawValue,
@@ -29,7 +24,7 @@ public class KeyChain{
         assert(status == noErr, "failed to save token")
     }
     
-    public class func read(key: Keys) -> String?{
+    public class func read(key: KeyChainKeys) -> String?{
         let query: NSDictionary = [
             kSecClass : kSecClassGenericPassword,
             kSecAttrAccount : key.rawValue,
@@ -51,7 +46,7 @@ public class KeyChain{
         }
     }
     
-    public class func delete(key: Keys){
+    public class func delete(key: KeyChainKeys){
         let query: NSDictionary = [
             kSecClass : kSecClassGenericPassword,
             kSecAttrAccount : key.rawValue

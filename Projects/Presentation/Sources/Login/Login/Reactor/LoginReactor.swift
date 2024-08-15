@@ -81,12 +81,12 @@ final public class LoginReactor: Reactor{
             state.successed = value
         case .successdKakaoLogin(let kakaoAccessToken):
             UserDefaultsManager.set(to: LoginType.kakao.rawValue, forKey: .loginTypeKey)
-            KeyChain.create(key: .kakaoLoginAccessTokenKey, token: kakaoAccessToken)
+            loginUseCase.createKeyChain(key: .kakaoLoginAccessTokenKey, value: kakaoAccessToken)
             state.successed = true
         case .successedAppleLogin(let identityToken, let authorizationCode):
             UserDefaultsManager.set(to: LoginType.apple.rawValue, forKey: .loginTypeKey)
-            KeyChain.create(key: .appleLoginIdentityTokenKey, token: identityToken)
-            KeyChain.create(key: .appleLoginAuthorizationCodeKey, token: authorizationCode)
+            loginUseCase.createKeyChain(key: .appleLoginIdentityTokenKey, value: identityToken)
+            loginUseCase.createKeyChain(key: .appleLoginAuthorizationCodeKey, value: authorizationCode)
             state.successed = true
         }
         return state

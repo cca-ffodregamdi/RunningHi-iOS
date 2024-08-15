@@ -55,5 +55,17 @@ final public class LoginUseCase: LoginUseCaseProtocol{
     public func setUserLocation(userLocationModel: UserLocation) -> Observable<Any> {
         return loginRepository.setUserLocation(userLocationModel: userLocationModel)
     }
+    
+    public func createKeyChain(key: KeyChainKeys, value: String) {
+        return loginRepository.createKeyChain(key: key, value: value)
+    }
+    
+    public func readKeyChain(key: KeyChainKeys) -> String? {
+        return loginRepository.readKeyChain(key: key)
+    }
+    
+    public func deleteKeyChain(key: KeyChainKeys) {
+        return loginRepository.deleteKeyChain(key: key)
+    }
 }
 

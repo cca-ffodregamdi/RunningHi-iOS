@@ -36,6 +36,18 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
         print("deinit LoginRepositoryImplementation")
     }
     
+    public func createKeyChain(key: KeyChainKeys, value: String) {
+        KeyChainManager.create(key: key, token: value)
+    }
+    
+    public func readKeyChain(key: KeyChainKeys) -> String? {
+        return KeyChainManager.read(key: key)
+    }
+    
+    public func deleteKeyChain(key: KeyChainKeys) {
+        KeyChainManager.delete(key: key)
+    }
+    
     public func checkUserCurrentLocationAuthorization() {
         self.locationService = LocationService()
         self.locationService.observeUpdatedAuthorization()
