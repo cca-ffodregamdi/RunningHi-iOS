@@ -28,22 +28,21 @@ class LoginView: UIView {
         return stackView
     }()
     
-    lazy var kakaoLoginButton: UIButton = {
-        var configure = UIButton.Configuration.plain()
-        configure.background.image = CommonAsset.kakaoLoginButton.image.withRenderingMode(.alwaysOriginal)
-        configure.background.imageContentMode = .scaleAspectFit
-        let button = UIButton(configuration: configure)
+    lazy var kakaoLoginButton: LoginButtonView = {
+        let button = LoginButtonView()
+        button.configureBackgroundColor(color: .colorWithRGB(r: 254, g: 229, b: 0))
+        button.configureImageView(image: CommonAsset.kakaoLogo.image)
+        button.setTitleLabelText(text: "카카오로 시작하기")
+        button.configureTitleLabel(textColor: .colorWithRGB(r: 0, g: 0, b: 0, alpha: 0.85), font: UIFont.systemFont(ofSize: 13, weight: .regular))
         return button
     }()
     
-    lazy var appleLoginButton: UIButton = {
-        var configure = UIButton.Configuration.plain()
-        configure.background.image = CommonAsset.appleLoginButton.image
-        configure.background.imageContentMode = .scaleAspectFill
-        let button = UIButton(configuration: configure)
-        button.contentHorizontalAlignment = .fill
-        button.contentVerticalAlignment = .fill
-        button.imageView?.contentMode = .scaleAspectFit
+    lazy var appleLoginButton: LoginButtonView = {
+        let button = LoginButtonView()
+        button.configureBackgroundColor(color: .black)
+        button.configureImageView(image: CommonAsset.appleLogo.image)
+        button.setTitleLabelText(text: "Apple로 시작하기")
+        button.configureTitleLabel(textColor: .white, font: UIFont.systemFont(ofSize: 13, weight: .regular))
         return button
     }()
     

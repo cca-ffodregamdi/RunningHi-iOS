@@ -62,13 +62,13 @@ final public class LoginViewController: UIViewController {
 
 extension LoginViewController: View{
     public func bind(reactor: LoginReactor){
-        loginView.kakaoLoginButton.rx.tap
-            .map{ Reactor.Action.kakaoLogin }
+        loginView.kakaoLoginButton.tapGesture.rx.event
+            .map{ _ in Reactor.Action.kakaoLogin }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
-        loginView.appleLoginButton.rx.tap
-            .map{ Reactor.Action.appleLogin }
+        loginView.appleLoginButton.tapGesture.rx.event
+            .map{ _ in Reactor.Action.appleLogin }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
