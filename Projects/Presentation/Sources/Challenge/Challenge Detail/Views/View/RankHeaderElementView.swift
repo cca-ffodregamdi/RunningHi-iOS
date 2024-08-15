@@ -94,7 +94,7 @@ class RankHeaderElementView: UIView {
     
     func configureModel(model: RankModel, challengeCategory: String){
         rankLabel.text = "\(model.rank)"
-        nickNameLabel.text = model.nickName
+        nickNameLabel.text = model.nickName == nil ? " " : model.nickName
         
         if challengeCategory == "SPEED"{
             recordLabel.text = Int.convertMeanPaceToString(meanPace: Int(model.record))
