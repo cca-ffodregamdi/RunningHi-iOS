@@ -10,6 +10,7 @@ import Moya
 import RxMoya
 import RxSwift
 import Domain
+import Data
 
 public class AuthManager{
     public static let shared = AuthManager()
@@ -18,7 +19,7 @@ public class AuthManager{
     
     public init(){
         let authPlugIn = AccessTokenPlugin { _ in
-            return UserDefaults.standard.object(forKey: "accessToken") as? String ?? ""
+            return KeyChainManager.read(key: .runningHiAccessTokenkey)!
         }
         service = MoyaProvider<AuthService>(plugins: [authPlugIn])
     }
@@ -48,7 +49,7 @@ public class AuthManager{
                 let refreshReponse = try JSONDecoder().decode(RefreshTokenValidationResponseDTO.self, from: response.data)
                 if refreshReponse.data == true{
                     let accessToken = response.response?.allHeaderFields["Authorization"] as? String
-                    UserDefaults.standard.setValue(accessToken, forKey: "accessToken")
+                    KeyChainManager.create(key: .runningHiAccessTokenkey, token: accessToken!)
                     return true
                 }else{
                     return false

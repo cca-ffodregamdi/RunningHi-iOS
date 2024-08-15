@@ -22,7 +22,7 @@ extension MyService: TargetType{
     }
     
     public var accessToken: String{
-        return UserDefaults.standard.object(forKey: "accessToken") as! String
+        return KeyChainManager.read(key: .runningHiAccessTokenkey)!
     }
     
     public var path: String{

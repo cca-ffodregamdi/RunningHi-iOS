@@ -91,8 +91,8 @@ public class AccessReactor: Reactor{
             newState.checkArray[0] = newState.checkAllState
             newState.checkArray[1] = newState.checkAllState
         case .signed(let accessToken, let refreshToken):
-            UserDefaults.standard.setValue(accessToken, forKey: "accessToken")
-            UserDefaults.standard.setValue(refreshToken, forKey: "refreshToken")
+            loginUseCase.createKeyChain(key: .runningHiAccessTokenkey, value: accessToken)
+            loginUseCase.createKeyChain(key: .runningHiRefreshTokenKey, value: refreshToken)
         case .setAuthorization(let status):
             newState.authorization = status
             if newState.authorization == .allowed {

@@ -7,6 +7,7 @@
 
 import Foundation
 import Moya
+import Data
 
 public enum AuthService{
     case isValidAccessToken
@@ -19,11 +20,11 @@ extension AuthService: TargetType{
     }
     
     public var accessToken: String{
-        return UserDefaults.standard.object(forKey: "accessToken") as? String ?? ""
+        return KeyChainManager.read(key: .runningHiAccessTokenkey) ?? ""
     }
     
     public var refreshToken: String{
-        return UserDefaults.standard.object(forKey: "refreshToken") as? String ?? ""
+        return KeyChainManager.read(key: .runningHiRefreshTokenKey) ?? ""
     }
     
     public var authorizationType: AuthorizationType{
