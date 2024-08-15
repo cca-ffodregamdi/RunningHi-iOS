@@ -11,17 +11,12 @@ import ReactorKit
 import SnapKit
 import Domain
 
-public protocol LoginViewControllerDelegate: AnyObject{
-    func login()
-}
 
 final public class LoginViewController: UIViewController {
     
     // MARK: Properties
     
     public var disposeBag: DisposeBag = DisposeBag()
-    
-    weak var delegate: LoginViewControllerDelegate?
     
     public var coordinator: LoginCoordinatorInterface?
     
@@ -49,15 +44,17 @@ final public class LoginViewController: UIViewController {
         configureUI()
     }
     
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        reactor?.action.onNext(.resetSuccessed)
+    }
     
     func configureUI(){
         self.view.backgroundColor = .systemBackground
         self.view.addSubview(loginView)
         
         loginView.snp.makeConstraints { make in
-            make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
-            make.left.right.equalToSuperview()
-            make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
+            make.edges.equalToSuperview()
         }
     }
 }
@@ -65,23 +62,24 @@ final public class LoginViewController: UIViewController {
 
 extension LoginViewController: View{
     public func bind(reactor: LoginReactor){
-        loginView.kakaoLoginButton.rx.tap
-            .map{ Reactor.Action.kakaoLogin }
+        loginView.kakaoLoginButton.tapGesture.rx.event
+            .map{ _ in Reactor.Action.kakaoLogin }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
-        loginView.appleLoginButton.rx.tap
-            .map{ Reactor.Action.appleLogin }
+        loginView.appleLoginButton.tapGesture.rx.event
+            .map{ _ in Reactor.Action.appleLogin }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
         reactor.state
             .map{$0.successed}
             .distinctUntilChanged()
-            .bind{ [weak self] isLogin in
-                if isLogin{
-                    self?.coordinator?.login()
-                }
+            .filter{$0}
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showAccess()
             }.disposed(by: self.disposeBag)
         
         reactor.state

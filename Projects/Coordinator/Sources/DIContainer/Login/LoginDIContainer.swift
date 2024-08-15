@@ -27,4 +27,15 @@ class LoginDIContainer{
         vc.coordinator = coordinator
         return vc
     }
+    
+    func makeAccessViewController(coordinator: LoginCoordinator) -> AccessViewController{
+        let vc = AccessViewController(reactor: AccessReactor(loginUseCase: loginUseCase))
+        vc.coordinator = coordinator
+        return vc
+    }
+    
+    func makeAccessDetailViewController(coordinator: LoginCoordinator, index: Int) -> AccessDetailViewController{
+        let vc = AccessDetailViewController(reactor: AccessDetailReactor(index: index))
+        return vc
+    }
 }
