@@ -6,17 +6,15 @@
 //
 
 import Foundation
+import Domain
+
 public class UserDefaultsManager{
     
-    public enum Keys: String{
-        case loginTypeKey = "loginType"
-    }
-    
-    public static func set<T>(to: T, forKey: Keys){
+    public static func set<T>(to: T, forKey: UserDefaultsKeys){
         UserDefaults.standard.setValue(to, forKey: forKey.rawValue)
     }
     
-    public static func get(forKey: Keys) -> Any?{
+    public static func get(forKey: UserDefaultsKeys) -> Any?{
         return UserDefaults.standard.object(forKey: forKey.rawValue)
     }
 }

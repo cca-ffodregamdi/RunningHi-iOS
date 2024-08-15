@@ -9,6 +9,7 @@ import Foundation
 import RxSwift
 import ReactorKit
 import Domain
+import Common
 
 public class AccessReactor: Reactor{
     public enum Action{
@@ -55,22 +56,22 @@ public class AccessReactor: Reactor{
                 loginUseCase.checkUserCurrentLocationAuthorization().map{Mutation.setAuthorization($0)}.observe(on: MainScheduler.asyncInstance)
             ])
         case .signIn:
-            if let loginTypeRawValue = UserDefaultsManager.get(forKey: .loginTypeKey) as? String{
-                if let loginType = LoginType(rawValue: loginTypeRawValue){
-                    switch loginType{
-                    case .apple:
-                        return Observable.concat([
-                            loginUseCase.signWithApple(requestModel: .init(authorizationCode: loginUseCase.readKeyChain(key: .appleLoginAuthorizationCodeKey) ?? "", identityToken: loginUseCase.readKeyChain(key: .appleLoginIdentityTokenKey) ?? "")).map{ Mutation.signed($0, $1)}.observe(on: MainScheduler.asyncInstance),
-                            loginUseCase.setUserLocation(userLocationModel: UserLocation(latitude: currentState.currentLocation!.latitude, longitude: currentState.currentLocation!.latitude)).map{ _ in Mutation.successedUploadUserLocation}
-                        ])
-                    case .kakao:
-                        return Observable.concat([
-                            loginUseCase.signWithKakao(kakaoAccessToken: loginUseCase.readKeyChain(key: .kakaoLoginAccessTokenKey) ?? "").map{ Mutation.signed($0, $1) }.observe(on: MainScheduler.asyncInstance),
-                            loginUseCase.setUserLocation(userLocationModel: UserLocation(latitude: currentState.currentLocation!.latitude, longitude: currentState.currentLocation!.latitude)).map{ _ in Mutation.successedUploadUserLocation}
-                        ])
-                    }
+            if let loginType = LoginType(rawValue: 
+                                            UserDefaultsManager.get(forKey: .loginTypeKey) as! String){
+                switch loginType{
+                case .apple:
+                    return Observable.concat([
+                        loginUseCase.signWithApple(requestModel: .init(authorizationCode: loginUseCase.readKeyChain(key: .appleLoginAuthorizationCodeKey) ?? "", identityToken: loginUseCase.readKeyChain(key: .appleLoginIdentityTokenKey) ?? "")).map{ Mutation.signed($0, $1)}.observe(on: MainScheduler.asyncInstance),
+                        loginUseCase.setUserLocation(userLocationModel: UserLocation(latitude: currentState.currentLocation!.latitude, longitude: currentState.currentLocation!.latitude)).map{ _ in Mutation.successedUploadUserLocation}
+                    ])
+                case .kakao:
+                    return Observable.concat([
+                        loginUseCase.signWithKakao(kakaoAccessToken: loginUseCase.readKeyChain(key: .kakaoLoginAccessTokenKey) ?? "").map{ Mutation.signed($0, $1) }.observe(on: MainScheduler.asyncInstance),
+                        loginUseCase.setUserLocation(userLocationModel: UserLocation(latitude: currentState.currentLocation!.latitude, longitude: currentState.currentLocation!.latitude)).map{ _ in Mutation.successedUploadUserLocation}
+                    ])
                 }
             }
+            
             return Observable.empty()
         case .checkAuthorization:
             return loginUseCase.checkUserCurrentLocationAuthorization().map{Mutation.setAuthorization($0)}.observe(on: MainScheduler.asyncInstance)
