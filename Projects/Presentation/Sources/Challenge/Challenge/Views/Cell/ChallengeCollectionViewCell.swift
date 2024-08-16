@@ -1,19 +1,22 @@
 //
-//  ChallengeTableViewCell.swift
+//  ChallengeCollectionViewCell.swift
 //  Presentation
 //
-//  Created by 유현진 on 5/28/24.
+//  Created by 유현진 on 8/15/24.
 //
 
 import UIKit
-import SnapKit
 import Common
+import SnapKit
 import Domain
 
-class ChallengeTableViewCell: UITableViewCell {
-
+class ChallengeCollectionViewCell: UICollectionViewCell {
+    
+    static let identifier: String = "challengeCell"
+    
     private lazy var challengeThumbnailImageView: UIImageView = {
         let imageView = UIImageView()
+        imageView.clipsToBounds = true
         imageView.image = UIImage(systemName: "xmark")
         return imageView
     }()
@@ -21,7 +24,8 @@ class ChallengeTableViewCell: UITableViewCell {
     private lazy var challengeTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "챌린지 제목"
-        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        label.font = .Subhead
+        label.textColor = .black
         return label
     }()
     
@@ -43,7 +47,8 @@ class ChallengeTableViewCell: UITableViewCell {
     private lazy var paricipatedMemberCountLabel: UILabel = {
         let label = UILabel()
         label.text = "0"
-        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        label.font = .CaptionRegular
+        label.textColor = .black
         return label
     }()
     
@@ -56,12 +61,13 @@ class ChallengeTableViewCell: UITableViewCell {
     private lazy var remainingDateLabel: UILabel = {
         let label = UILabel()
         label.text = "0"
-        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        label.font = .CaptionRegular
+        label.textColor = .black
         return label
     }()
-            
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    
+    override init(frame: CGRect) {
+        super.init(frame: .zero)
         configureUI()
     }
     
@@ -70,7 +76,9 @@ class ChallengeTableViewCell: UITableViewCell {
     }
     
     private func configureUI(){
-        self.selectionStyle = .none
+        self.backgroundColor = .white
+        self.clipsToBounds = true
+        self.layer.cornerRadius = 24
         
         self.addSubview(challengeThumbnailImageView)
         self.addSubview(challengeTitleLabel)
@@ -81,9 +89,8 @@ class ChallengeTableViewCell: UITableViewCell {
         
         challengeThumbnailImageView.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(20)
-            make.top.equalToSuperview().offset(10)
-            make.bottom.equalToSuperview().offset(-10)
-            make.width.equalTo(self.challengeThumbnailImageView.snp.height)
+            make.centerY.equalToSuperview()
+            make.width.height.equalTo(64)
         }
         
         challengeTitleLabel.snp.makeConstraints { make in
@@ -117,5 +124,11 @@ class ChallengeTableViewCell: UITableViewCell {
         challengeTitleLabel.text = ""
         paricipatedMemberCountLabel.text = ""
         remainingDateLabel.text = ""
+    }
+    
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        challengeThumbnailImageView.layer.cornerRadius = challengeThumbnailImageView.frame.height / 2
     }
 }

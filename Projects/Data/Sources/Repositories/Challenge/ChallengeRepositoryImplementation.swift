@@ -22,7 +22,7 @@ public final class ChallengeRepositoryImplementation: ChallengeRepositoryProtoco
             .filterSuccessfulStatusCodes()
             .map{ response -> [ChallengeModel] in
                 let challengeResponse = try JSONDecoder().decode(ChallengeResponseDTO.self, from: response.data)
-                return challengeResponse.data
+                return challengeResponse.data.challengeList
             }.asObservable()
             .catch{ error in
                 print("ChallengeRepositoryImplementation fetchChallenge decoding error: \(error)")
@@ -36,7 +36,7 @@ public final class ChallengeRepositoryImplementation: ChallengeRepositoryProtoco
             .filterSuccessfulStatusCodes()
             .map{ response -> [MyChallengeModel] in
                 let myChallengeResponse = try JSONDecoder().decode(MyChallengeResponseDTO.self, from: response.data)
-                return myChallengeResponse.data
+                return myChallengeResponse.data.myChallengeList
             }.asObservable()
             .catch{ error in
                 print("ChallengeRepositoryImplementation fetchMyChallenge decoding error: \(error)")

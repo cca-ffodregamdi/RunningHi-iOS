@@ -20,11 +20,7 @@ final public class ChallengeViewController: UIViewController{
     public var disposeBag: DisposeBag = DisposeBag()
     public var coordinator: ChallengeCoordinatorInterface?
     
-    private var dataSource: RxTableViewSectionedReloadDataSource<ChallengeSectionModel>!
-    
-    private lazy var challengeHeaderView: ChallengeHeaderView = {
-        return ChallengeHeaderView()
-    }()
+    private var dataSource: RxCollectionViewSectionedReloadDataSource<ChallengeSectionModel>!
     
     private lazy var notificationButton: UIButton = {
         let button = UIButton()
@@ -32,23 +28,8 @@ final public class ChallengeViewController: UIViewController{
         return button
     }()
     
-    private lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.showsHorizontalScrollIndicator = false
-        scrollView.alwaysBounceVertical = true
-        return scrollView
-    }()
-    
-    private lazy var challengeTableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .plain)
-        tableView.separatorStyle = .none
-        tableView.isScrollEnabled = false
-        tableView.rowHeight = 84
-        tableView.sectionHeaderTopPadding = 0
-        tableView.sectionHeaderHeight = tableView.estimatedSectionHeaderHeight
-        tableView.register(ChallengeTableViewCell.self, forCellReuseIdentifier: "challengeCell")
-        tableView.register(ChallengeHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: "challengeHeaderView")
-        return tableView
+    private lazy var challengeView: ChallengeView = {
+        return ChallengeView()
     }()
     
     // MARK: LifeCyecle
@@ -81,28 +62,13 @@ final public class ChallengeViewController: UIViewController{
     }
     
     private func configureUI(){
-        self.view.backgroundColor = UIColor.colorWithRGB(r: 231, g: 235, b: 239)
-        self.view.addSubview(scrollView)
+        self.view.backgroundColor = .Secondary100
+        self.view.addSubview(challengeView)
         
-        [challengeHeaderView, challengeTableView].forEach{
-            self.scrollView.addSubview($0)
-        }
-        
-        scrollView.snp.makeConstraints { make in
+        challengeView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
             make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
             make.left.right.equalToSuperview()
-        }
-        
-        challengeHeaderView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.left.right.equalToSuperview()
-            make.width.equalToSuperview()
-        }
-        
-        challengeTableView.snp.makeConstraints { make in
-            make.top.equalTo(challengeHeaderView.snp.bottom)
-            make.left.right.width.bottom.equalToSuperview()
         }
     }
 }
@@ -113,8 +79,9 @@ extension ChallengeViewController: View{
         reactor.action.onNext(.fetchChallenge)
         reactor.action.onNext(.fetchMyChallenge)
         
-        self.dataSource = RxTableViewSectionedReloadDataSource<ChallengeSectionModel>(configureCell:{ dataSource, tableView, indexPath, item in
-            let cell = tableView.dequeueReusableCell(withIdentifier: "challengeCell", for: indexPath) as! ChallengeTableViewCell
+        self.dataSource = RxCollectionViewSectionedReloadDataSource<ChallengeSectionModel>(configureCell:{ dataSource, collectionView, indexPath, item in
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChallengeCollectionViewCell.identifier, for: indexPath) as! ChallengeCollectionViewCell
+            
             switch item{
             case .participating(let myChallengeModel):
                 cell.configureWithMyChallengeModel(model: myChallengeModel)
@@ -122,16 +89,20 @@ extension ChallengeViewController: View{
                 cell.configureModel(model: challgensModel)
             }
             return cell
+        }, configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
+            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ChallengeCollectionReusableView.identifier, for: indexPath) as! ChallengeCollectionReusableView
+            header.configureModel(title: dataSource[indexPath.section].header, count: dataSource[indexPath.section].items.count)
+            return header
         })
         
         reactor.state.map{$0.section}
-            .bind(to: challengeTableView.rx.items(dataSource: self.dataSource))
+            .bind(to: challengeView.challengeCollectionView.rx.items(dataSource: self.dataSource))
             .disposed(by: self.disposeBag)
         
-        self.challengeTableView.rx.setDelegate(self)
+        challengeView.challengeCollectionView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
         
-        self.challengeTableView.rx.modelSelected(ChallengeItem.self)
+        challengeView.challengeCollectionView.rx.modelSelected(ChallengeItem.self)
             .bind{ [weak self] item in
                 guard let self = self else {return}
                 var challengeId: Int
@@ -145,30 +116,26 @@ extension ChallengeViewController: View{
                     self.coordinator?.showChallengeDetailView(viewController: self, challengeId: challengeId, isParticipated: false)
                 }
             }.disposed(by: self.disposeBag)
-        
-        challengeTableView.rx.observe(CGSize.self, "contentSize")
-            .bind{ [weak self] size in
-                guard let size = size, let self = self else {return}
-                self.challengeTableView.snp.updateConstraints({ make in
-                    make.height.equalTo(size.height)
-                })
-            }.disposed(by: self.disposeBag)
-    }
-    
-   
-}
-extension ChallengeViewController: UITableViewDelegate{
-    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "challengeHeaderView") as! ChallengeHeaderFooterView
-        headerView.configureModel(title: dataSource[section].header)
-        return headerView
-    }
-    
-    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 50
     }
 }
 
+extension ChallengeViewController: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout{
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: collectionView.frame.width - 40, height: 96)
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 16
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 16
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: 60)
+    }
+}
 
 extension ChallengeViewController: ChallengeDetailViewControllerDelegate{
     public func joined() {

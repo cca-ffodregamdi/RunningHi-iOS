@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import Data
 
 public class AppCoordinator: Coordinator{
     
@@ -23,7 +24,7 @@ public class AppCoordinator: Coordinator{
     public func start() {
         AuthManager.shared.isValidAccessToken()
             .bind{ bool in
-                print(UserDefaults.standard.object(forKey: "accessToken"))
+                print(KeyChainManager.read(key: .runningHiAccessTokenkey))
                 if bool{
                     self.showBaseTabBarController()
                 }else{

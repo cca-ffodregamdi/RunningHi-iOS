@@ -30,7 +30,7 @@ public class ChallengeReactor: Reactor{
             
             let myChallengeSection = ChallengeSectionModel(header: "참여 중인 챌린지", items: myChallengeItems)
             let challengeSection = ChallengeSectionModel(header: "진행 중인 챌린지", items: challengeItems)
-            
+    
             return [myChallengeSection, challengeSection]
         }
     }

@@ -1,18 +1,11 @@
 //
-//  MyChallengeResponseDTO.swift
+//  MyChallengeModel.swift
 //  Domain
 //
-//  Created by 유현진 on 7/4/24.
+//  Created by 유현진 on 8/15/24.
 //
 
 import Foundation
-
-public struct MyChallengeResponseDTO: Decodable{
-    let timeStamp: String
-    let status: String
-    let message: String
-    public let data: [MyChallengeModel]
-}
 
 public struct MyChallengeModel: Decodable{
     public let myChallengeId: Int
