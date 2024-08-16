@@ -19,8 +19,8 @@ class RunningDIContainer{
         return RunningUseCase(repository: runningRepository)
     }()
     
-    func makeRunningViewController(coordinator: RunningCoordinator) -> RunningViewController{
-        let vc = RunningViewController(reactor: RunningReactor(runningUseCase: runningUseCase))
+    func makeRunningViewController(coordinator: RunningCoordinator, settingType: RunningSettingType?, value: Int = 0) -> RunningViewController{
+        let vc = RunningViewController(reactor: RunningReactor(runningUseCase: runningUseCase), settingType: settingType, value: value)
         vc.coordinator = coordinator
         return vc
     }

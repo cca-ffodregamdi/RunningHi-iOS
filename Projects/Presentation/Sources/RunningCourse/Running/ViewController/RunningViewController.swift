@@ -20,6 +20,9 @@ final public class RunningViewController: UIViewController {
     private var runningResult = RunningResult()
     private var beforeLocation: RouteInfo?
     
+    private var settingType: RunningSettingType?
+    private var settingValue: Int = 0
+    
     public var disposeBag = DisposeBag()
     
     private lazy var runningView: RunningView = {
@@ -32,9 +35,11 @@ final public class RunningViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public init(reactor: RunningReactor){
+    public init(reactor: RunningReactor, settingType: RunningSettingType?, value: Int = 0){
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
+        self.settingType = settingType
+        self.settingValue = value
     }
     
     deinit {
@@ -144,6 +149,10 @@ extension RunningViewController: View {
                 let calorie = Int.convertTimeToCalorie(time: time)
                 self.runningResult.calorie = calorie
                 self.runningView.runningRecordView.setRunningData(time: time, calorie: calorie)
+                
+                if settingType == .time && settingValue != 0 {
+                    runningView.runningRecordView.setProgress(min(1.0, Float(time) / Float(settingValue)))
+                }
             }.disposed(by: self.disposeBag)
         
         // 러닝 위치 변경 감지
@@ -172,6 +181,10 @@ extension RunningViewController: View {
                 let pace: Int = (distance == 0.0) ? 0 : Int.convertTimeAndDistanceToPace(time: runningTime, distance: distance)
                 self.runningResult.averagePace = pace
                 self.runningView.runningRecordView.setRunningData(distance: distance, pace: pace)
+                
+                if settingType == .distance && settingValue != 0 {
+                    runningView.runningRecordView.setProgress(min(1.0, Float(distance) / Float(settingValue)))
+                }
             }.disposed(by: self.disposeBag)
     }
     
