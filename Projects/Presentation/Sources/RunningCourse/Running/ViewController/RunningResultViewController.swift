@@ -167,7 +167,6 @@ extension RunningResultViewController: View {
             .skip(1)
             .bind{ [weak self] level in
                 guard let self = self else { return }
-                print("isSaveCompleted -> finish")
                 coordinator?.finishRunning()
             }.disposed(by: self.disposeBag)
     }

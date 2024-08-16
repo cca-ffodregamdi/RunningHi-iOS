@@ -17,9 +17,7 @@ class RunningSettingButton: UIButton {
         super.init(frame: .zero)
         
         setTitle(title, for: .normal)
-        setTitleColor(isActive ? .white : .Neutrals300, for: .normal)
         titleLabel?.font = .Body1Regular
-        backgroundColor = isActive ? .Primary : .Neutrals100
         
         layer.cornerRadius = 20
         
@@ -27,5 +25,14 @@ class RunningSettingButton: UIButton {
             make.height.equalTo(40)
             make.width.equalTo(85)
         }
+        
+        setActive(isActive)
+    }
+    
+    //MARK: - Helpers
+    
+    func setActive(_ isActive: Bool) {
+        setTitleColor(isActive ? .white : .Neutrals300, for: .normal)
+        backgroundColor = isActive ? .Primary : .Neutrals100
     }
 }

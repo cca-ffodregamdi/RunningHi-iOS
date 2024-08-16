@@ -30,7 +30,7 @@ class RunningCoordinator: Coordinator {
     
     func start() {
         if isFreeCourse {
-            let vc = runningDIContainer.makeRunningViewController(coordinator: self)
+            let vc = runningDIContainer.makeRunningViewController(coordinator: self, settingType: nil)
             self.navigationController.pushViewController(vc, animated: true)
         } else {
             let vc = runningDIContainer.makeRunningSettingViewController(coordinator: self)
@@ -40,6 +40,11 @@ class RunningCoordinator: Coordinator {
 }
 
 extension RunningCoordinator: RunningCoordinatorInterface {
+    func startRunning(settingType: RunningSettingType, value: Int) {
+        let vc = runningDIContainer.makeRunningViewController(coordinator: self, settingType: settingType, value: value)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
     func showRunningResult(runningResult: RunningResult) {
         let vc = runningDIContainer.makeRunningResultViewController(coordinator: self, runningResult: runningResult)
         self.navigationController.pushViewController(vc, animated: true)

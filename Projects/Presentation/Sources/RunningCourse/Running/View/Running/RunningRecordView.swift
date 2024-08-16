@@ -48,6 +48,16 @@ class RunningRecordView: UIView {
         return stackView
     }()
     
+    var progressView: UIProgressView = {
+        let progressView = UIProgressView(progressViewStyle: .default)
+        progressView.progress = 0.0
+        progressView.trackTintColor = .Primary100
+        progressView.progressTintColor = .Primary
+        progressView.layer.cornerRadius = 5
+        progressView.clipsToBounds = true
+        return progressView
+    }()
+    
     var pauseButton = RunningRecordButton(frame: .zero, image: CommonAsset.pauseLBlue.image.resized(to: .init(width: 88, height: 88)))
     var playButton = RunningRecordButton(frame: .zero, image: CommonAsset.playSBlue.image.resized(to: .init(width: 72, height: 72)))
     var stopButton = RunningRecordButton(frame: .zero, image: CommonAsset.stopSBlack.image.resized(to: .init(width: 72, height: 72)))
@@ -89,6 +99,8 @@ class RunningRecordView: UIView {
         currentDistanceStackView.addArrangedSubview(distanceLabel)
         currentDistanceStackView.addArrangedSubview(unitLabel)
         
+        addSubview(progressView)
+        
         addSubview(pauseButton)
         
         addSubview(runningButtonStackView)
@@ -107,6 +119,12 @@ class RunningRecordView: UIView {
         currentDistanceStackView.snp.makeConstraints { make in
             make.top.equalTo(recordInfoStackView.snp.bottom).offset(100)
             make.left.right.equalToSuperview()
+        }
+        
+        progressView.snp.makeConstraints { make in
+            make.top.equalTo(currentDistanceStackView.snp.bottom).offset(24)
+            make.left.right.equalToSuperview().inset(70)
+            make.height.equalTo(10)
         }
         
         pauseButton.snp.makeConstraints { make in
@@ -137,5 +155,9 @@ class RunningRecordView: UIView {
     func toggleRunningState(isRunning: Bool) {
         pauseButton.isHidden = !isRunning
         runningButtonStackView.isHidden = isRunning
+    }
+    
+    func setProgress(_ value: Float) {
+        progressView.setProgress(value, animated: false)
     }
 }
