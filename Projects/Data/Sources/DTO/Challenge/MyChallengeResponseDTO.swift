@@ -6,12 +6,13 @@
 //
 
 import Foundation
+import Domain
 
 public struct MyChallengeResponseDTO: Decodable{
     let timeStamp: String
     let status: String
     let message: String
-    public let data: MyChallengeModelDTO
+    let data: MyChallengeModelDTO
 }
 
 public struct MyChallengeModelDTO: Decodable{
