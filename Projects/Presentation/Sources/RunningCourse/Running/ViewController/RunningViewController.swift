@@ -10,6 +10,7 @@ import RxSwift
 import ReactorKit
 import RxRelay
 import Domain
+import CoreLocation
 
 final public class RunningViewController: UIViewController {
     
@@ -186,6 +187,28 @@ extension RunningViewController: View {
                 
                 if settingType == .distance && settingValue != 0 {
                     runningView.runningRecordView.setProgress(min(1.0, Float(distance) / Float(settingValue)))
+                }
+            }.disposed(by: self.disposeBag)
+        
+        reactor.state
+            .compactMap{$0.currentLocation}
+            .take(1)
+            .bind{ [weak self] location in
+                guard let self = self else { return }
+                
+                // 시작점 위치로 지역 저장하기
+                let startLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
+                let geocoder = CLGeocoder()
+                geocoder.reverseGeocodeLocation(startLocation) { (placemarks, error) in
+                    if let _ = error {
+                        return
+                    }
+                    
+                    if let placemark = placemarks?.first {
+                        let locality = placemark.locality // ex 서울특별시
+                        let subLocality = placemark.subLocality // ex 구로동
+                        self.runningResult.location = subLocality ?? (locality ?? "")
+                    }
                 }
             }.disposed(by: self.disposeBag)
     }

@@ -52,16 +52,28 @@ public class RunningRepositoryImplementation: RunningRepositoryProtocol {
     }
     
     public func saveRunningResult(runningResult: RunningResult) -> Observable<Any> {
-//        let runningResultDTO = RunningResultDTO.fromEntity(runningResult)
-//        return networkService.rx.request(.saveRunningResult(data: runningResultDTO))
-//            .filterSuccessfulStatusCodes()
-//            .map{ _ in
-//                return Observable.just(())
-//            }.asObservable()
-//            .catch{ error in
-//                return Observable.error(error)
-//            }
-        return Observable.just(())
+        let runningResultDTO = RunningResultDTO.fromEntity(data: runningResult)
+        
+        var request_data = ""
+        do {
+            let jsonData = try JSONEncoder().encode(runningResultDTO)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                request_data = jsonString
+                print(jsonString)
+            }
+        } catch {
+            return Observable.error(error)
+        }
+        
+        return networkService.rx.request(.saveRunningResult(data: request_data))
+            .filterSuccessfulStatusCodes()
+            .map{ response in
+                return Observable.just(())
+            }.asObservable()
+            .catch{ error in
+                print(error)
+                return Observable.error(error)
+            }
     }
     
     //MARK: - Helpers

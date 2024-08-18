@@ -75,7 +75,9 @@ final public class RecordDetailViewController: UIViewController {
         backButton.addTarget(self, action: #selector(customBackAction), for: .touchUpInside)
 
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "삭제", style: .plain, target: self, action: #selector(deleteAction))
+        self.navigationItem.rightBarButtonItem?.tintColor = .Neutrals300
     }
     
     private func configureUI() {
@@ -100,7 +102,7 @@ final public class RecordDetailViewController: UIViewController {
             preferredStyle: .alert
         )
         let confirm = UIAlertAction(title: "삭제", style: .destructive) { _ in
-            self.navigationController?.popViewController(animated: true)
+//            self.navigationController?.popViewController(animated: true)
         }
         let cancel = UIAlertAction(title: "아니오", style: .default)
         requestLocationServiceAlert.addAction(cancel)
