@@ -7,6 +7,7 @@
 
 import UIKit
 import Presentation
+import Domain
 
 class RecordCoordinator: Coordinator {
     
@@ -28,8 +29,8 @@ class RecordCoordinator: Coordinator {
 }
 
 extension RecordCoordinator: RecordCoordinatorInterface {
-    func showRecordDetail() {
-        let vc = recordDIContainer.makeRecordDetailViewController(coordinator: self)
+    func showRecordDetail(postNo: Int) {
+        let vc = recordDIContainer.makeRecordDetailViewController(coordinator: self, postNo: postNo)
         self.navigationController.pushViewController(vc, animated: true)
     }
 }

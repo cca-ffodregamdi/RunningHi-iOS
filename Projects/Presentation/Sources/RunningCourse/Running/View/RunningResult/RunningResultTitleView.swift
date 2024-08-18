@@ -68,8 +68,8 @@ class RunningResultTitleView: UIView {
     
     //MARK: - Helpers
     
-    func setData(startTime: Date, endTime: Date) {
-        runningNameLabel.text = startTime.convertDateToFormat(format: "M월 d일 러닝")
+    func setData(startTime: Date, endTime: Date, location: String) {
+        runningNameLabel.text = startTime.convertDateToFormat(format: "M월 d일 ") + location + " 러닝"
         runningDateLabel.text = startTime.convertDateToFormat(format: "yyyy년 M월 d일 HH:mm") + "~ " + endTime.convertDateToFormat(format: "HH:mm")
     }
 }

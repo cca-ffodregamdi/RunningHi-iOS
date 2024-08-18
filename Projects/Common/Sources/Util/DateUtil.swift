@@ -35,6 +35,20 @@ public struct DateUtil {
         return "알 수 없음"
     }
     
+    // 서버 형식의 dateString을 date로 변환한다.
+    public static func formatDateStringToDate(dateString: String) -> Date? {
+        let possibleFormats = [
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        ]
+        
+        for format in possibleFormats{
+            dateFormatter.dateFormat = format
+            return dateFormatter.date(from: dateString)
+        }
+        return nil
+    }
+    
     // date에서 DateType에 따라 format을 출력한다.
     public static func dateToChartRangeFormatByType(type: Calendar.Component, date: Date) -> String {
         let calendar = Calendar.current

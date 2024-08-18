@@ -91,4 +91,19 @@ public enum FeedDetailDifficultyType: String, Decodable, CaseIterable {
     case NORMAL
     case HARD
     case VERYHARD
+    
+    public var level: Int {
+        switch self {
+        case .VERYEASY:
+            return 1
+        case .EASY:
+            return 2
+        case .NORMAL:
+            return 3
+        case .HARD:
+            return 4
+        case .VERYHARD:
+            return 5
+        }
+    }
 }

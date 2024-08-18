@@ -10,4 +10,5 @@ import RxSwift
 
 public protocol RecordRepositoryProtocol {
     func fetchRecordData(type: RecordChartType, date: Date) -> Observable<RecordData>
+    func fetchRecordDetailData(postNo: Int) -> Observable<RunningResult>
 }

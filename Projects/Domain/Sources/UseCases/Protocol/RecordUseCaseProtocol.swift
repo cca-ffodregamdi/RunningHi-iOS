@@ -11,4 +11,5 @@ import KakaoSDKAuth
 
 public protocol RecordUseCaseProtocol{
     func fetchRecordData(type: RecordChartType, date: Date) -> Observable<RecordData>
+    func fetchRecordDetailData(postNo: Int) -> Observable<RunningResult>
 }

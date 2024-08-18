@@ -10,7 +10,7 @@ import Foundation
 public struct RecordData {
     public var chartType: RecordChartType = .weekly
     public var date: Date = Date()
-    public var chartDatas: [Double]
+    public var chartDatas: [RunningRecordChartData]
     public let totalTime: Int
     public let meanPace: Int
     public let totalKcal: Int
@@ -18,7 +18,7 @@ public struct RecordData {
     
     public init(chartType: RecordChartType,
                 date: Date,
-                chartDatas: [Double]?,
+                chartDatas: [RunningRecordChartData]?,
                 totalTime: Int,
                 meanPace: Int,
                 totalKcal: Int,
@@ -44,7 +44,7 @@ public struct RunningRecordData: Decodable {
     public let difficulty: String
     public let title: String
     
-    public init(postNo: Int, 
+    public init(postNo: Int,
                 createDate: String,
                 locationName: String,
                 distance: Double,
@@ -62,5 +62,22 @@ public struct RunningRecordData: Decodable {
         self.status = status
         self.difficulty = difficulty
         self.title = title
+    }
+}
+
+public struct RunningRecordChartData: Decodable {
+    public let distance: Double
+    public let time: Int
+    public let pace: Int
+    public let kcal: Int
+    
+    public init(distance: Double,
+                time: Int,
+                pace: Int,
+                kcal: Int) {
+        self.distance = distance
+        self.time = time
+        self.pace = pace
+        self.kcal = kcal
     }
 }

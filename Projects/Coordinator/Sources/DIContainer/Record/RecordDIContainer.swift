@@ -25,8 +25,8 @@ class RecordDIContainer {
         return vc
     }
     
-    func makeRecordDetailViewController(coordinator: RecordCoordinator) -> RecordDetailViewController{
-        let vc = RecordDetailViewController(reactor: RecordReactor(recordUseCase: recordUseCase))
+    func makeRecordDetailViewController(coordinator: RecordCoordinator, postNo: Int) -> RecordDetailViewController {
+        let vc = RecordDetailViewController(reactor: RecordDetailReactor(recordUseCase: recordUseCase), postNo: postNo)
         vc.coordinator = coordinator
         return vc
     }

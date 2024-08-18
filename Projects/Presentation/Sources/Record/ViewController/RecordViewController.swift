@@ -96,6 +96,14 @@ extension RecordViewController: View {
                 }
             }.disposed(by: self.disposeBag)
         
+        self.recordView.runningListView.tableView.rx.itemSelected
+            .subscribe(onNext: { [weak self] indexPath in
+                if let self = self, let postNo = reactor.currentState.recordData?.runningRecords[indexPath.row].postNo {
+                    self.coordinator?.showRecordDetail(postNo: postNo)
+                }
+            })
+            .disposed(by: disposeBag)
+        
         self.rx.methodInvoked(#selector(ChartViewDelegate.chartValueSelected(_:entry:highlight:)))
             .subscribe(onNext: { parameters in
                 guard let entry = parameters[1] as? ChartDataEntry, let highlight = parameters[2] as? Highlight else { return }
@@ -111,13 +119,12 @@ extension RecordViewController: View {
                         
                         dataSet.highlightColor = UIColor.clear
                         dataSet.colors = Array(repeating: .Secondary100, count: dataSet.entries.count)
-                        dataSet.colors[index] = .Primary // 원하는 색상으로 변경
+                        dataSet.colors[index] = .Primary
                         
-                        chartArea.chartViewRenderer?.highlightedIndex = index
-                        
-                        chartArea.highlightRunningRecordView(true)
-                        chartArea.chartView.highlightValue(highlight)
-                        chartArea.chartView.notifyDataSetChanged()
+                        chartArea.highlightRunningRecordView(true, highlight, index)
+                        chartArea.setChartDataView(time: reactor.currentState.recordData?.chartDatas[index].time ?? 0,
+                                                   pace: reactor.currentState.recordData?.chartDatas[index].pace ?? 0,
+                                                   kcal: reactor.currentState.recordData?.chartDatas[index].kcal ?? 0)
                     }
                 }
             })
@@ -133,9 +140,10 @@ extension RecordViewController: View {
                     dataSet.colors = Array(repeating: .Secondary100, count: dataSet.entries.count)
                 }
                 
-                chartArea.highlightRunningRecordView(false)
-                chartArea.chartView.highlightValue(nil)
-                chartArea.chartViewRenderer?.highlightedIndex = -1
+                chartArea.highlightRunningRecordView(false, nil, -1)
+                chartArea.setChartDataView(time: reactor.currentState.recordData?.totalTime ?? 0,
+                                           pace: reactor.currentState.recordData?.meanPace ?? 0,
+                                           kcal: reactor.currentState.recordData?.totalKcal ?? 0)
             })
             .disposed(by: self.disposeBag)
     }
