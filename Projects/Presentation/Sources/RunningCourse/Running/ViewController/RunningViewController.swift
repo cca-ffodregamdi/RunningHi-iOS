@@ -40,6 +40,8 @@ final public class RunningViewController: UIViewController {
         self.reactor = reactor
         self.settingType = settingType
         self.settingValue = value
+        
+        self.runningView.runningRecordView.showProgressView(settingType != nil)
     }
     
     deinit {

@@ -146,16 +146,18 @@ class RecordChartView: UIView {
     //MARK: - Helpers
     
     func setData(data: RecordData) {
-        self.distanceLabel.text = "\(String(format: "%.2f", data.chartDatas.reduce(0,+)))km"
-        self.runningCountLabel.text = "/\(data.chartDatas.filter {$0 > 0.0}.count)번"
+        self.distanceLabel.text = "\(String(format: "%.2f", data.chartDatas.map{$0.distance}.reduce(0,+)))km"
+        self.runningCountLabel.text = "/\(data.chartDatas.filter {$0.distance > 0.0}.count)번"
         
-        self.timeView.setData(data: TimeUtil.convertSecToTimeFormat(sec: data.totalTime))
-        self.paceView.setData(data: Int.convertMeanPaceToString(meanPace: data.meanPace))
-        self.calorieView.setData(data: "\(Int.formatNumberWithComma(number: data.totalKcal))kcal")
-        
+        self.setChartDataView(time: data.totalTime, pace: data.meanPace, kcal: data.totalKcal)
         self.setChartView(data: data)
-        
         self.chartRangeView.setRange(range: DateUtil.dateToChartRangeFormatByType(type: data.chartType.calendarType, date: data.date))
+    }
+    
+    func setChartDataView(time: Int, pace: Int, kcal: Int) {
+        self.timeView.setData(data: TimeUtil.convertSecToTimeFormat(sec: time))
+        self.paceView.setData(data: Int.convertMeanPaceToString(meanPace: pace))
+        self.calorieView.setData(data: "\(Int.formatNumberWithComma(number: kcal))kcal")
     }
     
     func setChartView(data: RecordData) {
@@ -169,17 +171,22 @@ class RecordChartView: UIView {
         }
         
         chartView.leftAxis.axisMinimum = 0
-        chartView.leftAxis.axisMaximum = data.chartDatas.filter({$0 > 0}).max() ?? 10
+        chartView.leftAxis.axisMaximum = data.chartDatas.map{$0.distance}.filter({$0 > 0}).max() ?? 10
         
         chartView.highlightValue(x: 0, dataSetIndex: -1)
         chartView.setBarChartData(xValues: data.chartType == .weekly ? weekXList : dataXList,
-                                  yValues: data.chartDatas, label: "")
+                                  yValues: data.chartDatas.map{$0.distance}, label: "")
     }
     
-    func highlightRunningRecordView(_ isHighlited: Bool) {
+    func highlightRunningRecordView(_ isHighlited: Bool, _ highlight: Highlight?, _ index: Int) {
         self.recordDataStackView.backgroundColor = isHighlited ? .Primary : .white
         self.timeView.setHighlighted(isHighlited)
         self.paceView.setHighlighted(isHighlited)
         self.calorieView.setHighlighted(isHighlited)
+        
+        self.chartView.highlightValue(highlight)
+        self.chartViewRenderer?.highlightedIndex = index
+        
+        self.chartView.notifyDataSetChanged()
     }
 }

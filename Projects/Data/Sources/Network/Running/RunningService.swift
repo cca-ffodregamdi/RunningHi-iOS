@@ -11,7 +11,7 @@ import RxSwift
 import Domain
 
 public enum RunningService {
-    case saveRunningResult(data: RunningResultRequestDTO)
+    case saveRunningResult(data: RunningResultDTO)
 }
 
 extension RunningService: TargetType {
@@ -20,7 +20,7 @@ extension RunningService: TargetType {
     }
     
     public var accessToken: String {
-        return UserDefaults.standard.object(forKey: "accessToken") as! String
+        return KeyChainManager.read(key: .runningHiAccessTokenkey)!
     }
     
     public var path: String {

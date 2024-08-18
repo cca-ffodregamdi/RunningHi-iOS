@@ -8,63 +8,47 @@
 import Foundation
 import Domain
 
-public struct RunningResultRequestDTO: Codable {
+public struct RunningResultDTO: Codable {
     
-    var file: String?
-    var data: RunningResultData?
+    public let runInfo: RunningResultRunInfoDTO?
+    public let sectionData: RunningResultSectionDTO?
+    public let gpsData: [RunningResultGPSDTO]?
     
-    public init() { }
-    
-    public init(file: String, runStartDate: String, location: String, distance: Double, time: Int, kcal: Int, meanPace: Int, difficulty: String, sectionPace: [Int], sectionKcal: [Int]) {
-        self.file = file
-        self.data = RunningResultData(runStartDate: runStartDate,
-                                      location: location,
-                                      distance: distance,
-                                      time: time,
-                                      kcal: kcal,
-                                      meanPace: meanPace,
-                                      difficulty: difficulty,
-                                      sectionPace: sectionPace,
-                                      sectionKcal: sectionKcal)
-    }
-    
-    static func fromEntity(_ from: RunningResult) -> RunningResultRequestDTO {
-        return RunningResultRequestDTO(file: "",
-                                       runStartDate: "",
-                                       location: "",
-                                       distance: 0.0,
-                                       time: 0,
-                                       kcal: 0,
-                                       meanPace: 0,
-                                       difficulty: "",
-                                       sectionPace: [],
-                                       sectionKcal: []
-        )
+    public static func fromEntity(data: RunningResult) -> RunningResultDTO {
+        return RunningResultDTO(runInfo: RunningResultRunInfoDTO(runStartDate: "\(data.startTime.convertDateToFormat(format: "yyyy-MM-dd'T'HH:mm:ss"))",
+                                                                        location: data.location,
+                                                                        distance: data.distance,
+                                                                        time: data.runningTime,
+                                                                        kcal: data.calorie,
+                                                                        meanPace: data.averagePace,
+                                                                        difficulty: data.difficulty.rawValue),
+                                       sectionData: RunningResultSectionDTO(pace: data.sectionPace,
+                                                                            kcal: data.sectionKcal),
+                                       gpsData: data.routeList.map {
+                                                return RunningResultGPSDTO(lon: "\($0.longitude)",
+                                                                           lat: "\($0.latitude)",
+                                                                           time: "\($0.timestamp.convertDateToFormat(format: "yyyy-MM-dd'T'HH:mm:ss"))")
+        })
     }
 }
 
-public struct RunningResultData: Codable {
-    var runStartDate: String?
-    var location: String?
-    var distance: Double?
-    var time: Int?
-    var kcal: Int?
-    var meanPace: Int?
-    var difficulty: String?
-    var sectionPace: [Int]?
-    var sectionKcal: [Int]?
-    
-    init() { }
-    
-    init(runStartDate: String, location: String, distance: Double, time: Int, kcal: Int, meanPace: Int, difficulty: String, sectionPace: [Int], sectionKcal: [Int]) {
-        self.runStartDate = runStartDate
-        self.location = location
-        self.distance = distance
-        self.time = time
-        self.kcal = kcal
-        self.meanPace = meanPace
-        self.difficulty = difficulty
-        self.sectionPace = sectionPace
-        self.sectionKcal = sectionKcal
-    }
+public struct RunningResultRunInfoDTO: Codable {
+    let runStartDate: String
+    let location: String
+    let distance: Double
+    let time: Int
+    let kcal: Int
+    let meanPace: Int
+    let difficulty: String
+}
+
+public struct RunningResultSectionDTO: Codable {
+    let pace: [Int]
+    let kcal: [Int]
+}
+
+public struct RunningResultGPSDTO: Codable {
+    let lon: String
+    let lat: String
+    let time: String
 }

@@ -6,7 +6,8 @@
 //
 
 import Foundation
+import Domain
 
 public protocol RecordCoordinatorInterface {
-    func showRecordDetail()
+    func showRecordDetail(postNo: Int)
 }

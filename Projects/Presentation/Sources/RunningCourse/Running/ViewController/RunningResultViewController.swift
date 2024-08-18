@@ -25,7 +25,7 @@ final public class RunningResultViewController: UIViewController {
     public var disposeBag = DisposeBag()
     
     private var runningResultView: RunningResultView = {
-        return RunningResultView()
+        return RunningResultView(isRunningResult: true)
     }()
     
     //MARK: - Lifecycle

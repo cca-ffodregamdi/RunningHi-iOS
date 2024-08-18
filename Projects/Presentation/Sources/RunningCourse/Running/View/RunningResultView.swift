@@ -13,6 +13,8 @@ class RunningResultView: UIView {
     
     //MARK: - Configure
     
+    private var isRunningResult = true
+    
     static var horizontalPadding = 20
     
     var titleArea = RunningResultTitleView()
@@ -55,12 +57,16 @@ class RunningResultView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupViews()
-        setupConstraints()
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+    }
+    
+    required init(isRunningResult: Bool) {
+        super.init(frame: .zero)
+        
+        self.isRunningResult = isRunningResult
         setupViews()
         setupConstraints()
     }
@@ -77,9 +83,11 @@ class RunningResultView: UIView {
         runningResultStackView.addArrangedSubview(difficultyArea)
         runningResultStackView.addArrangedSubview(recordView)
         
-        addSubview(buttonStackView)
-        buttonStackView.addArrangedSubview(saveButton)
-        buttonStackView.addArrangedSubview(shareButton)
+        if isRunningResult {
+            addSubview(buttonStackView)
+            buttonStackView.addArrangedSubview(saveButton)
+            buttonStackView.addArrangedSubview(shareButton)
+        }
     }
     
     private func setupConstraints() {
@@ -93,9 +101,11 @@ class RunningResultView: UIView {
             make.bottom.equalToSuperview().inset(80)
         }
         
-        buttonStackView.snp.makeConstraints { make in
-            make.left.right.equalToSuperview().inset(21)
-            make.bottom.equalToSuperview().inset(0)
+        if isRunningResult {
+            buttonStackView.snp.makeConstraints { make in
+                make.left.right.equalToSuperview().inset(21)
+                make.bottom.equalToSuperview().inset(0)
+            }
         }
     }
     
@@ -103,12 +113,15 @@ class RunningResultView: UIView {
     
     func setData(runningModel: RunningResult) {
         titleArea.setData(startTime: runningModel.startTime,
-                          endTime: runningModel.endTime
+                          endTime: runningModel.endTime,
+                          location: runningModel.location
         )
         dataArea.setData(time: runningModel.runningTime,
                          calorie: runningModel.calorie,
                          distance: runningModel.distance,
                          pace: runningModel.averagePace
         )
+        
+        difficultyArea.setDifficulty(level: runningModel.difficulty.level)
     }
 }

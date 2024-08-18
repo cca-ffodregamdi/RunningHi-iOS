@@ -21,4 +21,8 @@ public final class RecordUseCase: RecordUseCaseProtocol {
     public func fetchRecordData(type: RecordChartType, date: Date) -> Observable<RecordData> {
         return repository.fetchRecordData(type: type, date: date)
     }
+    
+    public func fetchRecordDetailData(postNo: Int) -> Observable<RunningResult> {
+        return repository.fetchRecordDetailData(postNo: postNo)
+    }
 }

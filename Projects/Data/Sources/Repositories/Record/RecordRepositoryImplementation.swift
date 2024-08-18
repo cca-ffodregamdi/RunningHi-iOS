@@ -26,21 +26,48 @@ public class RecordRepositoryImplementation: RecordRepositoryProtocol {
             .filterSuccessfulStatusCodes()
             .map{ response -> RecordData in
                 let recordResponse = try JSONDecoder().decode(RecordResponseDTO.self, from: response.data)
-                var data = recordResponse.data.toEntity(chartType: type, date: date)
-                // TestCase
-//                if type == .weekly {
-//                    data.chartDatas = (0..<7).map { _ in Double.random(in: 0...5.0) }
-//                } else if type == .monthly {
-//                    data.chartDatas = (0..<31).map { _ in Double.random(in: 0...10.0) }
-//                } else {
-//                    data.chartDatas = (0..<12).map { _ in Double.random(in: 0...50.0) }
-//                }
-                return data
+                return recordResponse.data.toEntity(chartType: type, date: date)
             }
             .asObservable()
             .catch{ error in
-                print("RecordRepositoryImplementation fetchRecord error = \(error)")
                 return Observable.error(error)
             }
+    }
+    
+    public func fetchRecordDetailData(postNo: Int) -> Observable<RunningResult> {
+        return service.rx.request(.fetchRunning(postNo: postNo))
+            .filterSuccessfulStatusCodes()
+            .asObservable()
+            .flatMap { response -> Observable<RunningResult> in
+                do {
+                    let recordResponse = try JSONDecoder().decode(RecordDetailResponseDTO.self, from: response.data)
+                    var runningResult = recordResponse.data.toEntity(postNo: postNo)
+
+                    return self.getRunningRouteData(url: recordResponse.data.gpsUrl ?? "")
+                        .map { gpsData in
+                            runningResult.routeList = gpsData.gpsData?.compactMap { data in
+                                return RouteInfo(latitude: Double(data.lat) ?? 0.0,
+                                                 longitude: Double(data.lon) ?? 0.0,
+                                                 timestamp: DateUtil.formatDateStringToDate(dateString: data.time) ?? Date())
+                            } ?? []
+                            runningResult.sectionPace = gpsData.sectionData?.pace ?? []
+                            runningResult.sectionKcal = gpsData.sectionData?.kcal ?? []
+                            
+                            return runningResult
+                        }
+                } catch {
+                    return Observable.error(error)
+                }
+            }
+            .catch { error in
+                return Observable.error(error)
+            }
+    }
+    
+    private func getRunningRouteData(url: String) -> Observable<RunningResultDTO> {
+        return service.rx.request(.fetchGPSData(url: url))
+            .filterSuccessfulStatusCodes()
+            .asObservable()
+            .map(RunningResultDTO.self)
     }
 }

@@ -157,6 +157,10 @@ class RunningRecordView: UIView {
         runningButtonStackView.isHidden = isRunning
     }
     
+    func showProgressView(_ showProgress: Bool) {
+        progressView.isHidden = !showProgress
+    }
+    
     func setProgress(_ value: Float) {
         progressView.setProgress(value, animated: false)
     }
