@@ -78,7 +78,7 @@ final public class RunningResultViewController: UIViewController {
 //        backButton.addTarget(self, action: #selector(customBackAction), for: .touchUpInside)
 //        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "삭제", style: .plain, target: self, action: #selector(customBackAction))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "삭제", style: .plain, target: self, action: #selector(deleteAction))
         self.navigationItem.rightBarButtonItem?.tintColor = .Neutrals300
     }
     
@@ -96,11 +96,29 @@ final public class RunningResultViewController: UIViewController {
         let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
         runningResultView.mapArea.mapView.addOverlay(polyline)
 
-        let region = MKCoordinateRegion(
-            center: coordinates[0],
-            latitudinalMeters: 5000,
-            longitudinalMeters: 5000
+        // 경로의 최대/최소 좌표를 계산
+        var minLat = runningResult.routeList[0].latitude
+        var maxLat = runningResult.routeList[0].latitude
+        var minLon = runningResult.routeList[0].longitude
+        var maxLon = runningResult.routeList[0].longitude
+
+        for coordinate in runningResult.routeList {
+            minLat = min(minLat, coordinate.latitude)
+            maxLat = max(maxLat, coordinate.latitude)
+            minLon = min(minLon, coordinate.longitude)
+            maxLon = max(maxLon, coordinate.longitude)
+        }
+
+        // 중심 좌표와 span(확대/축소 정도)를 계산
+        let center = CLLocationCoordinate2D(
+            latitude: (minLat + maxLat) / 2,
+            longitude: (minLon + maxLon) / 2
         )
+        let span = MKCoordinateSpan(
+            latitudeDelta: (maxLat - minLat) * 1.2, // 여유를 주기 위해 1.2배
+            longitudeDelta: (maxLon - minLon) * 1.2 // 여유를 주기 위해 1.2배
+        )
+        let region = MKCoordinateRegion(center: center, span: span)
         
         runningResultView.mapArea.mapView.delegate = self
         runningResultView.mapArea.mapView.setRegion(region, animated: true)
@@ -113,10 +131,19 @@ final public class RunningResultViewController: UIViewController {
     }
     
     @objc func deleteAction() {
-    }
-    
-    private func initData() {
+        let requestLocationServiceAlert = UIAlertController(
+            title: "기록 삭제",
+            message: "삭제된 기록은 다시 불러올 수 없습니다.\n해당 기록을 삭제하시겠습니까?",
+            preferredStyle: .alert
+        )
+        let confirm = UIAlertAction(title: "삭제", style: .destructive) { _ in
+            self.coordinator?.finishRunning()
+        }
+        let cancel = UIAlertAction(title: "아니오", style: .default)
+        requestLocationServiceAlert.addAction(cancel)
+        requestLocationServiceAlert.addAction(confirm)
         
+        self.present(requestLocationServiceAlert, animated: true)
     }
 }
 
@@ -143,11 +170,6 @@ extension RunningResultViewController: View {
         Observable<Array<(key: Double, value: RouteInfo)>>.just(calculateTotalRunningTimePerKm())
             .bind(to: runningResultView.recordView.tableView.rx.items(cellIdentifier: RunningResultRecordTableViewCell.identifier, cellType: RunningResultRecordTableViewCell.self)) { index, model, cell in
                 cell.setData(distance: model.key, time: Int(model.value.runningTime))
-                
-                // 마지막줄 라인 제거
-                if index == 4 {
-                    cell.removeLine()
-                }
             }
             .disposed(by: disposeBag)
         
@@ -183,31 +205,31 @@ extension RunningResultViewController: View {
     
     private func bindingDifficultyButtonAction(reactor: RunningResultReactor) {
         let difficulty1Tap = runningResultView.difficultyArea.difficulty1Button.rx.tap
-            .map { Reactor.Action.tapDifficultyButton(1) }
+            .map { Reactor.Action.tapDifficultyButton(.VERYEASY) }
 
         let difficulty2Tap = runningResultView.difficultyArea.difficulty2Button.rx.tap
-            .map { Reactor.Action.tapDifficultyButton(2) }
+            .map { Reactor.Action.tapDifficultyButton(.EASY) }
         
         let difficulty3Tap = runningResultView.difficultyArea.difficulty3Button.rx.tap
-            .map { Reactor.Action.tapDifficultyButton(3) }
+            .map { Reactor.Action.tapDifficultyButton(.NORMAL) }
         
         let difficulty4Tap = runningResultView.difficultyArea.difficulty4Button.rx.tap
-            .map { Reactor.Action.tapDifficultyButton(4) }
+            .map { Reactor.Action.tapDifficultyButton(.HARD) }
         
         let difficulty5Tap = runningResultView.difficultyArea.difficulty5Button.rx.tap
-            .map { Reactor.Action.tapDifficultyButton(5) }
+            .map { Reactor.Action.tapDifficultyButton(.VERYHARD) }
 
         Observable.merge(difficulty1Tap, difficulty2Tap, difficulty3Tap, difficulty4Tap, difficulty5Tap)
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
         reactor.state
-            .map{$0.difficultyLevel}
+            .map{$0.difficultyType}
             .distinctUntilChanged()
-            .skip(1)
-            .bind{ [weak self] level in
+            .bind{ [weak self] difficulty in
                 guard let self = self else { return }
-                runningResultView.difficultyArea.setDifficulty(level: level)
+                runningResult.difficulty = difficulty
+                runningResultView.difficultyArea.setDifficulty(level: difficulty.level)
             }.disposed(by: self.disposeBag)
     }
     
@@ -223,7 +245,10 @@ extension RunningResultViewController: View {
             }
         }
         
-        return routeInfoPerKm.sorted { $0.key < $1.key }
+        let routes = routeInfoPerKm.sorted { $0.key < $1.key }
+        runningResult.sectionPace = routes.map{ Int.convertTimeAndDistanceToPace(time: $0.value.runningTime, distance: $0.value.distance) }
+        runningResult.sectionKcal = routes.map{ Int.convertTimeToCalorie(time: $0.value.runningTime) }
+        return routes
     }
 }
 
@@ -233,8 +258,8 @@ extension RunningResultViewController: MKMapViewDelegate {
     public func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         if let polyline = overlay as? MKPolyline {
             let renderer = MKPolylineRenderer(polyline: polyline)
-            renderer.strokeColor = .blue
-            renderer.lineWidth = 3
+            renderer.strokeColor = UIColor(hexaRGB: "2A71DB")
+            renderer.lineWidth = 2
 
             return renderer
         }

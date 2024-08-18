@@ -11,7 +11,7 @@ import RxSwift
 import Domain
 
 public enum RunningService {
-    case saveRunningResult(data: RunningResultDTO)
+    case saveRunningResult(data: String)
 }
 
 extension RunningService: TargetType {
@@ -26,7 +26,7 @@ extension RunningService: TargetType {
     public var path: String {
         switch self {
         case .saveRunningResult:
-            return "/posts/gpx"
+            return "/posts/gps"
         }
     }
     
@@ -40,12 +40,21 @@ extension RunningService: TargetType {
     public var task: Moya.Task {
         switch self {
         case .saveRunningResult(let data):
-            return .requestJSONEncodable(data)
+            var multipartData = [MultipartFormData]()
+            
+            if let fileData = data.data(using: .utf8) {
+                multipartData.append(MultipartFormData(provider: .data(fileData), name: "file", fileName: "fileName", mimeType: "text/plain"))
+            }
+            
+            return .uploadMultipart(multipartData)
         }
     }
     
     public var headers: [String : String]? {
-        return ["Content-type": "application/json",
-                "Authorization": accessToken]
+        switch self {
+        case .saveRunningResult:
+            return ["Content-type": "multipart/form-data",
+                    "Authorization": accessToken]
+        }
     }
 }

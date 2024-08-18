@@ -18,12 +18,12 @@ final public class RunningResultReactor: Reactor {
     private let runningUseCase: RunningUseCase
     
     public enum Action{
-        case tapDifficultyButton(Int)
+        case tapDifficultyButton(FeedDetailDifficultyType)
         case saveRunningRecord(RunningResult)
     }
     
     public enum Mutation{
-        case setDifficultyLevel(Int)
+        case setDifficultyType(FeedDetailDifficultyType)
         case setLoading(Bool)
         case completeSaveResult
     }
@@ -31,7 +31,7 @@ final public class RunningResultReactor: Reactor {
     public struct State{
         var isLoading = false
         var isSaveCompleted = false
-        var difficultyLevel = 0
+        var difficultyType: FeedDetailDifficultyType = .NORMAL
     }
     
     //MARK: - Lifecycle
@@ -46,7 +46,7 @@ final public class RunningResultReactor: Reactor {
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .tapDifficultyButton(let difficulty):
-            return Observable.just(Mutation.setDifficultyLevel(difficulty))
+            return Observable.just(Mutation.setDifficultyType(difficulty))
         
         case .saveRunningRecord(let runningResult):
             guard !currentState.isLoading else { return .empty()}
@@ -54,7 +54,6 @@ final public class RunningResultReactor: Reactor {
                 Observable.just(Mutation.setLoading(true)),
                 runningUseCase.saveRunningResult(runningResult: runningResult).map { _ in Mutation.completeSaveResult }
                     .catch { error in
-                        print("errororororororororor \(error)")
                         return Observable.concat([
                             Observable.just(Mutation.setLoading(false))
                         ])
@@ -67,8 +66,8 @@ final public class RunningResultReactor: Reactor {
         var newState = state
         switch mutation{
         
-        case .setDifficultyLevel(let difficulty):
-            newState.difficultyLevel = difficulty
+        case .setDifficultyType(let difficulty):
+            newState.difficultyType = difficulty
         
         case .setLoading(let value):
             newState.isLoading = value
