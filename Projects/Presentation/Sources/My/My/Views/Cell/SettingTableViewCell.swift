@@ -9,7 +9,6 @@ import UIKit
 import SnapKit
 import Common
 
-
 class SettingTableViewCell: UITableViewCell {
 
     static let identifier: String = "MySettingCell"
@@ -21,13 +20,14 @@ class SettingTableViewCell: UITableViewCell {
     
     private lazy var typeLabel: UILabel = {
         var label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        label.font = .Body1Regular
         return label
     }()
 
     private lazy var arrowButtonImageView: UIImageView = {
         var imageView = UIImageView()
-        imageView.image = CommonAsset.chevronRightOutline.image
+        imageView.image = CommonAsset.chevronRightOutline.image.withRenderingMode(.alwaysTemplate)
+        imageView.tintColor = .Neutrals300
         return imageView
     }()
     

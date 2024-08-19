@@ -37,19 +37,19 @@ class MyVersionView: UIView {
     }
     
     private func configureUI(){
-        self.backgroundColor = .white
+        self.backgroundColor = .clear
         
         self.addSubview(versionInfoLabel)
         self.addSubview(versionLabel)
         
         versionInfoLabel.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview().inset(15)
-            make.left.equalToSuperview().inset(20)
+            make.left.equalToSuperview().inset(40)
         }
         
         versionLabel.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview().inset(15)
-            make.right.equalToSuperview().inset(20)
+            make.right.equalToSuperview().inset(40)
         }
     }
     

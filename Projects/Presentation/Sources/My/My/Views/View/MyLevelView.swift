@@ -31,7 +31,6 @@ class MyLevelView: UIView {
         progressView.trackTintColor = .Primary1000
         progressView.progressTintColor = .Primary100
         progressView.progress = 0.5
-        progressView.transform = progressView.transform.scaledBy(x: 1, y: 2)
         return progressView
     }()
     
@@ -84,11 +83,13 @@ class MyLevelView: UIView {
         questionMarkButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(15)
             make.right.equalToSuperview().offset(-30)
+            make.width.height.equalTo(20)
         }
         
         expBar.snp.makeConstraints { make in
             make.top.equalTo(questionMarkButton.snp.bottom).offset(5)
             make.left.right.equalToSuperview().inset(30)
+            make.height.equalTo(8)
         }
         
         currentLevelLabel.snp.makeConstraints { make in

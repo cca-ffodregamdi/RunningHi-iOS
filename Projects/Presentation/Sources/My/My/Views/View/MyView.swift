@@ -27,6 +27,9 @@ class MyView: UIView {
         tableView.register(SettingTableViewCell.self, forCellReuseIdentifier: SettingTableViewCell.identifier)
         tableView.isScrollEnabled = false
         tableView.rowHeight = 56
+        tableView.backgroundColor = .clear
+        tableView.clipsToBounds = true
+        tableView.layer.cornerRadius = 24
         return tableView
     }()
     
@@ -63,8 +66,8 @@ class MyView: UIView {
         
         self.settingTableView.snp.makeConstraints { make in
             make.top.equalTo(self.myProfileHeaderView.snp.bottom)
-            make.left.right.equalToSuperview()
-            make.width.equalToSuperview()
+            make.left.right.equalToSuperview().inset(20)
+            make.width.equalToSuperview().offset(-40)
             make.height.equalTo(settingTableView.contentSize.height)
         }
         
@@ -74,4 +77,9 @@ class MyView: UIView {
             make.height.equalTo(50)
         }
     }
+    
+//    override func layoutSubviews() {
+//        super.layoutSubviews()
+//        settingTableView.layer.cornerRadius = settingTableView.frame.height * 0.25
+//    }
 }
