@@ -18,6 +18,28 @@ public extension UIViewController{
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
+    
+    func showToast(message : String, width: CGFloat) {
+        let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - (width / 2),
+                                               y: self.view.frame.size.height-100,
+                                               width: width,
+                                               height: 36))
+        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        toastLabel.textColor = UIColor.white
+        toastLabel.font = .Body2Regular
+        toastLabel.textAlignment = .center;
+        toastLabel.text = message
+        toastLabel.alpha = 1.0
+        toastLabel.layer.cornerRadius = 18;
+        toastLabel.clipsToBounds  =  true
+        self.view.addSubview(toastLabel)
+        
+        UIView.animate(withDuration: 4.0, delay: 0.1, options: .curveEaseOut, animations: {
+             toastLabel.alpha = 0.0
+        }, completion: {(isCompleted) in
+            toastLabel.removeFromSuperview()
+        })
+    }
 }
 
 public extension Reactive where Base: UIViewController {
