@@ -117,5 +117,12 @@ extension MyViewController: View{
                 self.myView.myProfileHeaderView.myProfileView.configureModel(profileImageURL: nil, nickname: userInfoModel.nickname)
                 self.myView.myProfileHeaderView.myLevelView.configureModel(totalDistance: userInfoModel.totalDistance, currentLevel: userInfoModel.level, remainDistance: userInfoModel.distanceToNextLevel)
             }.disposed(by: self.disposeBag)
+        
+        myView.myProfileHeaderView.myLevelView.questionMarkButton.rx
+            .tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.coordinator?.showLevelHelp()
+            }.disposed(by: self.disposeBag)
     }
 }

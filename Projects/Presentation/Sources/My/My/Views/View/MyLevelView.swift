@@ -115,6 +115,9 @@ class MyLevelView: UIView {
         currentLevelLabel.text = "Lv.\(currentLevel)"
         nextLevelLabel.text = "Lv.\(currentLevel+1)"
         remainDistanceLabel.text = "\(remainDistance)km만 더 뛰면"
+        
+        let max = (currentLevel+1) * 2
+        expBar.progress = Float(remainDistance) / Float(max)
     }
     
     override func layoutSubviews() {

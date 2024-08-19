@@ -41,4 +41,9 @@ class MyDIContainer{
         let vc = CustomerCenterViewController(reactor: CustomerCenterReactor(myUseCase: myUsecase))
         return vc
     }
+    
+    func makeLevelHelpViewController() -> LevelHelpViewController{
+        let vc = LevelHelpViewController()
+        return vc
+    }
 }
