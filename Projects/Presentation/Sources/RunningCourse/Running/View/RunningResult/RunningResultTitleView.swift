@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Common
+import Domain
 
 class RunningResultTitleView: UIView {
     
@@ -21,20 +22,18 @@ class RunningResultTitleView: UIView {
         return label
     }()
     
+    private lazy var difficultyLabel: DifficultyLabel = {
+        let label = DifficultyLabel()
+        label.font = .CaptionRegular
+        return label
+    }()
+    
     private var runningDateLabel: UILabel = {
         let label = UILabel()
         label.text = "####년 #월 #일 00:00 ~ 00:00"
         label.font = .CaptionRegular
         label.textColor = .Neutrals600
         return label
-    }()
-    
-    private var runningTitleStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 5
-        stackView.alignment = .leading
-        return stackView
     }()
     
     //MARK: - Lifecycle
@@ -54,23 +53,39 @@ class RunningResultTitleView: UIView {
     //MARK: - Configure
     
     private func setupViews() {
-        addSubview(runningTitleStackView)
-        runningTitleStackView.addArrangedSubview(runningNameLabel)
-        runningTitleStackView.addArrangedSubview(runningDateLabel)
+        addSubview(runningNameLabel)
+        addSubview(runningDateLabel)
+        addSubview(difficultyLabel)
     }
     
     private func setupConstraints() {
-        runningTitleStackView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview()
+        runningNameLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.left.equalToSuperview().inset(RunningResultView.horizontalPadding)
+        }
+        
+        difficultyLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(2)
+            make.left.equalTo(runningNameLabel.snp.right).offset(8)
+        }
+        
+        runningDateLabel.snp.makeConstraints { make in
+            make.top.equalTo(runningNameLabel.snp.bottom).offset(4)
             make.left.right.equalToSuperview().inset(RunningResultView.horizontalPadding)
+            make.bottom.equalToSuperview()
         }
     }
     
     //MARK: - Helpers
     
-    func setData(startTime: Date, endTime: Date, location: String) {
+    func setData(startTime: Date, endTime: Date, location: String, difficulty: FeedDetailDifficultyType?) {
         runningNameLabel.text = startTime.convertDateToFormat(format: "M월 d일 ") + location + " 러닝"
         runningDateLabel.text = startTime.convertDateToFormat(format: "yyyy년 M월 d일 HH:mm") + "~ " + endTime.convertDateToFormat(format: "HH:mm")
+        
+        if let difficulty = difficulty {
+            difficultyLabel.setTitle(difficulty: difficulty)
+        }
+        difficultyLabel.isHidden = (difficulty == nil)
     }
 }
 
