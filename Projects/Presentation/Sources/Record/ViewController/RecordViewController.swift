@@ -80,7 +80,7 @@ extension RecordViewController: View {
     }
     
     private func binding(reactor: RecordReactor) {
-        self.rx.viewDidLoad
+        self.rx.viewWillAppear
             .bind { [weak self] _ in
                 guard let self = self else {return}
                 self.recordView.chartTypeView.setChartType(type: .weekly)

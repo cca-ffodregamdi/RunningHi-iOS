@@ -116,8 +116,9 @@ final public class RecordDetailViewController: UIViewController {
             preferredStyle: .alert
         )
         let confirm = UIAlertAction(title: "삭제", style: .destructive) { _ in
-            //TODO: 삭제 API 연동
-//            self.navigationController?.popViewController(animated: true)
+            if let reactor = self.reactor, let postNo = self.postNo {
+                reactor.action.onNext(.deleteRunningRecord(postNo))
+            }
         }
         let cancel = UIAlertAction(title: "아니오", style: .default)
         requestLocationServiceAlert.addAction(cancel)
@@ -159,6 +160,13 @@ extension RecordDetailViewController: View {
                 cell.setData(distance: model.key, time: Int(model.value.runningTime))
             }
             .disposed(by: disposeBag)
+        
+        reactor.state
+            .filter {$0.isFinishDeleteRunningRecord}
+            .bind{ [weak self] runningResult in
+                guard let self = self else { return }
+                self.navigationController?.popViewController(animated: true)
+            }.disposed(by: self.disposeBag)
         
         self.runningResultView.recordView.tableView.rx.observe(CGSize.self, "contentSize")
             .bind{ [weak self] size in
