@@ -105,8 +105,6 @@ extension MyViewController: View{
                     self.coordinator?.showNotice()
                 case .customerCenter:
                     self.coordinator?.showCustomerCenter()
-                case .logOut:
-                    self.showLogoutAlert()
                 default: break
                 }
             }.disposed(by: self.disposeBag)

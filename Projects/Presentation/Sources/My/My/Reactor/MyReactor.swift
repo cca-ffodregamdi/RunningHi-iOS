@@ -23,10 +23,10 @@ final public class MyReactor: Reactor{
     public struct State{
         var items: [MyPageItem] = [
             .myFeed,
+            .locationSetting,
+            .noticeSetting,
             .notices,
-            .setting,
             .customerCenter,
-            .logOut
         ]
         var userInfo: MyUserInfoModel?
     }
