@@ -75,9 +75,8 @@ final public class MyViewController: UIViewController{
 
 extension MyViewController: View{
     public func bind(reactor: MyReactor) {
-        Observable.just(Reactor.Action.load)
-            .bind(to: reactor.action)
-            .disposed(by: self.disposeBag)
+        
+        reactor.action.onNext(.fetchUserInfo)
         
         let dataSource = DataSource{ dataSource, tableView, indexPath, item in
             let cell = tableView.dequeueReusableCell(withIdentifier: SettingTableViewCell.identifier, for: indexPath) as! SettingTableViewCell
@@ -111,8 +110,16 @@ extension MyViewController: View{
                 default: break
                 }
             }.disposed(by: self.disposeBag)
+        
         myView.settingTableView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
+        
+        reactor.state.compactMap{$0.userInfo}
+            .bind{ [weak self] userInfoModel in
+                guard let self = self else { return }
+                self.myView.myProfileHeaderView.myProfileView.configureModel(profileImageURL: nil, nickname: userInfoModel.nickname)
+                self.myView.myProfileHeaderView.myLevelView.configureModel(totalDistance: userInfoModel.totalDistance, currentLevel: userInfoModel.level, remainDistance: userInfoModel.distanceToNextLevel)
+            }.disposed(by: self.disposeBag)
     }
 }
 

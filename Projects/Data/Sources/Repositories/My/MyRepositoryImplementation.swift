@@ -54,4 +54,17 @@ public final class MyRepositoryImplementation: MyRepositoryProtocol{
                 return Observable.error(error)
             }
     }
+    
+    public func fetchUserInfo() -> Observable<MyUserInfoModel> {
+        return service.rx.request(.fetchUserInfo)
+            .filterSuccessfulStatusCodes()
+            .map{ response -> MyUserInfoModel in
+                let userInfoResponse = try JSONDecoder().decode(MyUserInfoDTO.self, from: response.data)
+                return userInfoResponse.data
+            }.asObservable()
+            .catch { error in
+                print("MyRepositoryImplementation fetchUserInfo error = \(error)")
+                return Observable.error(error)
+            }
+    }
 }

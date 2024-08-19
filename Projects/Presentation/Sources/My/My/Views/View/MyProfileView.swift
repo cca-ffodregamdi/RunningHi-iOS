@@ -70,4 +70,9 @@ class MyProfileView: UIView {
             make.bottom.equalToSuperview().offset(-20)
         }
     }
+    
+    func configureModel(profileImageURL: String?, nickname: String){
+        if let url = profileImageURL { profileImageView.setImage(urlString: url)}
+        self.nickNameLabel.text = nickname
+    }
 }
