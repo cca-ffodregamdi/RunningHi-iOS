@@ -1,5 +1,5 @@
 //
-//  FilterModalPresentationController.swift
+//  CustomModalPresentationController.swift
 //  Presentation
 //
 //  Created by 유현진 on 8/1/24.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class FilterModalPresentationController: UIPresentationController {
+public class CustomModalPresentationController: UIPresentationController {
     
     private var modalHeight: CGFloat
     
@@ -57,6 +57,6 @@ public class CustomTransitioningDelegate: NSObject, UIViewControllerTransitionin
     }
     
     public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
-        return FilterModalPresentationController(presentedViewController: presented, presenting: presenting, modalHeight: modalHeight)
+        return CustomModalPresentationController(presentedViewController: presented, presenting: presenting, modalHeight: modalHeight)
     }
 }
