@@ -110,31 +110,12 @@ extension MyViewController: View{
                 default: break
                 }
             }.disposed(by: self.disposeBag)
-        
-        myView.settingTableView.rx.setDelegate(self)
-            .disposed(by: self.disposeBag)
-        
+
         reactor.state.compactMap{$0.userInfo}
             .bind{ [weak self] userInfoModel in
                 guard let self = self else { return }
                 self.myView.myProfileHeaderView.myProfileView.configureModel(profileImageURL: nil, nickname: userInfoModel.nickname)
                 self.myView.myProfileHeaderView.myLevelView.configureModel(totalDistance: userInfoModel.totalDistance, currentLevel: userInfoModel.level, remainDistance: userInfoModel.distanceToNextLevel)
             }.disposed(by: self.disposeBag)
-    }
-}
-
-extension MyViewController: UITableViewDelegate{
-    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: SettingFooterView.identifier) as! SettingFooterView
-        if let dictionary = Bundle.main.infoDictionary{
-            if let version = dictionary["CFBundleShortVersionString"] as? String{
-                footerView.configureModel(version: "v.\(version)")
-            }
-        }
-        return footerView
-    }
-    
-    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 58
     }
 }

@@ -25,10 +25,13 @@ class MyView: UIView {
     lazy var settingTableView: UITableView = {
         var tableView = UITableView()
         tableView.register(SettingTableViewCell.self, forCellReuseIdentifier: SettingTableViewCell.identifier)
-        tableView.register(SettingFooterView.self, forHeaderFooterViewReuseIdentifier: SettingFooterView.identifier)
         tableView.isScrollEnabled = false
         tableView.rowHeight = 56
         return tableView
+    }()
+    
+    lazy var myVersionView: MyVersionView = {
+        return MyVersionView()
     }()
 
     override init(frame: CGRect) {
@@ -46,6 +49,7 @@ class MyView: UIView {
         self.addSubview(scrollView)
         self.scrollView.addSubview(myProfileHeaderView)
         self.scrollView.addSubview(settingTableView)
+        self.scrollView.addSubview(myVersionView)
         
         self.scrollView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -59,10 +63,15 @@ class MyView: UIView {
         
         self.settingTableView.snp.makeConstraints { make in
             make.top.equalTo(self.myProfileHeaderView.snp.bottom)
-            make.bottom.equalToSuperview()
             make.left.right.equalToSuperview()
             make.width.equalToSuperview()
             make.height.equalTo(settingTableView.contentSize.height)
+        }
+        
+        self.myVersionView.snp.makeConstraints { make in
+            make.top.equalTo(settingTableView.snp.bottom).offset(8)
+            make.width.left.right.equalToSuperview()
+            make.height.equalTo(50)
         }
     }
 }

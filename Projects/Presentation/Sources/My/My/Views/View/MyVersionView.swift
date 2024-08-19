@@ -1,23 +1,15 @@
 //
-//  SettingFooterView.swift
+//  MyVersionView.swift
 //  Presentation
 //
 //  Created by 유현진 on 8/19/24.
 //
 
 import UIKit
-import Common
 import SnapKit
+import Common
 
-class SettingFooterView: UITableViewHeaderFooterView {
-
-    static let identifier: String = "settingFooterView"
-    
-    private lazy var containerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        return view
-    }()
+class MyVersionView: UIView {
     
     private lazy var versionInfoLabel: UILabel = {
         var label = UILabel()
@@ -34,9 +26,10 @@ class SettingFooterView: UITableViewHeaderFooterView {
         return label
     }()
     
-    override init(reuseIdentifier: String?) {
-        super.init(reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         configureUI()
+        configureModel()
     }
     
     required init?(coder: NSCoder) {
@@ -44,15 +37,10 @@ class SettingFooterView: UITableViewHeaderFooterView {
     }
     
     private func configureUI(){
-        self.backgroundColor = .clear
-        self.addSubview(containerView)
-        self.containerView.addSubview(versionInfoLabel)
-        self.containerView.addSubview(versionLabel)
+        self.backgroundColor = .white
         
-        containerView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(8)
-            make.left.right.bottom.equalToSuperview()
-        }
+        self.addSubview(versionInfoLabel)
+        self.addSubview(versionLabel)
         
         versionInfoLabel.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview().inset(15)
@@ -65,7 +53,11 @@ class SettingFooterView: UITableViewHeaderFooterView {
         }
     }
     
-    func configureModel(version: String){
-        versionLabel.text = version
+    private func configureModel(){
+        if let dictionary = Bundle.main.infoDictionary{
+            if let version = dictionary["CFBundleShortVersionString"] as? String{
+                versionLabel.text = "v\(version)"
+            }
+        }
     }
 }

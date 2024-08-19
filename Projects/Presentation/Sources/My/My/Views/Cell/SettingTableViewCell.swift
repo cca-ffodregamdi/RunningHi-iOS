@@ -52,6 +52,9 @@ class SettingTableViewCell: UITableViewCell {
     
     private func configureUI(){
         self.selectionStyle = .none
+        self.separatorInset.right = 20
+        self.separatorInset.left = 20
+        
         self.addSubview(typeImageView)
         self.addSubview(typeLabel)
         self.addSubview(arrowButtonImageView)
