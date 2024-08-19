@@ -13,6 +13,7 @@ import RxRelay
 import RxDataSources
 import Domain
 import MapKit
+import Common
 
 final public class RecordDetailViewController: UIViewController {
     
@@ -73,11 +74,20 @@ final public class RecordDetailViewController: UIViewController {
         let backButton: UIButton = UIButton(type: .custom)
         backButton.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
         backButton.addTarget(self, action: #selector(customBackAction), for: .touchUpInside)
-
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "삭제", style: .plain, target: self, action: #selector(deleteAction))
-        self.navigationItem.rightBarButtonItem?.tintColor = .Neutrals300
+        let shareButton = UIButton()
+        shareButton.setImage(CommonAsset.shareOutline.image, for: .normal)
+        shareButton.addTarget(self, action: #selector(shareAction), for: .touchUpInside)
+        
+        let deleteButton = UIButton()
+        deleteButton.setImage(CommonAsset.trashOutline.image, for: .normal)
+        deleteButton.addTarget(self, action: #selector(deleteAction), for: .touchUpInside)
+        
+        let stackView = UIStackView.init(arrangedSubviews: [shareButton, deleteButton])
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: stackView)
     }
     
     private func configureUI() {
@@ -95,6 +105,10 @@ final public class RecordDetailViewController: UIViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
+    @objc func shareAction() {
+        //TODO: 공유하기 기능 구현
+    }
+    
     @objc func deleteAction() {
         let requestLocationServiceAlert = UIAlertController(
             title: "기록 삭제",
@@ -102,6 +116,7 @@ final public class RecordDetailViewController: UIViewController {
             preferredStyle: .alert
         )
         let confirm = UIAlertAction(title: "삭제", style: .destructive) { _ in
+            //TODO: 삭제 API 연동
 //            self.navigationController?.popViewController(animated: true)
         }
         let cancel = UIAlertAction(title: "아니오", style: .default)
