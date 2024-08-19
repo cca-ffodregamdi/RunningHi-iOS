@@ -155,7 +155,7 @@ class RecordRunningListTableViewCell: UITableViewCell {
     
     func setData(data: RunningRecordData) {
         self.titleLabel.text = "\(Date().formatChallengeTermToMd(dateString: data.createDate)) 러닝"
-        self.descriptionLabel.text = "\(data.distance)km · \(TimeUtil.convertSecToTimeFormat(sec: data.time))"
+        self.descriptionLabel.text = "\(String(format: "%.2fkm", data.distance)) · \(TimeUtil.convertSecToTimeFormat(sec: data.time))"
         self.locationLabel.text = "\(data.locationName)"
         
         self.badgeImageView.isHidden = !data.status
