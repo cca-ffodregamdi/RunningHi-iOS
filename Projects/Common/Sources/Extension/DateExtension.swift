@@ -101,4 +101,18 @@ public extension Date{
         
         return "알 수 없음"
     }
+    
+    func isTwoWeeksPassedForNotice(dateString: String) -> Bool{
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        dateFormatter.locale = Locale(identifier: "ko_KR")
+        dateFormatter.timeZone = TimeZone(abbreviation: "KST")
+        
+        guard let date = dateFormatter.date(from: dateString) else { return false }
+        
+        let currentDate = Date()
+        let twoWeeks: TimeInterval = 60 * 60 * 24 * 7 * 2
+        
+        return currentDate.timeIntervalSince(date) > twoWeeks
+    }
 }

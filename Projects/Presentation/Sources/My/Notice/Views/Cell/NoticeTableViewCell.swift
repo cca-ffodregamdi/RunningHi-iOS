@@ -51,7 +51,7 @@ final class NoticeTableViewCell: UITableViewCell {
         super.prepareForReuse()
         titleLabel.text = ""
         dateLabel.text = ""
-        newBadgeImageView.isHidden = true
+        newBadgeImageView.isHidden = false
     }
 
     private func configureUI(){
@@ -89,5 +89,8 @@ final class NoticeTableViewCell: UITableViewCell {
     func configureModel(noticeModel: NoticeModel){
         titleLabel.text = noticeModel.title
         dateLabel.text = Date().formatNoticeCreateDate(dateString: noticeModel.createDate)
+        if Date().isTwoWeeksPassedForNotice(dateString: noticeModel.createDate){
+            newBadgeImageView.isHidden = true
+        }
     }
 }
