@@ -12,4 +12,5 @@ public protocol MyCoordinatorInterface{
     func showNotice()
     func showNoticeDetail(noticeModel: NoticeModel)
     func showCustomerCenter()
+    func showLevelHelp()
 }

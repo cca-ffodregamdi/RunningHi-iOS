@@ -11,8 +11,9 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 import RxDataSources
+import Common
 
-final public class MyViewController: UIViewController, View{
+final public class MyViewController: UIViewController{
     
     public var disposeBag: DisposeBag = DisposeBag()
     
@@ -21,29 +22,15 @@ final public class MyViewController: UIViewController, View{
     public var coordinator: MyCoordinatorInterface?
     
     // MARK: Properties
-    private lazy var scrollView: UIScrollView = {
-        var scrollView = UIScrollView()
-        scrollView.alwaysBounceVertical = true
-        scrollView.showsHorizontalScrollIndicator = false
-        return scrollView
-    }()
-    
-    private lazy var myProfileHeaderView: MyProfileHeaderView = {
-        return MyProfileHeaderView()
-    }()
-    
-    private lazy var settingTableView: UITableView = {
-        var tableView = UITableView()
-        tableView.isScrollEnabled = false
-        tableView.rowHeight = 56
-        return tableView
+    private lazy var myView: MyView = {
+        return MyView()
     }()
     
     // MARK: LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        initTableView()
+        
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -60,61 +47,56 @@ final public class MyViewController: UIViewController, View{
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func initTableView(){
-        self.settingTableView.register(SettingTableViewCell.self, forCellReuseIdentifier: "MySettingCell")
-    }
-    
     private func configureUI(){
-        self.view.backgroundColor = .systemBackground
-        self.view.addSubview(scrollView)
-        self.scrollView.addSubview(myProfileHeaderView)
-        self.scrollView.addSubview(settingTableView)
+        self.view.backgroundColor = .Secondary100
+        self.view.addSubview(myView)
         
-        self.scrollView.snp.makeConstraints { make in
+        myView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
             make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
             make.left.right.equalToSuperview()
         }
-        
-        self.myProfileHeaderView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.width.equalToSuperview()
-            make.left.right.equalToSuperview()
-        }
-        
-        self.settingTableView.snp.makeConstraints { make in
-            make.top.equalTo(self.myProfileHeaderView.snp.bottom)
-            make.bottom.equalToSuperview()
-            make.left.right.equalToSuperview()
-            make.width.equalToSuperview()
-            make.height.equalTo(settingTableView.contentSize.height)
-        }
     }
     
+    private func showLogoutAlert(){
+        let alertView = UIAlertController(title: "로그아웃", message: "로그아웃 하시겠습니까?", preferredStyle: .alert)
+        
+        let logout = UIAlertAction(title: "로그아웃", style: .destructive) { [weak self] _ in
+            guard let self = self else { return }
+            
+        }
+        
+        let cancel = UIAlertAction(title: "아니오", style: .cancel)
+        alertView.addAction(cancel)
+        alertView.addAction(logout)
+        self.present(alertView, animated: true)
+    }
+}
+
+extension MyViewController: View{
     public func bind(reactor: MyReactor) {
-        Observable.just(Reactor.Action.load)
-            .bind(to: reactor.action)
-            .disposed(by: self.disposeBag)
+        
+        reactor.action.onNext(.fetchUserInfo)
         
         let dataSource = DataSource{ dataSource, tableView, indexPath, item in
-            let cell = tableView.dequeueReusableCell(withIdentifier: "MySettingCell", for: indexPath) as! SettingTableViewCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: SettingTableViewCell.identifier, for: indexPath) as! SettingTableViewCell
             cell.setSectionModel(model: item)
             return cell
         }
         
         reactor.state.map{[MyPageSection(items: $0.items)]}
-            .bind(to: settingTableView.rx.items(dataSource: dataSource))
+            .bind(to: myView.settingTableView.rx.items(dataSource: dataSource))
             .disposed(by: self.disposeBag)
         
-        settingTableView.rx.observe(CGSize.self, "contentSize")
+        myView.settingTableView.rx.observe(CGSize.self, "contentSize")
             .bind{ [weak self] size in
                 guard let size = size, let self = self else { return }
-                settingTableView.snp.updateConstraints { make in
+                self.myView.settingTableView.snp.updateConstraints { make in
                     make.height.equalTo(size.height)
                 }
             }.disposed(by: self.disposeBag)
         
-        settingTableView.rx.itemSelected
+        myView.settingTableView.rx.itemSelected
             .bind{ [weak self] indexPath in
                 guard let self = self else { return }
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
@@ -125,7 +107,20 @@ final public class MyViewController: UIViewController, View{
                     self.coordinator?.showCustomerCenter()
                 default: break
                 }
-                
+            }.disposed(by: self.disposeBag)
+
+        reactor.state.compactMap{$0.userInfo}
+            .bind{ [weak self] userInfoModel in
+                guard let self = self else { return }
+                self.myView.myProfileHeaderView.myProfileView.configureModel(profileImageURL: nil, nickname: userInfoModel.nickname)
+                self.myView.myProfileHeaderView.myLevelView.configureModel(totalDistance: userInfoModel.totalDistance, currentLevel: userInfoModel.level, remainDistance: userInfoModel.distanceToNextLevel)
+            }.disposed(by: self.disposeBag)
+        
+        myView.myProfileHeaderView.myLevelView.questionMarkButton.rx
+            .tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.coordinator?.showLevelHelp()
             }.disposed(by: self.disposeBag)
     }
 }

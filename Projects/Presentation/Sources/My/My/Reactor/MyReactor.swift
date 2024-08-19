@@ -13,15 +13,22 @@ import Domain
 final public class MyReactor: Reactor{
     
     public enum Action{
-        case load
+        case fetchUserInfo
     }
     
     public enum Mutation{
-        case setSections([MyPageItem])
+        case setUserInfo(MyUserInfoModel)
     }
     
     public struct State{
-        var items: [MyPageItem] = []
+        var items: [MyPageItem] = [
+            .myFeed,
+            .locationSetting,
+            .noticeSetting,
+            .notices,
+            .customerCenter,
+        ]
+        var userInfo: MyUserInfoModel?
     }
     
     public var initialState: State
@@ -33,26 +40,16 @@ final public class MyReactor: Reactor{
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
-        case .load:
-            let items: [MyPageItem] = [
-                .myFeed,
-                .notices,
-                .setting,
-                .customerCenter,
-                .logOut
-            ]
-            return .just(.setSections(items))
+        case .fetchUserInfo: myUseCase.fetchUserInfo().map{Mutation.setUserInfo($0)}
         }
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation{
-        case .setSections(let sections):
-            newState.items = sections
-            
+        case .setUserInfo(let userInfoModel):
+            newState.userInfo = userInfoModel
         }
         return newState
     }
-    
 }

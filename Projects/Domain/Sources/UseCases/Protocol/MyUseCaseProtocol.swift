@@ -12,4 +12,5 @@ protocol MyUseCaseProtocol{
     func fetchNotice() -> Observable<[NoticeModel]>
     func fetchFAQ() -> Observable<[FAQModel]>
     func fetchFeedback() -> Observable<[FeedbackModel]>
+    func fetchUserInfo() -> Observable<MyUserInfoModel>
 }

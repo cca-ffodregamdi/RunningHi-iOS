@@ -26,4 +26,8 @@ public final class MyUseCase: MyUseCaseProtocol{
     public func fetchFeedback() -> Observable<[FeedbackModel]> {
         return self.repository.fetchFeedback()
     }
+    
+    public func fetchUserInfo() -> Observable<MyUserInfoModel> {
+        return self.repository.fetchUserInfo()
+    }
 }
