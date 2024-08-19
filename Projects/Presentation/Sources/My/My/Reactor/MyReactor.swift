@@ -50,7 +50,6 @@ final public class MyReactor: Reactor{
         switch mutation{
         case .setSections(let sections):
             newState.items = sections
-            
         }
         return newState
     }

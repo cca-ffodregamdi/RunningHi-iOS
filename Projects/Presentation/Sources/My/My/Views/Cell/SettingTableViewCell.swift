@@ -12,6 +12,8 @@ import Common
 
 class SettingTableViewCell: UITableViewCell {
 
+    static let identifier: String = "MySettingCell"
+    
     private lazy var typeImageView: UIImageView = {
         var imageView = UIImageView()
         return imageView
