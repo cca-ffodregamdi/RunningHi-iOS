@@ -111,12 +111,14 @@ class ChallengeCollectionViewCell: UICollectionViewCell {
         challengeTitleLabel.text = model.title
         paricipatedMemberCountLabel.text = "\(model.participantsCount)명"
         remainingDateLabel.text = "\(model.remainingTime)일 남음"
+        challengeThumbnailImageView.setImage(urlString: model.imageUrl)
     }
     
     func configureWithMyChallengeModel(model: MyChallengeModel){
         challengeTitleLabel.text = model.title
         paricipatedMemberCountLabel.text = "\(model.participantsCount)명"
         remainingDateLabel.text = "\(model.remainingTime)일 남음"
+        challengeThumbnailImageView.setImage(urlString: model.imageUrl)
     }
     
     override func prepareForReuse() {
@@ -124,6 +126,7 @@ class ChallengeCollectionViewCell: UICollectionViewCell {
         challengeTitleLabel.text = ""
         paricipatedMemberCountLabel.text = ""
         remainingDateLabel.text = ""
+        challengeThumbnailImageView.image = nil
     }
     
     
