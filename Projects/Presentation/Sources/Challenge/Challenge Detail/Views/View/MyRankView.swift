@@ -20,6 +20,7 @@ class MyRankView: UIView{
     
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
+        imageView.clipsToBounds = true
         imageView.image = CommonAsset.defaultSmallProfile.image
         return imageView
     }()
@@ -92,5 +93,11 @@ class MyRankView: UIView{
         }else{
             recordLabel.text = "\(model.record)km"
         }
+        if let url = model.profileImageUrl { profileImageView.setImage(urlString: url) }
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        profileImageView.layer.cornerRadius = profileImageView.frame.height / 2
     }
 }
