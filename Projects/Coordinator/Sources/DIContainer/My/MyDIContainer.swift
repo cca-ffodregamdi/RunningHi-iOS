@@ -46,4 +46,9 @@ class MyDIContainer{
         let vc = LevelHelpViewController()
         return vc
     }
+    
+    func showAnnounceViewController() -> AnnounceViewController{
+        let vc = AnnounceViewController(reactor: AnnounceReactor(announceUseCase: AnnounceUseCase(repository: AnnounceRepositoryImplementation())))
+        return vc
+    }
 }
