@@ -24,6 +24,7 @@ final class PostView: UIView {
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = CommonAsset.defaultSmallProfile.image
+        imageView.clipsToBounds = true
         return imageView
     }()
     
@@ -163,5 +164,10 @@ final class PostView: UIView {
         dateLabel.text = Date().createDateToString(createDate: model.createDate)
         likeCountLabel.text = "\(model.likeCount)"
         commentCountLabel.text = "\(model.commentCount)"
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        profileImageView.layer.cornerRadius = profileImageView.frame.height / 2
     }
 }

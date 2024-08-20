@@ -14,6 +14,8 @@ class MyProfileView: UIView {
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = CommonAsset.defaultLargeProfile.image
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 24
         return imageView
     }()
     
