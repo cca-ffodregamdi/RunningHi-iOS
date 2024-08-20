@@ -22,6 +22,12 @@ final public class MyViewController: UIViewController{
     public var coordinator: MyCoordinatorInterface?
     
     // MARK: Properties
+    private lazy var announceButton: UIButton = {
+        let button = UIButton()
+        button.setImage(CommonAsset.bellOutline.image, for: .normal)
+        return button
+    }()
+    
     private lazy var myView: MyView = {
         return MyView()
     }()
@@ -30,7 +36,7 @@ final public class MyViewController: UIViewController{
     public override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        
+        configureNavigationBarItem()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -56,6 +62,12 @@ final public class MyViewController: UIViewController{
             make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
             make.left.right.equalToSuperview()
         }
+    }
+    
+    private func configureNavigationBarItem(){
+        var barButtonItems: [UIBarButtonItem] = []
+        barButtonItems.append(UIBarButtonItem(customView: announceButton))
+        self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
     
     private func showLogoutAlert(){
@@ -121,6 +133,12 @@ extension MyViewController: View{
             .bind{ [weak self] _ in
                 guard let self = self else { return }
                 self.coordinator?.showLevelHelp()
+            }.disposed(by: self.disposeBag)
+        
+        announceButton.rx.tap
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.coordinator?.showAnnounce()
             }.disposed(by: self.disposeBag)
     }
 }

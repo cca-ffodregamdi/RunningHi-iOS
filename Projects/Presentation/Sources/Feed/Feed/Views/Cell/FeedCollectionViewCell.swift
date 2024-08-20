@@ -20,6 +20,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
     private lazy var thumbnailImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         return imageView
     }()
     
@@ -199,7 +200,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
             setContentBackgrondView(isHidden: false)
             setContentColor(color: .white)
         }else{
-            if Bool.random(){
+            if model.postId / 2 == 0{
                 self.backgroundColor = .white
                 setContentColor(color: .black)
             }else{
@@ -260,5 +261,6 @@ class FeedCollectionViewCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         bookmarkButton.layer.cornerRadius = bookmarkButton.bounds.width / 2
+        profileImageView.layer.cornerRadius = profileImageView.frame.height / 2
     }
 }

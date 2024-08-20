@@ -68,8 +68,6 @@ class RankHeaderElementView: UIView {
     
         profileImageView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(20)
-//            make.left.equalToSuperview().offset(10)
-//            make.right.equalToSuperview().offset(-10)
             make.left.right.equalToSuperview().inset(10)
             make.height.equalTo(profileImageView.snp.width)
         }
@@ -103,6 +101,8 @@ class RankHeaderElementView: UIView {
         }else{
             recordLabel.text = "\(model.record)km"
         }
+        
+        if let url = model.profileImageUrl { profileImageView.setImage(urlString: url) }
     }
     
     func isFirstRanker(){

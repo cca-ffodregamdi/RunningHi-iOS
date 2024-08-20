@@ -33,4 +33,9 @@ extension ChallengeCoordinator: ChallengeCoordinatorInterface{
         vc.delegate = viewController
         self.navigationController.pushViewController(vc, animated: true)
     }
+    
+    func showAnnounce() {
+        let vc = challengeDIContainer.showAnnounceViewController()
+        self.navigationController.pushViewController(vc, animated: true)
+    }
 }

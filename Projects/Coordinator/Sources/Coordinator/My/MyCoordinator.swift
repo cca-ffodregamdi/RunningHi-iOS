@@ -46,4 +46,9 @@ extension MyCoordinator: MyCoordinatorInterface{
         let vc = myDIContainer.makeLevelHelpViewController()
         self.navigationController.present(vc, animated: true)
     }
+    
+    func showAnnounce() {
+        let vc = myDIContainer.showAnnounceViewController()
+        self.navigationController.pushViewController(vc, animated: true)
+    }
 }

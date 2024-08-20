@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 public struct AnnounceResponseDTO: Decodable{
     let timeStamp: String
@@ -14,9 +15,4 @@ public struct AnnounceResponseDTO: Decodable{
     public let data: [AnnounceModel]
 }
 
-public struct AnnounceModel: Decodable{
-    public let title: String
-    public let content: String
-    public let isRead: Bool
-    public let createDate: String
-}
+

@@ -22,7 +22,7 @@ final public class ChallengeViewController: UIViewController{
     
     private var dataSource: RxCollectionViewSectionedReloadDataSource<ChallengeSectionModel>!
     
-    private lazy var notificationButton: UIButton = {
+    private lazy var announceButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bellOutline.image, for: .normal)
         return button
@@ -57,7 +57,7 @@ final public class ChallengeViewController: UIViewController{
     
     private func configureNavigationBarItem(){
         var barButtonItems: [UIBarButtonItem] = []
-        barButtonItems.append(UIBarButtonItem(customView: notificationButton))
+        barButtonItems.append(UIBarButtonItem(customView: announceButton))
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
     
@@ -115,6 +115,12 @@ extension ChallengeViewController: View{
                     challengeId = challengeModel.challengeId
                     self.coordinator?.showChallengeDetailView(viewController: self, challengeId: challengeId, isParticipated: false)
                 }
+            }.disposed(by: self.disposeBag)
+        
+        announceButton.rx.tap
+            .bind{ [weak self] _ in
+                guard let self = self else {return}
+                self.coordinator?.showAnnounce()
             }.disposed(by: self.disposeBag)
     }
 }

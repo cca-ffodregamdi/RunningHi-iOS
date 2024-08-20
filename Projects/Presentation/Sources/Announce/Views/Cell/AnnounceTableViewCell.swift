@@ -59,7 +59,7 @@ class AnnounceTableViewCell: UITableViewCell {
         super.prepareForReuse()
         titleLabel.text = ""
         dateLabel.text = ""
-        newBadgeImageView.isHidden = true
+        newBadgeImageView.isHidden = false
     }
 
     private func configureUI(){
@@ -104,5 +104,6 @@ class AnnounceTableViewCell: UITableViewCell {
     func configureModel(model: AnnounceModel){
         titleLabel.text = model.title
         dateLabel.text = Date().formatNoticeCreateDate(dateString: model.createDate)
+        newBadgeImageView.isHidden = model.isRead
     }
 }
