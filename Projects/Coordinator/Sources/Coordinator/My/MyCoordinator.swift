@@ -48,7 +48,18 @@ extension MyCoordinator: MyCoordinatorInterface{
     }
     
     func showAnnounce() {
-        let vc = myDIContainer.showAnnounceViewController()
+        let vc = myDIContainer.makeAnnounceViewController()
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showMyFeed() {
+        let vc = myDIContainer.makeMyFeedViewController(coordinator: self)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showFeedDetailByMyFeed(viewController: MyFeedViewController, postId: Int) {
+        let vc = myDIContainer.makeFeedDetailViewController(postId: postId)
+        vc.delegate = viewController
         self.navigationController.pushViewController(vc, animated: true)
     }
 }

@@ -16,8 +16,8 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         self.repository = repository
     }
     
-    public func fetchFeeds(page: Int, sort: String = "latest", distance: Int = 500) -> Observable<([FeedModel], Int)>{
-        return repository.fetchFeeds(page: page, sort: sort, distance: distance)
+    public func fetchFeeds(page: Int, size: Int, sort: String = "latest", distance: Int = 500) -> Observable<([FeedModel], Int)>{
+        return repository.fetchFeeds(page: page, size: size, sort: sort, distance: distance)
     }
     
     public func fetchPost(postId: Int) -> Observable<FeedDetailModel> {
@@ -68,7 +68,7 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         return repository.editComment(commentId: commentId, editCommentModel: editCommentModel)
     }
     
-    public func fetchBookmarkedFeeds(page: Int) -> Observable<([FeedModel], Int)> {
-        return repository.fetchBookmarkedFeeds(page: page)
+    public func fetchBookmarkedFeeds(page: Int, size: Int) -> Observable<([FeedModel], Int)> {
+        return repository.fetchBookmarkedFeeds(page: page, size: size)
     }
 }

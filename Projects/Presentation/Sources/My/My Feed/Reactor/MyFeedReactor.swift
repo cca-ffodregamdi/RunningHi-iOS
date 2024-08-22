@@ -1,18 +1,18 @@
 //
-//  BookmarkedReactor.swift
+//  MyFeedReactor.swift
 //  Presentation
 //
-//  Created by 유현진 on 7/27/24.
+//  Created by 유현진 on 8/20/24.
 //
 
 import Foundation
+import RxSwift
 import ReactorKit
 import Domain
-import RxSwift
 
-public class BookmarkedReactor: Reactor{
+public class MyFeedReactor: Reactor{
     public enum Action{
-        case fetchFeeds
+        case fetchMyFeeds
         case refresh
         case makeBookmark(BookmarkRequestDTO, Int)
         case deleteBookmark(Int, Int)
@@ -37,21 +37,21 @@ public class BookmarkedReactor: Reactor{
     }
 
     public let initialState: State
-    private let feedUseCase: FeedUseCase
+    private let myUseCase: MyUseCase
     
-    public init(feedUseCase: FeedUseCase){
+    public init(myUseCase: MyUseCase){
         self.initialState = State()
-        self.feedUseCase = feedUseCase
+        self.myUseCase = myUseCase
     }
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
-        case .fetchFeeds:
+        case .fetchMyFeeds:
             guard !currentState.isLoading else { return .empty()}
             guard currentState.pageNumber < currentState.totalPages else { return .empty()}
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                self.feedUseCase.fetchBookmarkedFeeds(page: currentState.pageNumber, size: 20).map{ Mutation.addFeeds($0.0, $0.1)},
+                self.myUseCase.fetchMyFeed(page: currentState.pageNumber, size: 20).map{ Mutation.addFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false))
             ])
         case .refresh:
@@ -60,15 +60,15 @@ public class BookmarkedReactor: Reactor{
             return Observable.concat([
                 Observable.just(Mutation.setRefreshing(true)),
                 Observable.just(Mutation.setLoading(true)),
-                feedUseCase.fetchBookmarkedFeeds(page: 0, size: 20)
+                myUseCase.fetchMyFeed(page: 0, size: 20)
                     .map{ Mutation.setFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false)),
                 Observable.just(Mutation.setRefreshing(false)),
             ])
         case .makeBookmark(let bookmarkRequest, let index):
-            return feedUseCase.makeBookmark(post: bookmarkRequest).map{ _ in Mutation.updateBookmarked(index, true) }
+            return myUseCase.makeBookmark(post: bookmarkRequest).map{ _ in Mutation.updateBookmarked(index, true) }
         case .deleteBookmark(let postId, let index):
-            return feedUseCase.deleteBookmark(postId: postId).map{_ in Mutation.updateBookmarked(index, false) }
+            return myUseCase.deleteBookmark(postId: postId).map{_ in Mutation.updateBookmarked(index, false) }
         case .deleteFeed(let postId):
             return Observable.just(Mutation.removeFeed(postId))
         }

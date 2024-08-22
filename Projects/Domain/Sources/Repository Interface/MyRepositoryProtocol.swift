@@ -13,4 +13,8 @@ public protocol MyRepositoryProtocol{
     func fetchFAQ() -> Observable<[FAQModel]>
     func fetchFeedback() -> Observable<[FeedbackModel]>
     func fetchUserInfo() -> Observable<MyUserInfoModel>
+    
+    func fetchMyFeed(page: Int, size: Int) -> Observable<([FeedModel], Int)>
+    func makeBookmark(post: BookmarkRequestDTO) -> Observable<Any>
+    func deleteBookmark(postId: Int) -> Observable<Any>
 }

@@ -113,6 +113,8 @@ extension MyViewController: View{
                 guard let self = self else { return }
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
                 switch dataSource[indexPath]{
+                case .myFeed:
+                    self.coordinator?.showMyFeed()
                 case .notices:
                     self.coordinator?.showNotice()
                 case .customerCenter:

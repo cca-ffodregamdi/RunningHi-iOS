@@ -10,7 +10,7 @@ import Moya
 import RxSwift
 
 public protocol FeedRepositoryProtocol{
-    func fetchFeeds(page: Int, sort: String, distance: Int) -> Observable<([FeedModel], Int)>
+    func fetchFeeds(page: Int, size: Int, sort: String, distance: Int) -> Observable<([FeedModel], Int)>
     func fetchPost(postId: Int) -> Observable<FeedDetailModel>
     func fetchComment(postId: Int) -> Observable<[CommentModel]>
     func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentResponseModel>
@@ -23,5 +23,5 @@ public protocol FeedRepositoryProtocol{
     func likePost(likePost: FeedLikeRequestDTO) -> Observable<FeedLikeResponseModel>
     func unLikePost(postId: Int) -> Observable<FeedLikeResponseModel>
     func editComment(commentId: Int, editCommentModel: EditCommentRequestDTO) -> Observable<Any>
-    func fetchBookmarkedFeeds(page: Int) -> Observable<([FeedModel], Int)>
+    func fetchBookmarkedFeeds(page: Int, size: Int) -> Observable<([FeedModel], Int)>
 }

@@ -62,7 +62,7 @@ extension FeedService: TargetType{
             return "/like"
         case.unLikePost(let postId):
             return "/like/\(postId)"
-        case .editComment(let commentId, let editCommentModel):
+        case .editComment(let commentId, _):
             return "/reply/update/\(commentId)"
         case .fetchBookmarkedFeeds:
             return "/posts/bookmarked"
@@ -102,7 +102,7 @@ extension FeedService: TargetType{
             return .requestJSONEncodable(reportCommentModel)
         case .editPost(_, let editPostModel):
             return .requestJSONEncodable(editPostModel)
-        case .editComment(let commentId, let editCommentModel):
+        case .editComment(_, let editCommentModel):
             return .requestJSONEncodable(editCommentModel)
         case .fetchPost,
                 .deleteBookmark,

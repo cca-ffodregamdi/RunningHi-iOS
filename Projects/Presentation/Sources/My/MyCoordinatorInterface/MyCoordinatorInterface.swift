@@ -14,4 +14,6 @@ public protocol MyCoordinatorInterface{
     func showCustomerCenter()
     func showLevelHelp()
     func showAnnounce()
+    func showMyFeed()
+    func showFeedDetailByMyFeed(viewController: MyFeedViewController, postId: Int)
 }

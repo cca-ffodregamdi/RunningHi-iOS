@@ -305,8 +305,15 @@ final public class FeedDetailViewController: UIViewController {
     
     private func configureStickyView(imageUrl: String?){
         guard let url = imageUrl else { return }
+        
+        if stickyImageView.superview != nil {
+            stickyImageView.removeFromSuperview()
+        }
+        
         self.scrollView.contentInset = .init(top: stickViewDefaultHeight, left: 0, bottom: 0, right: 0)
         self.scrollView.contentOffset = .init(x: 0, y: -stickViewDefaultHeight)
+        
+        
         self.view.addSubview(stickyImageView)
         self.stickyImageView.setImage(urlString: url)
         
