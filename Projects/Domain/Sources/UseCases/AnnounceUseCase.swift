@@ -18,4 +18,8 @@ public final class AnnounceUseCase: AnnounceUseCaseProtocol{
     public func fetchAnnounce() -> Observable<[AnnounceModel]> {
         return repository.fetchAnnounce()
     }
+    
+    public func deleteAnnounce(announceId: Int) -> Observable<Any> {
+        return repository.deleteAnnounce(announceId: announceId)
+    }
 }

@@ -13,10 +13,12 @@ import Domain
 public class AnnounceReactor: Reactor{
     public enum Action{
         case fetchAnnounce
+        case deleteAnnounce(announceId: Int, index: Int)
     }
     
     public enum Mutation{
         case setAnnouce([AnnounceModel])
+        case deletedAnnounce(index: Int)
     }
     
     public struct State{
@@ -34,6 +36,7 @@ public class AnnounceReactor: Reactor{
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .fetchAnnounce: announceUseCase.fetchAnnounce().map{ Mutation.setAnnouce($0) }
+        case .deleteAnnounce(let announceId, let index): announceUseCase.deleteAnnounce(announceId: announceId).map{ _ in Mutation.deletedAnnounce(index: index)}
         }
     }
     
@@ -42,6 +45,8 @@ public class AnnounceReactor: Reactor{
         switch mutation{
         case .setAnnouce(let models):
             newState.announces = models
+        case .deletedAnnounce(let index):
+            newState.announces.remove(at: index)
         }
         return newState
     }

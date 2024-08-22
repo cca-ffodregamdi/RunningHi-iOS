@@ -10,4 +10,5 @@ import RxSwift
 
 public protocol AnnounceUseCaseProtocol{
     func fetchAnnounce() -> Observable<[AnnounceModel]>
+    func deleteAnnounce(announceId: Int) -> Observable<Any>
 }

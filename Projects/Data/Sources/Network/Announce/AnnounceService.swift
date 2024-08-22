@@ -12,6 +12,7 @@ import Domain
 
 public enum AnnounceService{
     case fetchAnnounce
+    case deleteAnnounce(announceId: Int)
 }
 
 
@@ -27,24 +28,27 @@ extension AnnounceService: TargetType{
     public var path: String{
         switch self{
         case .fetchAnnounce: "/alarm/all"
+        case .deleteAnnounce(let announceId): "/alarm/\(announceId)"
         }
     }
     
     public var method: Moya.Method{
         switch self{
         case .fetchAnnounce: .get
+        case .deleteAnnounce: .delete
         }
     }
     
     public var task: Task{
         switch self{
-        case .fetchAnnounce: .requestPlain
+        case .fetchAnnounce, .deleteAnnounce: .requestPlain
         }
     }
     
     public var headers: [String : String]?{
         switch self{
-        case .fetchAnnounce:
+        case .fetchAnnounce,
+                .deleteAnnounce:
             ["Content-type": "application/json",
                     "Authorization": accessToken]
         }

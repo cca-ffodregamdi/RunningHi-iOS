@@ -9,8 +9,11 @@ import UIKit
 import SnapKit
 import Common
 import Domain
+import RxSwift
 
 class AnnounceTableViewCell: UITableViewCell {
+    
+    var disposeBag: DisposeBag = DisposeBag()
     
     static let identifier: String = "AnnounceCell"
     
@@ -40,10 +43,10 @@ class AnnounceTableViewCell: UITableViewCell {
         return label
     }()
     
-    private lazy var xmarkImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = CommonAsset.xOutline.image
-        return imageView
+    lazy var deleteButton: UIButton = {
+        let button = UIButton()
+        button.setImage(CommonAsset.xOutline.image, for: .normal)
+        return button
     }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -60,15 +63,14 @@ class AnnounceTableViewCell: UITableViewCell {
         titleLabel.text = ""
         dateLabel.text = ""
         newBadgeImageView.isHidden = false
+        disposeBag = DisposeBag()
     }
 
     private func configureUI(){
         self.selectionStyle = .none
-        self.addSubview(bellImageView)
-        self.addSubview(titleLabel)
-        self.addSubview(newBadgeImageView)
-        self.addSubview(dateLabel)
-        self.addSubview(xmarkImageView)
+        [bellImageView, titleLabel, newBadgeImageView, dateLabel, deleteButton].forEach {
+            self.contentView.addSubview($0)
+        }
         
         bellImageView.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
@@ -90,11 +92,11 @@ class AnnounceTableViewCell: UITableViewCell {
         newBadgeImageView.snp.makeConstraints { make in
             make.centerY.equalTo(titleLabel)
             make.left.equalTo(titleLabel.snp.right).offset(5)
-            make.right.lessThanOrEqualTo(xmarkImageView.snp.left).offset(-20)
+            make.right.lessThanOrEqualTo(deleteButton.snp.left).offset(-20)
             make.width.height.equalTo(20)
         }
         
-        xmarkImageView.snp.makeConstraints { make in
+        deleteButton.snp.makeConstraints { make in
             make.right.equalToSuperview().offset(-20)
             make.centerY.equalToSuperview()
             make.width.height.equalTo(24)

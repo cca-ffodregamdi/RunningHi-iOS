@@ -10,4 +10,5 @@ import RxSwift
 
 public protocol AnnounceRespositoryProtocol{
     func fetchAnnounce() -> Observable<[AnnounceModel]>
+    func deleteAnnounce(announceId: Int) -> Observable<Any>
 }
