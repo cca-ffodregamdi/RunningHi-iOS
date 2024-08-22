@@ -51,7 +51,7 @@ public class MyFeedReactor: Reactor{
             guard currentState.pageNumber < currentState.totalPages else { return .empty()}
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                self.myUseCase.fetchMyFeed(page: currentState.pageNumber, size: 10).map{ Mutation.addFeeds($0.0, $0.1)},
+                self.myUseCase.fetchMyFeed(page: currentState.pageNumber, size: 20).map{ Mutation.addFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false))
             ])
         case .refresh:
@@ -60,7 +60,7 @@ public class MyFeedReactor: Reactor{
             return Observable.concat([
                 Observable.just(Mutation.setRefreshing(true)),
                 Observable.just(Mutation.setLoading(true)),
-                myUseCase.fetchMyFeed(page: 0, size: 10)
+                myUseCase.fetchMyFeed(page: 0, size: 20)
                     .map{ Mutation.setFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false)),
                 Observable.just(Mutation.setRefreshing(false)),

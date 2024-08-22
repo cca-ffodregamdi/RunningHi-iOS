@@ -141,7 +141,7 @@ extension BookmarkedFeedViewController: View{
             .distinctUntilChanged()
             .filter{ [weak self] offset in
                 guard let self = self else { return false }
-                return offset + self.feedView.feedCollectionView.frame.size.height + 100 > self.feedView.feedCollectionView.contentSize.height
+                return offset + self.feedView.feedCollectionView.frame.size.height + 300 > self.feedView.feedCollectionView.contentSize.height
             }.map{ _ in Reactor.Action.fetchFeeds }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)

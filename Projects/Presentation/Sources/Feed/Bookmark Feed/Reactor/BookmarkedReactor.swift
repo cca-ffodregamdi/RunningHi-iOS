@@ -51,7 +51,7 @@ public class BookmarkedReactor: Reactor{
             guard currentState.pageNumber < currentState.totalPages else { return .empty()}
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                self.feedUseCase.fetchBookmarkedFeeds(page: currentState.pageNumber).map{ Mutation.addFeeds($0.0, $0.1)},
+                self.feedUseCase.fetchBookmarkedFeeds(page: currentState.pageNumber, size: 20).map{ Mutation.addFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false))
             ])
         case .refresh:
@@ -60,7 +60,7 @@ public class BookmarkedReactor: Reactor{
             return Observable.concat([
                 Observable.just(Mutation.setRefreshing(true)),
                 Observable.just(Mutation.setLoading(true)),
-                feedUseCase.fetchBookmarkedFeeds(page: 0)
+                feedUseCase.fetchBookmarkedFeeds(page: 0, size: 20)
                     .map{ Mutation.setFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false)),
                 Observable.just(Mutation.setRefreshing(false)),
