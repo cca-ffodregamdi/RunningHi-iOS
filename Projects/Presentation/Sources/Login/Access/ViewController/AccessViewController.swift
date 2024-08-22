@@ -91,19 +91,19 @@ extension AccessViewController: View{
             .bind(to: accessView.accessTableView.rx.items(cellIdentifier: AccessTableViewCell.identifier, cellType: AccessTableViewCell.self)){ index, model, cell in
                 cell.configureModel(title: model)
                 
-                if index == 2{
-                    cell.checkButton.rx
-                        .tap
-                        .map{Reactor.Action.checkAuthorization}
-                        .bind(to: reactor.action)
-                        .disposed(by: cell.disposeBag)
-                }else{
-                    cell.checkButton.rx
-                        .tap
-                        .map{ Reactor.Action.checkRow(index) }
-                        .bind(to: reactor.action)
-                        .disposed(by: cell.disposeBag)
-                }
+//                if index == 2{
+//                    cell.checkButton.rx
+//                        .tap
+//                        .map{Reactor.Action.checkAuthorization}
+//                        .bind(to: reactor.action)
+//                        .disposed(by: cell.disposeBag)
+//                }else{
+                cell.checkButton.rx
+                    .tap
+                    .map{ Reactor.Action.checkRow(index) }
+                    .bind(to: reactor.action)
+                    .disposed(by: cell.disposeBag)
+//                }
                 
                 reactor.state
                     .map{$0.checkArray[index]}
@@ -111,17 +111,17 @@ extension AccessViewController: View{
                     .disposed(by: cell.disposeBag)
             }.disposed(by: self.disposeBag)
         
-        reactor.state
-            .map{$0.authorization}
-            .distinctUntilChanged()
-            .bind{ [weak self] status in
-                guard let self = self, let status = status else { return }
-                if status != .allowed {
-                    self.showRequestLocationServiceAlert()
-                }else{
-                    reactor.action.onNext(.readCurrentLocation)
-                }
-            }.disposed(by: self.disposeBag)
+//        reactor.state
+//            .map{$0.authorization}
+//            .distinctUntilChanged()
+//            .bind{ [weak self] status in
+//                guard let self = self, let status = status else { return }
+//                if status != .allowed {
+//                    self.showRequestLocationServiceAlert()
+//                }else{
+//                    reactor.action.onNext(.readCurrentLocation)
+//                }
+//            }.disposed(by: self.disposeBag)
         
         accessView.accessTableView.rx.itemSelected
             .bind{ [weak self] indexPath in
@@ -152,10 +152,9 @@ extension AccessViewController: View{
         
         accessView.nextButton.rx
             .tap
-            .bind{ [weak self] _ in
-                guard let self = self else { return }
-                reactor.action.onNext(.signIn)
-            }.disposed(by: self.disposeBag)
+            .map{Reactor.Action.signIn}
+            .bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
         
         reactor.state.map{$0.successedSignIn}
             .distinctUntilChanged()
@@ -176,6 +175,11 @@ extension AccessViewController: UITableViewDelegate{
         reactor.state
             .map{$0.checkAllState}
             .bind(to: footer.checkButton.rx.isSelected)
+            .disposed(by: footer.disposeBag)
+        
+        footer.checkButton.rx.tap
+            .map{Reactor.Action.touchUpCheckAllButton}
+            .bind(to: reactor.action)
             .disposed(by: footer.disposeBag)
         
         footer.tapGesture.rx
