@@ -29,4 +29,15 @@ final public class AnnounceRepositoryImplementation: AnnounceRespositoryProtocol
                 return Observable.error(error)
             }
     }
+    
+    public func deleteAnnounce(announceId: Int) -> Observable<Any> {
+        return service.rx.request(.deleteAnnounce(announceId: announceId))
+            .filterSuccessfulStatusCodes()
+            .map{ _ in Observable.just(())}
+            .asObservable()
+            .catch{ error in
+                print("AnnounceRepositoryImplementation deleteAnnounce error: \(error)")
+                return Observable.error(error)
+            }
+    }
 }

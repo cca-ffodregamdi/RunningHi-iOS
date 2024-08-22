@@ -57,6 +57,11 @@ extension AnnounceViewController: View{
         reactor.state.map{$0.announces}
             .bind(to: announceView.announceTableView.rx.items(cellIdentifier: AnnounceTableViewCell.identifier, cellType: AnnounceTableViewCell.self)){ index, item, cell in
                 cell.configureModel(model: item)
+                
+                cell.deleteButton.rx.tap
+                    .map{ Reactor.Action.deleteAnnounce(announceId: item.announceId, index: index)}
+                    .bind(to: reactor.action)
+                    .disposed(by: cell.disposeBag)
             }.disposed(by: self.disposeBag)
     }
 }
