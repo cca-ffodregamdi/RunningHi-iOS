@@ -9,4 +9,5 @@ import Foundation
 
 public enum UserDefaultsKeys: String{
     case loginTypeKey = "loginType"
+    case isFirstKey = "isFirst"
 }

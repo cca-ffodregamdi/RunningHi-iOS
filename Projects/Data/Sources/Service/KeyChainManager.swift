@@ -55,4 +55,10 @@ public class KeyChainManager{
         let status = SecItemDelete(query)
         assert(status == noErr, "failed to delete the value, status code = \(status)")
     }
+    
+    public class func reset(){
+        for key in KeyChainKeys.allCases{
+            delete(key: key)
+        }
+    }
 }

@@ -9,6 +9,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 import Data
+import Common
 
 public class AppCoordinator: Coordinator{
     
@@ -22,6 +23,11 @@ public class AppCoordinator: Coordinator{
     }
     
     public func start() {
+        if UserDefaultsManager.get(forKey: .isFirstKey) == nil {
+            UserDefaultsManager.set(to: true, forKey: .isFirstKey)
+            KeyChainManager.reset()
+        }
+        
         AuthManager.shared.isValidAccessToken()
             .bind{ bool in
                 print(KeyChainManager.read(key: .runningHiAccessTokenkey))
