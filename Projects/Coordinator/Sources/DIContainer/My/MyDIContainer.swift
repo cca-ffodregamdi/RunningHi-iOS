@@ -62,4 +62,9 @@ class MyDIContainer{
         let vc = FeedDetailViewController(reactor: FeedDetailReactor(feedUseCase: FeedUseCase(repository: FeedRepositoryImplementation()), postId: postId))
         return vc
     }
+    
+    func makeEditProfileViewController() -> EditProfileViewController{
+        let vc = EditProfileViewController(reactor: EditProfileReactor(myUseCase: myUsecase))
+        return vc
+    }
 }

@@ -16,4 +16,5 @@ public protocol MyCoordinatorInterface{
     func showAnnounce()
     func showMyFeed()
     func showFeedDetailByMyFeed(viewController: MyFeedViewController, postId: Int)
+    func showEditProfile()
 }

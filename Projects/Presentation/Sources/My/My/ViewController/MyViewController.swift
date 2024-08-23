@@ -142,5 +142,12 @@ extension MyViewController: View{
                 guard let self = self else { return }
                 self.coordinator?.showAnnounce()
             }.disposed(by: self.disposeBag)
+        
+        myView.myProfileHeaderView.myProfileView.editProfileButton.rx.tap
+            .bind{[weak self] _ in
+                guard let self = self else { return }
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showEditProfile()
+            }.disposed(by: self.disposeBag)
     }
 }
