@@ -76,18 +76,10 @@ final public class RecordDetailViewController: UIViewController {
         backButton.addTarget(self, action: #selector(customBackAction), for: .touchUpInside)
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         
-        let shareButton = UIButton()
-        shareButton.setImage(CommonAsset.shareOutline.image, for: .normal)
-        shareButton.addTarget(self, action: #selector(shareAction), for: .touchUpInside)
-        
-        let deleteButton = UIButton()
-        deleteButton.setImage(CommonAsset.trashOutline.image, for: .normal)
-        deleteButton.addTarget(self, action: #selector(deleteAction), for: .touchUpInside)
-        
-        let stackView = UIStackView.init(arrangedSubviews: [shareButton, deleteButton])
-        stackView.axis = .horizontal
-        stackView.spacing = 8
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: stackView)
+        let moreButton = UIButton()
+        moreButton.setImage(CommonAsset.dotsVerticalOutline.image, for: .normal)
+        moreButton.addTarget(self, action: #selector(moreAction), for: .touchUpInside)
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: moreButton)
     }
     
     private func configureUI() {
@@ -105,12 +97,30 @@ final public class RecordDetailViewController: UIViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
-    @objc func shareAction() {
-        //TODO: 공유하기 기능 구현
+    @objc func moreAction() {
+        let moreAlert = UIAlertController(
+            title: "기록 더보기",
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+        
+        let writeAlertAction = UIAlertAction(title: "현재 기록으로 게시글 쓰기", style: .default)
+        let deleteAlertAction = UIAlertAction(title: "삭제", style: .destructive) { _ in self.deleteAction() }
+        let cancelAlertAction = UIAlertAction(title: "취소", style: .cancel)
+        
+        moreAlert.addAction(writeAlertAction)
+        moreAlert.addAction(deleteAlertAction)
+        moreAlert.addAction(cancelAlertAction)
+        
+        self.present(moreAlert, animated: true)
+    }
+    
+    @objc func writeAction() {
+        //TODO: 게시글 쓰기 기능 구현
     }
     
     @objc func deleteAction() {
-        let requestLocationServiceAlert = UIAlertController(
+        let deleteAlert = UIAlertController(
             title: "기록 삭제",
             message: "삭제된 기록은 다시 불러올 수 없습니다.\n해당 기록을 삭제하시겠습니까?",
             preferredStyle: .alert
@@ -121,10 +131,10 @@ final public class RecordDetailViewController: UIViewController {
             }
         }
         let cancel = UIAlertAction(title: "아니오", style: .default)
-        requestLocationServiceAlert.addAction(cancel)
-        requestLocationServiceAlert.addAction(confirm)
+        deleteAlert.addAction(cancel)
+        deleteAlert.addAction(confirm)
         
-        self.present(requestLocationServiceAlert, animated: true)
+        self.present(deleteAlert, animated: true)
     }
 }
 
