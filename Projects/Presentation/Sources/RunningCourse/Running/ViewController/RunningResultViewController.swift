@@ -21,6 +21,7 @@ final public class RunningResultViewController: UIViewController {
     public var coordinator: RunningCoordinatorInterface?
     
     public var runningResult = RunningResult()
+    private let delegate = RunningMapDelegate()
     
     public var disposeBag = DisposeBag()
     
@@ -54,15 +55,13 @@ final public class RunningResultViewController: UIViewController {
         
         configureNavigationBar()
         configureUI()
-        configureMap()
+        
+        runningResultView.mapArea.mapView.delegate = delegate
+        runningResultView.mapArea.mapView.configureMap(runningResult: runningResult)
     }
     
     public override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.isNavigationBarHidden = false
-    }
-    
-    public override func viewWillDisappear(_ animated: Bool) {
-        self.navigationController?.isNavigationBarHidden = true
     }
     
     //MARK: - Configure
@@ -89,39 +88,6 @@ final public class RunningResultViewController: UIViewController {
         runningResultView.snp.makeConstraints { make in
             make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
-    }
-    
-    private func configureMap() {
-        let coordinates = runningResult.routeList.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
-        let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
-        runningResultView.mapArea.mapView.addOverlay(polyline)
-
-        // 경로의 최대/최소 좌표를 계산
-        var minLat = runningResult.routeList[0].latitude
-        var maxLat = runningResult.routeList[0].latitude
-        var minLon = runningResult.routeList[0].longitude
-        var maxLon = runningResult.routeList[0].longitude
-
-        for coordinate in runningResult.routeList {
-            minLat = min(minLat, coordinate.latitude)
-            maxLat = max(maxLat, coordinate.latitude)
-            minLon = min(minLon, coordinate.longitude)
-            maxLon = max(maxLon, coordinate.longitude)
-        }
-
-        // 중심 좌표와 span(확대/축소 정도)를 계산
-        let center = CLLocationCoordinate2D(
-            latitude: (minLat + maxLat) / 2,
-            longitude: (minLon + maxLon) / 2
-        )
-        let span = MKCoordinateSpan(
-            latitudeDelta: (maxLat - minLat) * 1.2, // 여유를 주기 위해 1.2배
-            longitudeDelta: (maxLon - minLon) * 1.2 // 여유를 주기 위해 1.2배
-        )
-        let region = MKCoordinateRegion(center: center, span: span)
-        
-        runningResultView.mapArea.mapView.delegate = self
-        runningResultView.mapArea.mapView.setRegion(region, animated: true)
     }
     
     //MARK: - Helpers
@@ -201,6 +167,18 @@ extension RunningResultViewController: View {
                 reactor.action.onNext(.saveRunningRecord(runningResult))
             }
             .disposed(by: disposeBag)
+        
+        runningResultView.shareButton.rx.tap
+            .bind { [weak self] _ in
+                guard let self = self else { return }
+                
+//                coordinator?.finishRunning()
+            }
+            .disposed(by: disposeBag)
+        
+        let tapGesture = UITapGestureRecognizer()
+        self.runningResultView.mapArea.mapView.addGestureRecognizer(tapGesture)
+        tapGesture.addTarget(self, action: #selector(showMapView))
     }
     
     private func bindingDifficultyButtonAction(reactor: RunningResultReactor) {
@@ -235,6 +213,11 @@ extension RunningResultViewController: View {
     
     //MARK: - Helpers
     
+    @objc func showMapView() {
+        let mapVC = RunningMapViewController(runningResult: runningResult)
+        self.navigationController?.pushViewController(mapVC, animated: true)
+    }
+    
     func calculateTotalRunningTimePerKm() -> Array<(key: Double, value: RouteInfo)> {
         let groupedByDistance = Dictionary(grouping: runningResult.routeList) { Int($0.distance) }
         var routeInfoPerKm: [Double: RouteInfo] = [:]
@@ -249,20 +232,5 @@ extension RunningResultViewController: View {
         runningResult.sectionPace = routes.map{ Int.convertTimeAndDistanceToPace(time: $0.value.runningTime, distance: $0.value.distance) }
         runningResult.sectionKcal = routes.map{ Int.convertTimeToCalorie(time: $0.value.runningTime) }
         return routes
-    }
-}
-
-// MARK: - Map Extension
-
-extension RunningResultViewController: MKMapViewDelegate {
-    public func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        if let polyline = overlay as? MKPolyline {
-            let renderer = MKPolylineRenderer(polyline: polyline)
-            renderer.strokeColor = UIColor(hexaRGB: "2A71DB")
-            renderer.lineWidth = 2
-
-            return renderer
-        }
-        return MKOverlayRenderer(overlay: overlay)
     }
 }

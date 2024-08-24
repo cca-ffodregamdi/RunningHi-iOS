@@ -22,6 +22,7 @@ final public class RecordDetailViewController: UIViewController {
     public var coordinator: RecordCoordinatorInterface?
     
     public var postNo: Int?
+    private let delegate = RunningMapDelegate()
     
     public var disposeBag = DisposeBag()
     
@@ -63,6 +64,8 @@ final public class RecordDetailViewController: UIViewController {
         
         configureNavigationBar()
         configureUI()
+        
+        runningResultView.mapArea.mapView.delegate = delegate
     }
     
     //MARK: - Configure
@@ -144,10 +147,11 @@ extension RecordDetailViewController: View {
     
     public func bind(reactor: RecordDetailReactor) {
         bindingView(reactor: reactor)
+        bindingState(reactor: reactor)
+        bindingButtonAction(reactor: reactor)
     }
     
     private func bindingView(reactor: RecordDetailReactor) {
-        
         rx.viewDidLoad
             .bind { [weak self] _ in
                 guard let self = self, let postNo = postNo else {return}
@@ -155,12 +159,22 @@ extension RecordDetailViewController: View {
             }
             .disposed(by: disposeBag)
         
+        self.runningResultView.recordView.tableView.rx.observe(CGSize.self, "contentSize")
+            .bind{ [weak self] size in
+                guard let size = size, let self = self else {return}
+                self.runningResultView.recordView.tableView.snp.updateConstraints { make in
+                    make.height.equalTo(size.height)
+                }
+            }.disposed(by: self.disposeBag)
+    }
+    
+    private func bindingState(reactor: RecordDetailReactor) {
         reactor.state
             .compactMap{$0.runningResult}
             .bind{ [weak self] runningResult in
                 guard let self = self else { return }
                 self.runningResultView.setData(runningModel: runningResult)
-                self.configureMap(runningResult: runningResult)
+                self.runningResultView.mapArea.mapView.configureMap(runningResult: runningResult)
             }.disposed(by: self.disposeBag)
         
         reactor.state
@@ -177,17 +191,22 @@ extension RecordDetailViewController: View {
                 guard let self = self else { return }
                 self.navigationController?.popViewController(animated: true)
             }.disposed(by: self.disposeBag)
-        
-        self.runningResultView.recordView.tableView.rx.observe(CGSize.self, "contentSize")
-            .bind{ [weak self] size in
-                guard let size = size, let self = self else {return}
-                self.runningResultView.recordView.tableView.snp.updateConstraints { make in
-                    make.height.equalTo(size.height)
-                }
-            }.disposed(by: self.disposeBag)
+    }
+    
+    private func bindingButtonAction(reactor: RecordDetailReactor) {
+        let tapGesture = UITapGestureRecognizer()
+        self.runningResultView.mapArea.mapView.addGestureRecognizer(tapGesture)
+        tapGesture.addTarget(self, action: #selector(showMapView))
     }
     
     //MARK: - Helpers
+    
+    @objc func showMapView() {
+        if let runningResult = reactor?.currentState.runningResult {
+            let mapVC = RunningMapViewController(runningResult: runningResult)
+            self.navigationController?.pushViewController(mapVC, animated: true)
+        }
+    }
     
     func calculateTotalRunningTimePerKm(runningResult: RunningResult) -> Array<(key: Double, value: RouteInfo)> {
         let groupedByDistance = Dictionary(grouping: runningResult.routeList) { Int($0.distance) }
@@ -201,55 +220,5 @@ extension RecordDetailViewController: View {
 
         let routes = routeInfoPerKm.sorted { $0.key < $1.key }
         return routes
-    }
-    
-    private func configureMap(runningResult: RunningResult) {
-        let coordinates = runningResult.routeList.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
-        let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
-        runningResultView.mapArea.mapView.addOverlay(polyline)
-        
-        if runningResult.routeList.count == 0 { return }
-
-        // 경로의 최대/최소 좌표를 계산
-        var minLat = runningResult.routeList[0].latitude
-        var maxLat = runningResult.routeList[0].latitude
-        var minLon = runningResult.routeList[0].longitude
-        var maxLon = runningResult.routeList[0].longitude
-
-        for coordinate in runningResult.routeList {
-            minLat = min(minLat, coordinate.latitude)
-            maxLat = max(maxLat, coordinate.latitude)
-            minLon = min(minLon, coordinate.longitude)
-            maxLon = max(maxLon, coordinate.longitude)
-        }
-
-        // 중심 좌표와 span(확대/축소 정도)를 계산
-        let center = CLLocationCoordinate2D(
-            latitude: (minLat + maxLat) / 2,
-            longitude: (minLon + maxLon) / 2
-        )
-        let span = MKCoordinateSpan(
-            latitudeDelta: (maxLat - minLat) * 1.2, // 여유를 주기 위해 1.2배
-            longitudeDelta: (maxLon - minLon) * 1.2 // 여유를 주기 위해 1.2배
-        )
-        let region = MKCoordinateRegion(center: center, span: span)
-        
-        runningResultView.mapArea.mapView.delegate = self
-        runningResultView.mapArea.mapView.setRegion(region, animated: true)
-    }
-}
-
-// MARK: - Map Extension
-
-extension RecordDetailViewController: MKMapViewDelegate {
-    public func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        if let polyline = overlay as? MKPolyline {
-            let renderer = MKPolylineRenderer(polyline: polyline)
-            renderer.strokeColor = UIColor(hexaRGB: "2A71DB")
-            renderer.lineWidth = 2
-
-            return renderer
-        }
-        return MKOverlayRenderer(overlay: overlay)
     }
 }
