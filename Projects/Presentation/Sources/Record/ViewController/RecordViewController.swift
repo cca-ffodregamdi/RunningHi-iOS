@@ -11,6 +11,7 @@ import ReactorKit
 import RxRelay
 import Domain
 import Charts
+import Common
 
 final public class RecordViewController: UIViewController {
     
@@ -28,6 +29,7 @@ final public class RecordViewController: UIViewController {
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .wheels
+        datePicker.minimumDate = DateUtil.formatDateStringToDate(dateString: "2024-01-01T00:00:00")
         datePicker.maximumDate = Date()
         datePicker.timeZone = TimeZone(identifier: "Asia/Seoul")
         datePicker.locale = Locale(identifier: "ko_KR")

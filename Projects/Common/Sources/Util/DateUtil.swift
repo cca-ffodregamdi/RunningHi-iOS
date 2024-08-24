@@ -9,26 +9,21 @@ import Foundation
 
 public struct DateUtil {
     
-    public static var dateFormatter: DateFormatter {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .none
-        dateFormatter.locale = Locale(identifier: "ko_KR")
-        return dateFormatter
-    }
-    
     // 서버 형식의 dateString을 format에 맞는 String으로 변환한다.
-    public static func formatDateStringToString(dateString: String, format: String = "MM월 dd일") -> String{
+    public static func formatDateStringToString(dateString: String, stringFormat: String = "MM월 dd일") -> String{
         let possibleFormats = [
             "yyyy-MM-dd'T'HH:mm:ss",
             "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
         ]
         
         for format in possibleFormats{
+            let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = format
+            dateFormatter.locale = Locale(identifier: "ko_KR")
+            
             if let date = dateFormatter.date(from: dateString){
                 let MdFormatter = DateFormatter()
-                MdFormatter.dateFormat = format
+                MdFormatter.dateFormat = stringFormat
                 return MdFormatter.string(from: date)
             }
         }
@@ -43,8 +38,12 @@ public struct DateUtil {
         ]
         
         for format in possibleFormats{
+            let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = format
-            return dateFormatter.date(from: dateString)
+            dateFormatter.locale = Locale(identifier: "ko_KR")
+            if let date = dateFormatter.date(from: dateString) {
+                return date
+            }
         }
         return nil
     }
