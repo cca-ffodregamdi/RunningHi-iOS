@@ -14,6 +14,7 @@ public enum RecordService {
     case fetchRecord(type: RecordChartType, date: String)
     case fetchRunning(postNo: Int)
     case fetchGPSData(url: String)
+    case deleteRecord(postNo: Int)
 }
 
 extension RecordService: TargetType {
@@ -34,7 +35,7 @@ extension RecordService: TargetType {
         switch self {
         case .fetchRecord(let type, _):
             return "/records/\(type.rawValue)"
-        case .fetchRunning(let postNo):
+        case .fetchRunning(let postNo), .deleteRecord(let postNo):
             return "posts/\(postNo)"
         case .fetchGPSData:
             return ""
@@ -45,6 +46,8 @@ extension RecordService: TargetType {
         switch self {
         case .fetchRecord, .fetchRunning, .fetchGPSData:
             return .get
+        case .deleteRecord(postNo: let postNo):
+            return .delete
         }
     }
     
@@ -52,7 +55,7 @@ extension RecordService: TargetType {
         switch self {
         case .fetchRecord(_, let date):
             return .requestParameters(parameters: ["date" : date], encoding: URLEncoding.queryString)
-        case .fetchRunning, .fetchGPSData:
+        case .fetchRunning, .fetchGPSData, .deleteRecord:
             return .requestPlain
         }
     }

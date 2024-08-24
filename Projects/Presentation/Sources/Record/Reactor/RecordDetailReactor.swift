@@ -20,14 +20,17 @@ final public class RecordDetailReactor: Reactor {
     
     public enum Action{
         case fetchRecordDetailData(Int)
+        case deleteRunningRecord(Int)
     }
     
     public enum Mutation{
         case setRecordDetailData(RunningResult)
+        case finishDeleteRunningRecord
     }
     
     public struct State{
         var runningResult: RunningResult?
+        var isFinishDeleteRunningRecord = false
     }
     
     //MARK: - Lifecycle
@@ -44,6 +47,9 @@ final public class RecordDetailReactor: Reactor {
         case .fetchRecordDetailData(let postNo):
             return recordUseCase.fetchRecordDetailData(postNo: postNo)
                 .map { Mutation.setRecordDetailData($0) }
+        case .deleteRunningRecord(let postNo):
+            return recordUseCase.deleteRunningRecord(postNo: postNo)
+                .map { Mutation.finishDeleteRunningRecord }
         }
     }
     
@@ -52,6 +58,8 @@ final public class RecordDetailReactor: Reactor {
         switch mutation{
         case .setRecordDetailData(let runningResult):
             newState.runningResult = runningResult
+        case .finishDeleteRunningRecord:
+            newState.isFinishDeleteRunningRecord = true
         }
         return newState
     }

@@ -98,7 +98,7 @@ class RunningResultView: UIView {
         runningResultStackView.snp.makeConstraints { make in
             make.width.equalToSuperview()
             make.top.equalToSuperview().inset(16)
-            make.bottom.equalToSuperview().inset(80)
+            make.bottom.equalToSuperview().inset(isRunningResult ? 80 : 30)
         }
         
         if isRunningResult {
@@ -114,7 +114,8 @@ class RunningResultView: UIView {
     func setData(runningModel: RunningResult) {
         titleArea.setData(startTime: runningModel.startTime,
                           endTime: runningModel.endTime,
-                          location: runningModel.location
+                          location: runningModel.location,
+                          difficulty: isRunningResult ? nil : runningModel.difficulty
         )
         dataArea.setData(time: runningModel.runningTime,
                          calorie: runningModel.calorie,

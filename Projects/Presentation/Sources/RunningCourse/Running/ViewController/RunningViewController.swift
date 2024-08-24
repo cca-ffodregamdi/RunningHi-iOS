@@ -233,8 +233,8 @@ extension RunningViewController: View {
         // Stop Button Tap Event
         runningView.runningRecordView.stopButton.rx.tap
             .bind { [weak self] _ in
-                guard let _ = self else { return }
-                //TODO: 토스트 메시지 출력 (오늘의 운동을 중지하시려면 길게 눌러주세요)
+                guard let self = self else { return }
+                self.showToast(message: "오늘의 운동을 중지하시려면 길게 눌러주세요", width: 310)
             }
             .disposed(by: disposeBag)
         

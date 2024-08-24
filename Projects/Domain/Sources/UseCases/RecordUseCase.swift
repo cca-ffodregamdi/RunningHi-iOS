@@ -25,4 +25,8 @@ public final class RecordUseCase: RecordUseCaseProtocol {
     public func fetchRecordDetailData(postNo: Int) -> Observable<RunningResult> {
         return repository.fetchRecordDetailData(postNo: postNo)
     }
+    
+    public func deleteRunningRecord(postNo: Int) -> Observable<Void> {
+        return repository.deleteRunningRecord(postNo: postNo)
+    }
 }

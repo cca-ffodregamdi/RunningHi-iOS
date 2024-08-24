@@ -47,6 +47,8 @@ class RunningDifficultyButton: UIButton {
     //MARK: - Configure
     
     private func setupViews() {
+        backgroundColor = .white.withAlphaComponent(0)
+        
         addSubview(circleView)
         addSubview(difficultuLabel)
     }
@@ -68,6 +70,6 @@ class RunningDifficultyButton: UIButton {
     //MARK: - Helpers
     
     func setActiveColor(isActive: Bool) {
-        circleView.backgroundColor = isActive ? .Primary : .Neutrals300
+        circleView.backgroundColor = isActive ? .black : .Neutrals300
     }
 }

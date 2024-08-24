@@ -70,4 +70,17 @@ public class RecordRepositoryImplementation: RecordRepositoryProtocol {
             .asObservable()
             .map(RunningResultDTO.self)
     }
+    
+    public func deleteRunningRecord(postNo: Int) -> Observable<Void> {
+        return service.rx.request(.deleteRecord(postNo: postNo))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> Void in
+                let recordResponse = try JSONDecoder().decode(RecordDeleteResponseDTO.self, from: response.data)
+                return
+            }
+            .asObservable()
+            .catch{ error in
+                return Observable.error(error)
+            }
+    }
 }

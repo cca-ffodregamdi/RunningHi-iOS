@@ -61,6 +61,11 @@ final public class RecordReactor: Reactor {
             // 아직 오지 않은 날짜의 차트는 볼 수 없음
             if DateUtil.isDateInFuture(type: chartType.calendarType, date: rangedDate) { return Observable.empty() }
             
+            // 2024년도 이후의 날짜만 조회 가능
+            if rangedDate < Calendar.current.date(from: DateComponents(year: 2024, month: 1, day: 1))! {
+                return Observable.empty()
+            }
+            
             return recordUseCase.fetchRecordData(type: chartType, date: rangedDate)
                 .map { Mutation.setRecordData($0) }
         
