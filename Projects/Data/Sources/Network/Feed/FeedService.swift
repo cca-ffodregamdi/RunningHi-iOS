@@ -25,6 +25,7 @@ public enum FeedService{
     case unLikePost(postId: Int)
     case editComment(commentId: Int, editCommentModel: EditCommentRequestDTO)
     case fetchBookmarkedFeeds(pages: Int, size: Int = 10)
+    case editFeed(feedData: CreateFeedRequestDTO)
 }
 
 extension FeedService: TargetType{
@@ -66,6 +67,8 @@ extension FeedService: TargetType{
             return "/reply/update/\(commentId)"
         case .fetchBookmarkedFeeds:
             return "/posts/bookmarked"
+        case .editFeed:
+            return "posts"
         }
     }
     
@@ -87,7 +90,8 @@ extension FeedService: TargetType{
             return .delete
         case .deleteComment,
                 .editPost,
-                .editComment:
+                .editComment,
+                .editFeed:
             return .put
         }
     }
@@ -118,6 +122,8 @@ extension FeedService: TargetType{
             return .requestJSONEncodable(likePost)
         case .fetchBookmarkedFeeds(let page, let size):
             return .requestParameters(parameters: ["page" : page + 1, "size" : size], encoding: URLEncoding.queryString)
+        case .editFeed(let feedData):
+            return .requestJSONEncodable(feedData)
         }
     }
     
@@ -136,7 +142,8 @@ extension FeedService: TargetType{
                 .likePost,
                 .unLikePost,
                 .editComment,
-                .fetchBookmarkedFeeds:
+                .fetchBookmarkedFeeds,
+                .editFeed:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]
         }

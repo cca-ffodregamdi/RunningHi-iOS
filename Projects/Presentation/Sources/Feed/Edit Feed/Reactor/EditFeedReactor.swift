@@ -11,45 +11,52 @@ import Domain
 
 public class EditFeedReactor: Reactor{
     
+    //MARK: - Properties
+    
+    public let initialState: State
+    private let feedUseCase: FeedUseCase
+    
     public enum Action{
-        case fetchPost
-        case editfeed(EditFeedRequestDTO)
+        case createRunningFeed(EditFeedModel)
+        case tapRepresentButton(FeedRepresentType)
     }
     
     public enum Mutation{
-        case setFeedModel(FeedDetailModel)
-        case setEditedFeed(Bool)
+        case finishCreateRunningFeed
+        case setFeedRepresentType(FeedRepresentType)
     }
     
     public struct State{
-        let postId: Int
-        var feed: FeedDetailModel?
-        var editedFeed: Bool = false
+        var isFinishCreateRunningFeed = false
+        var representType: FeedRepresentType?
     }
     
-    public var initialState: State
-    private let feedUsecase: FeedUseCase
-    public init(feedUsecase: FeedUseCase, postId: Int) {
-        self.initialState = State(postId: postId)
-        self.feedUsecase = feedUsecase
+    //MARK: - Lifecycle
+    
+    public init(feedUseCase: FeedUseCase) {
+        self.initialState = State()
+        self.feedUseCase = feedUseCase
     }
+    
+    //MARK: - Configure
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
-        case .fetchPost:
-            return feedUsecase.fetchPost(postId: currentState.postId).map{ Mutation.setFeedModel($0) }
-        case .editfeed(let model):
-            return feedUsecase.editPost(postId: currentState.postId, editPostModel: model).map{ _ in Mutation.setEditedFeed(true) }
+        case .createRunningFeed(let feedModel):
+            return feedUseCase.editFeed(feedModel: feedModel)
+                .map { Mutation.finishCreateRunningFeed }
+        case .tapRepresentButton(let type):
+            return Observable.just(Mutation.setFeedRepresentType(type))
         }
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation{
-        case .setFeedModel(let model):
-            newState.feed = model
-        case .setEditedFeed(let value):
-            newState.editedFeed = value
+        case .finishCreateRunningFeed:
+            newState.isFinishCreateRunningFeed = true
+        case .setFeedRepresentType(let type):
+            newState.representType = type
         }
         return newState
     }

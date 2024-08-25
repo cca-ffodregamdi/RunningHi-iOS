@@ -166,4 +166,21 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
                 return Observable.error(error)
             }
     }
+    
+    public func editFeed(feedModel: EditFeedModel) -> Observable<Void> {
+        return service.rx.request(.editFeed(feedData: CreateFeedRequestDTO(postNo: feedModel.postNo,
+                                                                            postContent: feedModel.postContent,
+                                                                            difficulty: "",
+                                                                            mainData: feedModel.mainData.typeNo,
+                                                                            imageUrl: feedModel.imageUrl)))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> Void in
+                let _ = try JSONDecoder().decode(RunningResultResponseDTO.self, from: response.data)
+                return
+            }
+            .asObservable()
+            .catch{ error in
+                return Observable.error(error)
+            }
+    }
 }
