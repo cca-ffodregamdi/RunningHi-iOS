@@ -51,7 +51,7 @@ public class RunningRepositoryImplementation: RunningRepositoryProtocol {
         stopUpdatingLocation()
     }
     
-    public func saveRunningResult(runningResult: RunningResult) -> Observable<Any> {
+    public func saveRunningResult(runningResult: RunningResult) -> Observable<Int> {
         let runningResultDTO = RunningResultDTO.fromEntity(data: runningResult)
         
         var request_data = ""
@@ -59,7 +59,6 @@ public class RunningRepositoryImplementation: RunningRepositoryProtocol {
             let jsonData = try JSONEncoder().encode(runningResultDTO)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
                 request_data = jsonString
-                print(jsonString)
             }
         } catch {
             return Observable.error(error)
@@ -67,8 +66,9 @@ public class RunningRepositoryImplementation: RunningRepositoryProtocol {
         
         return networkService.rx.request(.saveRunningResult(data: request_data))
             .filterSuccessfulStatusCodes()
-            .map{ response in
-                return Observable.just(())
+            .map{ response -> Int in
+                let announceResponse = try JSONDecoder().decode(RunningResultResponseDTO.self, from: response.data)
+                return announceResponse.data.postNo
             }.asObservable()
             .catch{ error in
                 print(error)

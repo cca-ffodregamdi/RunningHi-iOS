@@ -12,6 +12,12 @@ import RxRelay
 import Domain
 import CoreLocation
 
+public enum EditFeedEnterType {
+    case feed
+    case record
+    case running
+}
+
 final public class EditFeedViewController: UIViewController {
     
     //MARK: - Properties
@@ -19,6 +25,7 @@ final public class EditFeedViewController: UIViewController {
     public var coordinator: FeedCoordinatorInterface?
     
     private var postNo: Int?
+    private var enterType: EditFeedEnterType = .feed
     
     public var disposeBag = DisposeBag()
     
@@ -32,10 +39,11 @@ final public class EditFeedViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public init(reactor: EditFeedReactor, postNo: Int){
+    public init(reactor: EditFeedReactor, postNo: Int, enterType: EditFeedEnterType){
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
         self.postNo = postNo
+        self.enterType = enterType
     }
     
     deinit {
@@ -76,7 +84,12 @@ final public class EditFeedViewController: UIViewController {
     //MARK: - Helpers
     
     @objc func customBackAction() {
-        self.navigationController?.popViewController(animated: true)
+        if enterType == .running {
+            self.navigationController?.isNavigationBarHidden = true
+            self.navigationController?.popToRootViewController(animated: true)
+        } else {
+            self.navigationController?.popViewController(animated: true)
+        }
     }
     
     @objc func completeAction() {
@@ -104,7 +117,17 @@ extension EditFeedViewController: View {
             .distinctUntilChanged()
             .bind{ [weak self] type in
                 guard let self = self else { return }
-                self.navigationController?.popViewController(animated: true)
+                
+                switch enterType {
+                case .feed: 
+                    break
+                case .record:
+                    self.tabBarController?.tabBar.isHidden = false
+                    self.navigationController?.popToRootViewController(animated: true)
+                case .running:
+                    self.navigationController?.isNavigationBarHidden = true
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
             }.disposed(by: self.disposeBag)
     }
     

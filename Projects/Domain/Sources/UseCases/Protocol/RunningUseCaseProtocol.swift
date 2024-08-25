@@ -11,9 +11,7 @@ import KakaoSDKAuth
 
 public protocol RunningUseCaseProtocol{
     func checkUserCurrentLocationAuthorization() -> Observable<LocationAuthorizationStatus>
-    
     func startRunning()
     func stopRunning()
-    
-    func saveRunningResult(runningResult: RunningResult) -> Observable<Any>
+    func saveRunningResult(runningResult: RunningResult) -> Observable<Int>
 }

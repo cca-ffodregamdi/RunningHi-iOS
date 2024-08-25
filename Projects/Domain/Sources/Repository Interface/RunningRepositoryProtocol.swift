@@ -16,5 +16,5 @@ public protocol RunningRepositoryProtocol{
     func startRunning()
     func stopRunning()
     
-    func saveRunningResult(runningResult: RunningResult) -> Observable<Any>
+    func saveRunningResult(runningResult: RunningResult) -> Observable<Int>
 }

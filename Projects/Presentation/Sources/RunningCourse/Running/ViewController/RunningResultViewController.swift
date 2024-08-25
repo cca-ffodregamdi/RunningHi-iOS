@@ -157,6 +157,14 @@ extension RunningResultViewController: View {
                 guard let self = self else { return }
                 coordinator?.finishRunning()
             }.disposed(by: self.disposeBag)
+        
+        reactor.state
+            .compactMap{$0.postNo}
+            .distinctUntilChanged()
+            .bind{ [weak self] postNo in
+                guard let self = self else { return }
+                coordinator?.showEditFeed(postNo: postNo)
+            }.disposed(by: self.disposeBag)
     }
     
     private func bindingButtonAction(reactor: RunningResultReactor) {
@@ -172,7 +180,7 @@ extension RunningResultViewController: View {
             .bind { [weak self] _ in
                 guard let self = self else { return }
                 
-//                coordinator?.finishRunning()
+                reactor.action.onNext(.saveRunningRecordForShare(runningResult))
             }
             .disposed(by: disposeBag)
         

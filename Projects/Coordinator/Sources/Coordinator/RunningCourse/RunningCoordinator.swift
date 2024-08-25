@@ -50,10 +50,13 @@ extension RunningCoordinator: RunningCoordinatorInterface {
         self.navigationController.pushViewController(vc, animated: true)
     }
     
-//    func showFeedShareView() {
-//        let vc = runningDIContainer.makeFeedShareController(coordinator: self, runningResult: runningResult)
-//        self.navigationController.pushViewController(vc, animated: true)
-//    }
+    func showEditFeed(postNo: Int) {
+        let feedCoordinator: FeedCoordinator = FeedCoordinator(navigationController: navigationController)
+        let feedDIContainer = feedCoordinator.feedDIContainer
+        
+        let vc = feedDIContainer.makeEditPostViewController(postId: postNo, coordinator: feedCoordinator, enterType: .running)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
     
     func finishRunning() {
         self.navigationController?.isNavigationBarHidden = true
