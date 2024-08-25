@@ -47,7 +47,7 @@ final public class EditFeedViewController: UIViewController {
     }
     
     deinit {
-        print("deinit RecordFeedViewController")
+        print("deinit EditFeedViewController")
     }
     
     public override func viewDidLoad() {
@@ -93,6 +93,10 @@ final public class EditFeedViewController: UIViewController {
     }
     
     @objc func completeAction() {
+        if feedEditView.contentTextView.text == "" || reactor?.currentState.representType == nil {
+            return
+        }
+        
         if let postNo = postNo {
             reactor?.action.onNext(.createRunningFeed(EditFeedModel(postNo: postNo,
                                                                     postContent: feedEditView.contentTextView.text,
@@ -129,6 +133,20 @@ extension EditFeedViewController: View {
                     self.navigationController?.popToRootViewController(animated: true)
                 }
             }.disposed(by: self.disposeBag)
+        
+        Observable.combineLatest(feedEditView.contentTextView.rx.text, reactor.state.map { $0.representType })
+            .subscribe(onNext: { [weak self] text, representType in
+                guard let self = self else { return }
+                
+                if text == "" || representType == nil {
+                    self.navigationItem.rightBarButtonItem?.tintColor = .Neutrals300
+//                    self.navigationItem.rightBarButtonItem?.isEnabled = false
+                } else {
+                    self.navigationItem.rightBarButtonItem?.tintColor = .Primary
+//                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     private func bindingButtonAction(reactor: EditFeedReactor) {
