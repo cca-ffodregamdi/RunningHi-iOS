@@ -15,6 +15,15 @@ struct MyPageSection {
     var items: [MyPageItem]
 }
 
+extension MyPageSection: SectionModelType {
+    typealias Item = MyPageItem
+
+    init(original: MyPageSection, items: [MyPageItem]) {
+        self = original
+        self.items = items
+    }
+}
+
 public enum MyPageItem: Int, CaseIterable {
     case myFeed
     case notices
@@ -41,14 +50,5 @@ public enum MyPageItem: Int, CaseIterable {
         case .customerCenter: return CommonAsset.customerServiceOutline.image
         case .locationSetting: return CommonAsset.locationMarkerOutline.image
         }
-    }
-}
-
-extension MyPageSection: SectionModelType {
-    typealias Item = MyPageItem
-
-    init(original: MyPageSection, items: [MyPageItem]) {
-        self = original
-        self.items = items
     }
 }

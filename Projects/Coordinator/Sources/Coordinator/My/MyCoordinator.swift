@@ -64,7 +64,12 @@ extension MyCoordinator: MyCoordinatorInterface{
     }
     
     func showEditProfile() {
-        let vc = myDIContainer.makeEditProfileViewController()
+        let vc = myDIContainer.makeEditProfileViewController(coordinator: self)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showSignOut() {
+        let vc = myDIContainer.makeSignOutViewController(coordinator: self)
         self.navigationController.pushViewController(vc, animated: true)
     }
 }

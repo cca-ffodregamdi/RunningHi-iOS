@@ -68,7 +68,7 @@ class EditProfileView: UIView {
         return label
     }()
     
-    private lazy var logoutButton: UIButton = {
+    lazy var logoutButton: UIButton = {
         let button = UIButton()
         return button
     }()
@@ -87,7 +87,7 @@ class EditProfileView: UIView {
         return label
     }()
     
-    private lazy var signOutButton: UIButton = {
+    lazy var signOutButton: UIButton = {
         let button = UIButton()
         return button
     }()

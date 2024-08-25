@@ -63,8 +63,15 @@ class MyDIContainer{
         return vc
     }
     
-    func makeEditProfileViewController() -> EditProfileViewController{
+    func makeEditProfileViewController(coordinator: MyCoordinator) -> EditProfileViewController{
         let vc = EditProfileViewController(reactor: EditProfileReactor(myUseCase: myUsecase))
+        vc.coordinator = coordinator
+        return vc
+    }
+    
+    func makeSignOutViewController(coordinator: MyCoordinator) -> SignOutViewController{
+        let vc = SignOutViewController(reactor: SignOutReactor(myUseCase: myUsecase))
+        vc.coordinator = coordinator
         return vc
     }
 }

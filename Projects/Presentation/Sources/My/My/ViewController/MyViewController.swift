@@ -69,20 +69,6 @@ final public class MyViewController: UIViewController{
         barButtonItems.append(UIBarButtonItem(customView: announceButton))
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
-    
-    private func showLogoutAlert(){
-        let alertView = UIAlertController(title: "로그아웃", message: "로그아웃 하시겠습니까?", preferredStyle: .alert)
-        
-        let logout = UIAlertAction(title: "로그아웃", style: .destructive) { [weak self] _ in
-            guard let self = self else { return }
-            
-        }
-        
-        let cancel = UIAlertAction(title: "아니오", style: .cancel)
-        alertView.addAction(cancel)
-        alertView.addAction(logout)
-        self.present(alertView, animated: true)
-    }
 }
 
 extension MyViewController: View{
