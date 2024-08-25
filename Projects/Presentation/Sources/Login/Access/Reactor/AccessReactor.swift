@@ -62,15 +62,17 @@ public class AccessReactor: Reactor{
                                             UserDefaultsManager.get(forKey: .loginTypeKey) as! String){
                 switch loginType{
                 case .apple:
-                    return Observable.concat([
-                        loginUseCase.signWithApple(requestModel: .init(authorizationCode: loginUseCase.readKeyChain(key: .appleLoginAuthorizationCodeKey) ?? "", identityToken: loginUseCase.readKeyChain(key: .appleLoginIdentityTokenKey) ?? "")).map{ Mutation.signed($0, $1)}.observe(on: MainScheduler.asyncInstance),
+                    return loginUseCase.signWithApple(requestModel: .init(authorizationCode: loginUseCase.readKeyChain(key: .appleLoginAuthorizationCodeKey) ?? "", identityToken: loginUseCase.readKeyChain(key: .appleLoginIdentityTokenKey) ?? "")).map{ Mutation.signed($0, $1)}
+//                    return Observable.concat([
+//                        loginUseCase.signWithApple(requestModel: .init(authorizationCode: loginUseCase.readKeyChain(key: .appleLoginAuthorizationCodeKey) ?? "", identityToken: loginUseCase.readKeyChain(key: .appleLoginIdentityTokenKey) ?? "")).map{ Mutation.signed($0, $1)}.observe(on: MainScheduler.asyncInstance),
 //                        loginUseCase.setUserLocation(userLocationModel: UserLocation(latitude: currentState.currentLocation!.latitude, longitude: currentState.currentLocation!.latitude)).map{ _ in Mutation.successedUploadUserLocation}
-                    ])
+//                    ])
                 case .kakao:
-                    return Observable.concat([
-                        loginUseCase.signWithKakao(kakaoAccessToken: loginUseCase.readKeyChain(key: .kakaoLoginAccessTokenKey) ?? "").map{ Mutation.signed($0, $1) }.observe(on: MainScheduler.asyncInstance),
+                    return loginUseCase.signWithKakao(kakaoAccessToken: loginUseCase.readKeyChain(key: .kakaoLoginAccessTokenKey) ?? "").map{Mutation.signed($0, $1)}
+//                    return Observable.concat([
+//                        loginUseCase.signWithKakao(kakaoAccessToken: loginUseCase.readKeyChain(key: .kakaoLoginAccessTokenKey) ?? "").debug().map{ Mutation.signed($0, $1) }.observe(on: MainScheduler.asyncInstance),
 //                        loginUseCase.setUserLocation(userLocationModel: UserLocation(latitude: currentState.currentLocation!.latitude, longitude: currentState.currentLocation!.latitude)).map{ _ in Mutation.successedUploadUserLocation}
-                    ])
+//                    ])
                 }
             }
             

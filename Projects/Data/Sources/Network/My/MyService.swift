@@ -19,6 +19,9 @@ public enum MyService{
     case fetchMyFeed(page: Int, size: Int)
     case makeBookmark(post: BookmarkRequestDTO)
     case deleteBookmark(postId: Int)
+    
+    case signOutApple
+    case signOutKakao
 }
 
 extension MyService: TargetType{
@@ -39,6 +42,8 @@ extension MyService: TargetType{
         case .fetchMyFeed: "/posts/my-feed"
         case .makeBookmark: "/bookmark"
         case .deleteBookmark(let postId): "/bookmark/\(postId)"
+        case .signOutKakao: "/unlink/kakao"
+        case .signOutApple: "/unlink/apple"
         }
     }
     
@@ -47,6 +52,7 @@ extension MyService: TargetType{
         case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed: .get
         case .makeBookmark: .post
         case .deleteBookmark: .delete
+        case .signOutApple, .signOutKakao: .put
         }
     }
     
@@ -55,13 +61,14 @@ extension MyService: TargetType{
         case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .deleteBookmark: .requestPlain
         case .fetchMyFeed(let page, let size): .requestParameters(parameters: ["page" : page + 1, "size" : size], encoding: URLEncoding.queryString)
         case .makeBookmark(let postModel): .requestJSONEncodable(postModel)
+        case .signOutApple, .signOutKakao: .requestPlain
             
         }
     }
     
     public var headers: [String : String]?{
         switch self{
-        case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed, .makeBookmark, .deleteBookmark:
+        case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed, .makeBookmark, .deleteBookmark, .signOutApple, .signOutKakao:
             ["Content-type": "application/json",
                     "Authorization": accessToken]
         }

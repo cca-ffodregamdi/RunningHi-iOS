@@ -17,4 +17,8 @@ public protocol MyRepositoryProtocol{
     func fetchMyFeed(page: Int, size: Int) -> Observable<([FeedModel], Int)>
     func makeBookmark(post: BookmarkRequestDTO) -> Observable<Any>
     func deleteBookmark(postId: Int) -> Observable<Any>
+    
+    func deleteKeyChain()
+    
+    func signOut(loginType: LoginType) -> Observable<Any>
 }

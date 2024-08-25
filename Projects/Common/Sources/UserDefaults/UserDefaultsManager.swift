@@ -17,4 +17,10 @@ public class UserDefaultsManager{
     public static func get(forKey: UserDefaultsKeys) -> Any?{
         return UserDefaults.standard.object(forKey: forKey.rawValue)
     }
+    
+    public static func reset(){
+        for key in UserDefaultsKeys.allCases{
+            UserDefaults.standard.removeObject(forKey: key.rawValue)
+        }
+    }
 }

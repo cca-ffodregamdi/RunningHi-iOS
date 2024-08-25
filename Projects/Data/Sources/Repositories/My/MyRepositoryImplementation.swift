@@ -98,4 +98,23 @@ public final class MyRepositoryImplementation: MyRepositoryProtocol{
                 return Observable.just(())
             }.asObservable()
     }
+    
+    public func deleteKeyChain() {
+        KeyChainManager.reset()
+    }
+    
+    public func signOut(loginType: LoginType) -> Observable<Any> {
+        switch loginType{
+        case .apple:
+            return service.rx.request(.signOutApple)
+                .filterSuccessfulStatusCodes()
+                .map{_ in return Observable.just(())}
+                .asObservable()
+        case .kakao:
+            return service.rx.request(.signOutKakao)
+                .filterSuccessfulStatusCodes()
+                .map{_ in return Observable.just(())}
+                .asObservable()
+        }
+    }
 }

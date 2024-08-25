@@ -84,12 +84,37 @@ public class EditProfileViewController: UIViewController {
         
         let logout = UIAlertAction(title: "로그아웃", style: .destructive) { [weak self] _ in
             guard let self = self else { return }
-        
+            reactor?.action.onNext(.logout)
         }
         
         let cancel = UIAlertAction(title: "아니오", style: .cancel)
         alertView.addAction(cancel)
         alertView.addAction(logout)
+        self.present(alertView, animated: true)
+    }
+    
+    private func showSignOutAlert(){
+        let alertView = UIAlertController(title: "회원 탈퇴", message: "정말 회원 탈퇴 하시겠습니까?", preferredStyle: .alert)
+        
+        let logout = UIAlertAction(title: "탈퇴", style: .destructive) { [weak self] _ in
+            guard let self = self else { return }
+            self.showSuccessedSignOutAlert()
+        }
+        
+        let cancel = UIAlertAction(title: "아니오", style: .cancel)
+        alertView.addAction(cancel)
+        alertView.addAction(logout)
+        self.present(alertView, animated: true)
+    }
+    
+    private func showSuccessedSignOutAlert(){
+        let alertView = UIAlertController(title: "회원 탈퇴가 완료되었습니다.", message: "그동안 함께 달려온 추억, 잊지 않을게요! 언제든 다시 만나요!", preferredStyle: .alert)
+        
+        let dismiss = UIAlertAction(title: "메인으로 돌아가기", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            reactor?.action.onNext(.signOut)
+        }
+        alertView.addAction(dismiss)
         self.present(alertView, animated: true)
     }
 }
@@ -105,8 +130,23 @@ extension EditProfileViewController: View{
         editProfileView.signOutButton.rx.tap
             .bind{ [weak self] _ in
                 guard let self = self else { return }
-                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self.coordinator?.showSignOut()
+                self.showSignOutAlert()
+            }.disposed(by: self.disposeBag)
+        
+        reactor.state.map{$0.isLogout}
+            .filter{$0}
+            .distinctUntilChanged()
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.coordinator?.backLogin()
+            }.disposed(by: self.disposeBag)
+        
+        reactor.state.map{$0.isSignOut}
+            .filter{$0}
+            .distinctUntilChanged()
+            .bind{ [weak self] _ in
+                guard let self = self else { return }
+                self.coordinator?.backLogin()
             }.disposed(by: self.disposeBag)
     }
 }

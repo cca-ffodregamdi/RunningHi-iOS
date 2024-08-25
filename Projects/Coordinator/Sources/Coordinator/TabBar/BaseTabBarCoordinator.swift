@@ -10,6 +10,7 @@ import Presentation
 
 protocol BaseTabBarCoordinatorDelegate: AnyObject{
     func showRunning(isFreeCourse: Bool)
+    func backLogin(coordinator: BaseTabBarCoordinator)
 }
 
 class BaseTabBarCoordinator: Coordinator {
@@ -78,7 +79,7 @@ class BaseTabBarCoordinator: Coordinator {
             recordCoordinator.start()
             tabNavigationController.viewControllers.first?.title = TabBarItemType.Record.getTitle()
         case .My:
-            let myCoordinator: MyCoordinator = MyCoordinator(navigationController: tabNavigationController)
+            let myCoordinator: MyCoordinator = MyCoordinator(parentCoordinator: self, navigationController: tabNavigationController)
             self.childCoordinator.append(myCoordinator)
             myCoordinator.start()
             tabNavigationController.viewControllers.first?.title = TabBarItemType.My.getTitle()

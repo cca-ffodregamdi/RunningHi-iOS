@@ -57,8 +57,25 @@ public class KeyChainManager{
     }
     
     public class func reset(){
-        for key in KeyChainKeys.allCases{
-            delete(key: key)
+        let secItemClasses = [
+            kSecClassGenericPassword,
+            kSecClassInternetPassword,
+            kSecClassCertificate,
+            kSecClassKey,
+            kSecClassIdentity
+        ]
+        
+        for secItemClass in secItemClasses {
+            let query: [String: Any] = [
+                kSecClass as String: secItemClass
+            ]
+            
+            let status = SecItemDelete(query as CFDictionary)
+            if status == errSecSuccess || status == errSecItemNotFound {
+                print("Successfully deleted Keychain items for class: \(secItemClass)")
+            } else {
+                print("Failed to delete Keychain items for class: \(secItemClass). Error code: \(status)")
+            }
         }
     }
 }

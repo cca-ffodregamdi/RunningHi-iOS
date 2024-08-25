@@ -75,6 +75,11 @@ extension AppCoordinator: BaseTabBarCoordinatorDelegate{
     func showRunning(isFreeCourse: Bool) {
         self.showRunningViewController(isFreeCourse: isFreeCourse)
     }
+    
+    func backLogin(coordinator: BaseTabBarCoordinator) {
+        self.childCoordinator = self.childCoordinator.filter{$0 !== coordinator}
+        self.showLoginViewController()
+    }
 }
 
 extension AppCoordinator: RunningCoordinatorDelegate{
