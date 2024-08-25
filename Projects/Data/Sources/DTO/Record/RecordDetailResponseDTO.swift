@@ -7,7 +7,6 @@
 
 import Foundation
 import Domain
-import Common
 
 public struct RecordDetailResponseDTO: Decodable {
     let timeStamp: String
@@ -40,9 +39,9 @@ public struct RecordDetailDataDTO: Decodable {
     public let gpsUrl: String?
     
     public func toEntity(postNo: Int) -> RunningResult {
-        let startTime = DateUtil.formatDateStringToDate(dateString: createDate ?? "") ?? Date()
+        let startTime = Date.formatDateStringToDate(dateString: createDate ?? "") ?? Date()
         return RunningResult(startTime: startTime,
-                             endTime: DateUtil.getRangedDate(increase: time ?? 0, type: .second, date: startTime),
+                             time: time ?? 0,
                              location: locationName ?? "",
                              difficulty: FeedDetailDifficultyType.allCases.filter{$0.rawValue == difficulty}.first ?? FeedDetailDifficultyType.NORMAL,
                              runningTime: time ?? 0,

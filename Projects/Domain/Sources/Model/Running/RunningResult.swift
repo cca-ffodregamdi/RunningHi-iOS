@@ -9,7 +9,6 @@ import Foundation
 
 public struct RunningResult {
     public var startTime = Date()
-    public var endTime = Date()
     
     public var location = ""
     public var difficulty: FeedDetailDifficultyType = .NORMAL
@@ -26,7 +25,7 @@ public struct RunningResult {
     public init() { }
     
     public init(startTime: Date,
-                endTime: Date,
+                time: Int,
                 location: String,
                 difficulty: FeedDetailDifficultyType, 
                 runningTime: Int,
@@ -34,7 +33,7 @@ public struct RunningResult {
                 averagePace: Int,
                 calorie: Int) {
         self.startTime = startTime
-        self.endTime = endTime
+        self.runningTime = time
         self.location = location
         self.difficulty = difficulty
         self.runningTime = runningTime

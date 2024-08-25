@@ -244,7 +244,6 @@ extension RunningViewController: View {
             .withLatestFrom(reactor.state.map { $0.runningTime }) { ($0, $1) }
             .bind { [weak self] (_, runningTime) in
                 guard let self = self else { return }
-                self.runningResult.endTime = Date()
                 self.runningResult.runningTime = runningTime
                 
                 reactor.action.onNext(.stopRunning)

@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Domain
+import Common
 
 class RunningResultView: UIView {
     
@@ -112,8 +113,10 @@ class RunningResultView: UIView {
     //MARK: - Helpers
     
     func setData(runningModel: RunningResult) {
+        let endTime = DateUtil.getRangedDate(increase: runningModel.runningTime, type: .second, date: runningModel.startTime)
+
         titleArea.setData(startTime: runningModel.startTime,
-                          endTime: runningModel.endTime,
+                          endTime: endTime,
                           location: runningModel.location,
                           difficulty: isRunningResult ? nil : runningModel.difficulty
         )
