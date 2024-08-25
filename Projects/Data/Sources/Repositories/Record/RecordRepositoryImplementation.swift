@@ -11,7 +11,6 @@ import RxSwift
 import CoreLocation
 import Moya
 import RxMoya
-import Common
 
 public class RecordRepositoryImplementation: RecordRepositoryProtocol {
 
@@ -48,7 +47,7 @@ public class RecordRepositoryImplementation: RecordRepositoryProtocol {
                             runningResult.routeList = gpsData.gpsData?.compactMap { data in
                                 return RouteInfo(latitude: Double(data.lat) ?? 0.0,
                                                  longitude: Double(data.lon) ?? 0.0,
-                                                 timestamp: DateUtil.formatDateStringToDate(dateString: data.time) ?? Date())
+                                                 timestamp: Date.formatDateStringToDate(dateString: data.time) ?? Date())
                             } ?? []
                             runningResult.sectionPace = gpsData.sectionData?.pace ?? []
                             runningResult.sectionKcal = gpsData.sectionData?.kcal ?? []
