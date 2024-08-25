@@ -55,10 +55,6 @@ final public class RecordDetailViewController: UIViewController {
         self.tabBarController?.tabBar.isHidden = true
     }
     
-    public override func viewWillDisappear(_ animated: Bool) {
-        self.tabBarController?.tabBar.isHidden = false
-    }
-    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -97,6 +93,7 @@ final public class RecordDetailViewController: UIViewController {
     //MARK: - Helpers
     
     @objc func customBackAction() {
+        self.tabBarController?.tabBar.isHidden = false
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -107,7 +104,7 @@ final public class RecordDetailViewController: UIViewController {
             preferredStyle: .actionSheet
         )
         
-        let writeAlertAction = UIAlertAction(title: "현재 기록으로 게시글 쓰기", style: .default)
+        let writeAlertAction = UIAlertAction(title: "현재 기록으로 게시글 쓰기", style: .default) { _ in self.writeAction() }
         let deleteAlertAction = UIAlertAction(title: "삭제", style: .destructive) { _ in self.deleteAction() }
         let cancelAlertAction = UIAlertAction(title: "취소", style: .cancel)
         
@@ -119,7 +116,9 @@ final public class RecordDetailViewController: UIViewController {
     }
     
     @objc func writeAction() {
-        //TODO: 게시글 쓰기 기능 구현
+        if let postNo = postNo {
+            coordinator?.showEditFeed(postNo: postNo)
+        }
     }
     
     @objc func deleteAction() {
@@ -189,6 +188,7 @@ extension RecordDetailViewController: View {
             .filter {$0.isFinishDeleteRunningRecord}
             .bind{ [weak self] runningResult in
                 guard let self = self else { return }
+                self.tabBarController?.tabBar.isHidden = false
                 self.navigationController?.popViewController(animated: true)
             }.disposed(by: self.disposeBag)
     }

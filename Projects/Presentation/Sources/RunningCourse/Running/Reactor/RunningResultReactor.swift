@@ -20,17 +20,20 @@ final public class RunningResultReactor: Reactor {
     public enum Action{
         case tapDifficultyButton(FeedDetailDifficultyType)
         case saveRunningRecord(RunningResult)
+        case saveRunningRecordForShare(RunningResult)
     }
     
     public enum Mutation{
         case setDifficultyType(FeedDetailDifficultyType)
         case setLoading(Bool)
         case completeSaveResult
+        case setPostNo(Int)
     }
     
     public struct State{
         var isLoading = false
         var isSaveCompleted = false
+        var postNo: Int?
         var difficultyType: FeedDetailDifficultyType = .NORMAL
     }
     
@@ -59,6 +62,17 @@ final public class RunningResultReactor: Reactor {
                         ])
                     }
             ])
+        case .saveRunningRecordForShare(let runningResult):
+            guard !currentState.isLoading else { return .empty()}
+            return Observable.concat([
+                Observable.just(Mutation.setLoading(true)),
+                runningUseCase.saveRunningResult(runningResult: runningResult).map { postNo in Mutation.setPostNo(postNo) }
+                    .catch { error in
+                        return Observable.concat([
+                            Observable.just(Mutation.setLoading(false))
+                        ])
+                    }
+            ])
         }
     }
     
@@ -75,6 +89,9 @@ final public class RunningResultReactor: Reactor {
         case .completeSaveResult:
             newState.isLoading = false
             newState.isSaveCompleted = true
+            
+        case .setPostNo(let postNo):
+            newState.postNo = postNo
         }
         return newState
     }

@@ -41,8 +41,8 @@ extension FeedCoordinator: FeedCoordinatorInterface{
     }
     
     func showEditPost(viewController: FeedDetailViewController, postId: Int){
-        let vc = feedDIContainer.makeEditPostViewController(postId: postId, coordinator: self)
-        vc.delegate = viewController
+        let vc = feedDIContainer.makeEditPostViewController(postId: postId, coordinator: self, enterType: .feed)
+//        vc.delegate = viewController
         self.navigationController.pushViewController(vc, animated: true)
     }
     

@@ -12,4 +12,5 @@ public protocol RunningCoordinatorInterface {
     func startRunning(settingType: RunningSettingType, value: Int)
     func showRunningResult(runningResult: RunningResult)
     func finishRunning()
+    func showEditFeed(postNo: Int)
 }

@@ -33,5 +33,13 @@ extension RecordCoordinator: RecordCoordinatorInterface {
         let vc = recordDIContainer.makeRecordDetailViewController(coordinator: self, postNo: postNo)
         self.navigationController.pushViewController(vc, animated: true)
     }
+    
+    func showEditFeed(postNo: Int) {
+        let feedCoordinator: FeedCoordinator = FeedCoordinator(navigationController: navigationController)
+        let feedDIContainer = feedCoordinator.feedDIContainer
+        
+        let vc = feedDIContainer.makeEditPostViewController(postId: postNo, coordinator: feedCoordinator, enterType: .record)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
 }
 

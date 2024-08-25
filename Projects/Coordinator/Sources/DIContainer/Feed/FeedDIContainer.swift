@@ -39,9 +39,9 @@ class FeedDIContainer{
         return vc
     }
     
-    func makeEditPostViewController(postId: Int, coordinator: FeedCoordinator) -> EditFeedViewController{
+    func makeEditPostViewController(postId: Int, coordinator: FeedCoordinator, enterType: EditFeedEnterType) -> EditFeedViewController{
         let feedUseCase = feedUseCase
-        let vc = EditFeedViewController(reactor: EditFeedReactor(feedUsecase: feedUseCase, postId: postId))
+        let vc = EditFeedViewController(reactor: EditFeedReactor(feedUseCase: feedUseCase), postNo: postId, enterType: enterType)
         return vc
     }
     

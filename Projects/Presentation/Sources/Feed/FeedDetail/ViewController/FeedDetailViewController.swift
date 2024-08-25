@@ -515,11 +515,11 @@ extension FeedDetailViewController: UITableViewDelegate{
     }
 }
 
-extension FeedDetailViewController: EditFeedViewControllerDelegate{
-    public func editedFeed() {
-        reactor?.action.onNext(.fetchPost)
-    }
-}
+//extension FeedDetailViewController: EditFeedViewControllerDelegate{
+//    public func editedFeed() {
+//        reactor?.action.onNext(.fetchPost)
+//    }
+//}
 
 extension FeedDetailViewController: EditCommentViewControllerDelegate{
     public func editComment() {

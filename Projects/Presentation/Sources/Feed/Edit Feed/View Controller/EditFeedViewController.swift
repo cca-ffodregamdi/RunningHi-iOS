@@ -6,103 +6,175 @@
 //
 
 import UIKit
-import SnapKit
-import ReactorKit
 import RxSwift
-import RxCocoa
+import ReactorKit
+import RxRelay
 import Domain
+import CoreLocation
 
-public protocol EditFeedViewControllerDelegate: AnyObject {
-    func editedFeed()
+public enum EditFeedEnterType {
+    case feed
+    case record
+    case running
 }
 
-public class EditFeedViewController: UIViewController {
-
-    public weak var delegate: EditFeedViewControllerDelegate?
+final public class EditFeedViewController: UIViewController {
     
-    public var disposeBag: DisposeBag = DisposeBag()
+    //MARK: - Properties
     
-    private lazy var confirmButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("완료", for: .normal)
-        button.setTitleColor(.black, for: .normal)
-        return button
+    public var coordinator: FeedCoordinatorInterface?
+    
+    private var postNo: Int?
+    private var enterType: EditFeedEnterType = .feed
+    
+    public var disposeBag = DisposeBag()
+    
+    private lazy var feedEditView: FeedEditView = {
+        return FeedEditView()
     }()
     
-    private lazy var contentTextView: UITextView = {
-        let textView = UITextView()
-        
-        return UITextView()
-    }()
+    //MARK: - Lifecycle
     
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        configureUI()
-        configureNavigationBarItem()
-    }
-        
-    public override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        contentTextView.resignFirstResponder()
-    }
-    
-    public init(reactor: EditFeedReactor){
-        super.init(nibName: nil, bundle: nil)
-        self.reactor = reactor
-    }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    deinit{
+    public init(reactor: EditFeedReactor, postNo: Int, enterType: EditFeedEnterType){
+        super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
+        self.postNo = postNo
+        self.enterType = enterType
+    }
+    
+    deinit {
         print("deinit EditFeedViewController")
     }
     
-    private func configureUI(){
-        self.title = "게시글 수정"
+    public override func viewDidLoad() {
+        super.viewDidLoad()
         
-        self.view.addSubview(contentTextView)
+        configureNavigationBar()
+        configureUI()
+    }
+    
+    //MARK: - Configure
+    
+    private func configureNavigationBar() {
+        self.title = "새 게시글"
+        self.navigationController?.navigationBar.tintColor = .black
         
-        contentTextView.snp.makeConstraints { make in
-            make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
-            make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
-            make.left.right.equalToSuperview()
+        let backButton: UIButton = UIButton(type: .custom)
+        backButton.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
+        backButton.addTarget(self, action: #selector(customBackAction), for: .touchUpInside)
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "완료", style: .plain, target: self, action: #selector(completeAction))
+        self.navigationItem.rightBarButtonItem?.tintColor = .Neutrals300
+    }
+    
+    private func configureUI() {
+        self.view.backgroundColor = .white
+        self.view.addSubview(feedEditView)
+        
+        feedEditView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
     
-    private func configureNavigationBarItem(){
-        var barButtonItems: [UIBarButtonItem] = []
-        barButtonItems.append(UIBarButtonItem(customView: confirmButton))
-        self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
+    //MARK: - Helpers
+    
+    @objc func customBackAction() {
+        if enterType == .running {
+            self.navigationController?.isNavigationBarHidden = true
+            self.navigationController?.popToRootViewController(animated: true)
+        } else {
+            self.navigationController?.popViewController(animated: true)
+        }
+    }
+    
+    @objc func completeAction() {
+        if feedEditView.contentTextView.text == "" || reactor?.currentState.representType == nil {
+            return
+        }
+        
+        if let postNo = postNo {
+            reactor?.action.onNext(.createRunningFeed(EditFeedModel(postNo: postNo,
+                                                                    postContent: feedEditView.contentTextView.text,
+                                                                    mainData: reactor?.currentState.representType ?? .none,
+                                                                    imageUrl: "")))
+        }
     }
 }
 
-extension EditFeedViewController: View{
+// MARK: - Binding
+
+extension EditFeedViewController: View {
     
     public func bind(reactor: EditFeedReactor) {
-        reactor.action.onNext(.fetchPost)
-        
+        bindingView(reactor: reactor)
+        bindingButtonAction(reactor: reactor)
+    }
+    
+    private func bindingView(reactor: EditFeedReactor) {
         reactor.state
-            .compactMap{$0.feed}
-            .bind{ [weak self] feed in
-                self?.contentTextView.text = feed.postContent
+            .compactMap{$0.isFinishCreateRunningFeed}
+            .distinctUntilChanged()
+            .bind{ [weak self] type in
+                guard let self = self else { return }
+                
+                switch enterType {
+                case .feed: 
+                    break
+                case .record:
+                    self.tabBarController?.tabBar.isHidden = false
+                    self.navigationController?.popToRootViewController(animated: true)
+                case .running:
+                    self.navigationController?.isNavigationBarHidden = true
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
             }.disposed(by: self.disposeBag)
         
-        confirmButton.rx.tap
-            .map{ [weak self] _ in
-                self?.contentTextView.resignFirstResponder()
-                return Reactor.Action.editfeed(EditFeedRequestDTO(postContent: self?.contentTextView.text ?? "", dataType: 1, imageUrl: "")) // TODO: imageUrl 수정
-            }.bind(to: reactor.action)
+        Observable.combineLatest(feedEditView.contentTextView.rx.text, reactor.state.map { $0.representType })
+            .subscribe(onNext: { [weak self] text, representType in
+                guard let self = self else { return }
+                
+                if text == "" || representType == nil {
+                    self.navigationItem.rightBarButtonItem?.tintColor = .Neutrals300
+//                    self.navigationItem.rightBarButtonItem?.isEnabled = false
+                } else {
+                    self.navigationItem.rightBarButtonItem?.tintColor = .Primary
+//                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindingButtonAction(reactor: EditFeedReactor) {
+        let represent1Tap = feedEditView.representDistanceButton.rx.tap
+            .map { Reactor.Action.tapRepresentButton(.distance) }
+
+        let represent2Tap = feedEditView.representTimeButton.rx.tap
+            .map { Reactor.Action.tapRepresentButton(.time) }
+        
+        let represent3Tap = feedEditView.representPaceButton.rx.tap
+            .map { Reactor.Action.tapRepresentButton(.pace) }
+        
+        let represent4Tap = feedEditView.representKcalButton.rx.tap
+            .map { Reactor.Action.tapRepresentButton(.kcal) }
+        
+        let represent5Tap = feedEditView.representNoneButton.rx.tap
+            .map { Reactor.Action.tapRepresentButton(.none) }
+
+        Observable.merge(represent1Tap, represent2Tap, represent3Tap, represent4Tap, represent5Tap)
+            .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
         reactor.state
-            .map{$0.editedFeed}
-            .filter{$0}
-            .bind{ [weak self] _ in
+            .compactMap{$0.representType}
+            .distinctUntilChanged()
+            .bind{ [weak self] type in
                 guard let self = self else { return }
-                self.delegate?.editedFeed()
-                self.navigationController?.popViewController(animated: true)
+                feedEditView.setRepresentType(type: type)
             }.disposed(by: self.disposeBag)
     }
 }

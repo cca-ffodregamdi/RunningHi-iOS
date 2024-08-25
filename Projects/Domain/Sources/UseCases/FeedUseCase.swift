@@ -71,4 +71,8 @@ public final class FeedUseCase: FeedUseCaseProtocol{
     public func fetchBookmarkedFeeds(page: Int, size: Int) -> Observable<([FeedModel], Int)> {
         return repository.fetchBookmarkedFeeds(page: page, size: size)
     }
+    
+    public func editFeed(feedModel: EditFeedModel) -> Observable<Void> {
+        return repository.editFeed(feedModel: feedModel)
+    }
 }

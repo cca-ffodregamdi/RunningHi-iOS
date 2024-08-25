@@ -10,4 +10,5 @@ import Domain
 
 public protocol RecordCoordinatorInterface {
     func showRecordDetail(postNo: Int)
+    func showEditFeed(postNo: Int)
 }
