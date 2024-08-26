@@ -69,20 +69,6 @@ final public class MyViewController: UIViewController{
         barButtonItems.append(UIBarButtonItem(customView: announceButton))
         self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
     }
-    
-    private func showLogoutAlert(){
-        let alertView = UIAlertController(title: "로그아웃", message: "로그아웃 하시겠습니까?", preferredStyle: .alert)
-        
-        let logout = UIAlertAction(title: "로그아웃", style: .destructive) { [weak self] _ in
-            guard let self = self else { return }
-            
-        }
-        
-        let cancel = UIAlertAction(title: "아니오", style: .cancel)
-        alertView.addAction(cancel)
-        alertView.addAction(logout)
-        self.present(alertView, animated: true)
-    }
 }
 
 extension MyViewController: View{
@@ -126,7 +112,7 @@ extension MyViewController: View{
         reactor.state.compactMap{$0.userInfo}
             .bind{ [weak self] userInfoModel in
                 guard let self = self else { return }
-                self.myView.myProfileHeaderView.myProfileView.configureModel(profileImageURL: nil, nickname: userInfoModel.nickname)
+                self.myView.myProfileHeaderView.myProfileView.configureModel(profileImageURL: userInfoModel.profileImageUrl, nickname: userInfoModel.nickname)
                 self.myView.myProfileHeaderView.myLevelView.configureModel(totalDistance: userInfoModel.totalDistance, currentLevel: userInfoModel.level, remainDistance: userInfoModel.distanceToNextLevel)
             }.disposed(by: self.disposeBag)
         
@@ -142,5 +128,17 @@ extension MyViewController: View{
                 guard let self = self else { return }
                 self.coordinator?.showAnnounce()
             }.disposed(by: self.disposeBag)
+        
+        myView.myProfileHeaderView.myProfileView.editProfileButton.rx.tap
+            .bind{[weak self] _ in
+                guard let self = self else { return }
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showEditProfile(viewController: self)
+            }.disposed(by: self.disposeBag)
+    }
+}
+extension MyViewController: EditProfileViewControllerDelegate{
+    public func editProfile() {
+        reactor?.action.onNext(.fetchUserInfo)
     }
 }

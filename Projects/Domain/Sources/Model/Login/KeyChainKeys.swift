@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum KeyChainKeys: String{
+public enum KeyChainKeys: String, CaseIterable{
     case kakaoLoginAccessTokenKey = "kakaoLoginAccessToken"
     case appleLoginAuthorizationCodeKey = "appleLoginAuthorizationCode"
     case appleLoginIdentityTokenKey = "appleLoginIdentityToken"

@@ -37,6 +37,7 @@ public struct CommentModel: Decodable{
     public let content: String
     public let reportedCount: Int
     public let isDeleted: Bool
+    public let profileUrl: String?
     public let createDate: String
     public let isUpdated: Bool
     public let isOwner: Bool
@@ -49,6 +50,7 @@ public struct CommentModel: Decodable{
         case content = "replyContent"
         case reportedCount
         case isDeleted
+        case profileUrl
         case createDate
         case isUpdated
         case isOwner

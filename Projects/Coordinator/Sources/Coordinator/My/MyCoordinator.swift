@@ -12,12 +12,15 @@ import Domain
 class MyCoordinator: Coordinator{
     var childCoordinator: [Coordinator] = []
     
+    private var parentCoordinator: Coordinator?
+    
     private var navigationController: UINavigationController!
     let myDIContainer: MyDIContainer
     
-    public init(navigationController: UINavigationController) {
+    public init(parentCoordinator: Coordinator, navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.myDIContainer = MyDIContainer()
+        self.parentCoordinator = parentCoordinator
     }
     
     func start() {
@@ -61,5 +64,21 @@ extension MyCoordinator: MyCoordinatorInterface{
         let vc = myDIContainer.makeFeedDetailViewController(postId: postId)
         vc.delegate = viewController
         self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showEditProfile(viewController: MyViewController) {
+        let vc = myDIContainer.makeEditProfileViewController(coordinator: self)
+        vc.delegate = viewController
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showSignOut() {
+        let vc = myDIContainer.makeSignOutViewController(coordinator: self)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func backLogin() {
+        guard let baseTabCoordinator = self.parentCoordinator as? BaseTabBarCoordinator else { return }
+        baseTabCoordinator.delegate?.backLogin(coordinator: baseTabCoordinator)
     }
 }

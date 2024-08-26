@@ -120,6 +120,7 @@ class CommentTableViewCell: UITableViewCell {
         nickNameLabel.text = model.nickName ?? "러닝하이"
         dateLabel.text = Date().createDateToString(createDate: model.createDate)
         commentLabel.text = model.content
+        if let url = model.profileUrl { profileImageView.setImage(urlString: url) }
     }
     
     override func layoutSubviews() {

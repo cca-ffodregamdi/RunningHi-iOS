@@ -42,4 +42,24 @@ public final class MyUseCase: MyUseCaseProtocol{
     public func deleteBookmark(postId: Int) -> Observable<Any> {
         return self.repository.deleteBookmark(postId: postId)
     }
+    
+    public func deleteKeyChain() {
+        return self.repository.deleteKeyChain()
+    }
+    
+    public func signOut(loginType: LoginType) -> Observable<Any> {
+        return self.repository.signOut(loginType: loginType)
+    }
+    
+    public func editMyNickname(request: EditMyNicknameRequest) -> Observable<Any> {
+        return self.repository.editMyNickname(request: request)
+    }
+    
+    public func editMyProfileImage(request: EditMyProfileImageRequestModel) -> Observable<Any> {
+        return self.repository.editMyProfileImage(request: request)
+    }
+    
+    public func deleteMyProfileImage() -> Observable<Any> {
+        return self.repository.deleteMyProfileImage()
+    }
 }

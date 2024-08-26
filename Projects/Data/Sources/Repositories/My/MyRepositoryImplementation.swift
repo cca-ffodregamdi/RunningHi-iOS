@@ -98,4 +98,44 @@ public final class MyRepositoryImplementation: MyRepositoryProtocol{
                 return Observable.just(())
             }.asObservable()
     }
+    
+    public func deleteKeyChain() {
+        KeyChainManager.reset()
+    }
+    
+    public func signOut(loginType: LoginType) -> Observable<Any> {
+        switch loginType{
+        case .apple:
+            return service.rx.request(.signOutApple)
+                .filterSuccessfulStatusCodes()
+                .map{_ in return Observable.just(())}
+                .asObservable()
+        case .kakao:
+            return service.rx.request(.signOutKakao)
+                .filterSuccessfulStatusCodes()
+                .map{_ in return Observable.just(())}
+                .asObservable()
+        }
+    }
+    
+    public func editMyNickname(request: EditMyNicknameRequest) -> Observable<Any> {
+        return service.rx.request(.editMyNickname(request: request))
+            .filterSuccessfulStatusCodes()
+            .map{_ in return Observable.just(())}
+            .asObservable()
+    }
+    
+    public func editMyProfileImage(request: EditMyProfileImageRequestModel) -> Observable<Any> {
+        return service.rx.request(.editMyProfileImage(request: EditProfileImageRequestDTO(data: request).toRequsetMutipartFormData()))
+            .filterSuccessfulStatusCodes()
+            .map{_ in return Observable.just(())}
+            .asObservable()
+    }
+    
+    public func deleteMyProfileImage() -> Observable<Any> {
+        return service.rx.request(.deleteMyProfileImage)
+            .filterSuccessfulStatusCodes()
+            .map{_ in return Observable.just(())}
+            .asObservable()
+    }
 }

@@ -7,6 +7,7 @@
 
 import Foundation
 
-public enum UserDefaultsKeys: String{
+public enum UserDefaultsKeys: String, CaseIterable{
     case loginTypeKey = "loginType"
+    case isFirstKey = "isFirst"
 }

@@ -62,4 +62,16 @@ class MyDIContainer{
         let vc = FeedDetailViewController(reactor: FeedDetailReactor(feedUseCase: FeedUseCase(repository: FeedRepositoryImplementation()), postId: postId))
         return vc
     }
+    
+    func makeEditProfileViewController(coordinator: MyCoordinator) -> EditProfileViewController{
+        let vc = EditProfileViewController(reactor: EditProfileReactor(myUseCase: myUsecase))
+        vc.coordinator = coordinator
+        return vc
+    }
+    
+    func makeSignOutViewController(coordinator: MyCoordinator) -> SignOutViewController{
+        let vc = SignOutViewController(reactor: SignOutReactor(myUseCase: myUsecase))
+        vc.coordinator = coordinator
+        return vc
+    }
 }

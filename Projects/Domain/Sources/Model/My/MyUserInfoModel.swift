@@ -14,6 +14,7 @@ public struct MyUserInfoModel: Decodable{
     public let totalDistance: Double
     public let distanceToNextLevel: Int
     public let totalKcal: Double
+    public let profileImageUrl: String
     
     enum CodingKeys: String, CodingKey {
         case userId = "memberNo"
@@ -22,5 +23,6 @@ public struct MyUserInfoModel: Decodable{
         case totalDistance
         case distanceToNextLevel
         case totalKcal
+        case profileImageUrl
     }
 }

@@ -30,8 +30,10 @@ public class AccessReactor: Reactor{
     }
     
     public struct State{
-        let accessModel: [String] = ["서비스 이용 약관 (필수)", "개인정보 수집/이용 동의서 (필수)", "위치정보 이용약관 (필수)"]
-        var checkArray: [Bool] = [false, false, false]
+//        let accessModel: [String] = ["서비스 이용 약관 (필수)", "개인정보 수집/이용 동의서 (필수)", "위치정보 이용약관 (필수)"]
+        let accessModel: [String] = ["서비스 이용 약관 (필수)", "개인정보 수집/이용 동의서 (필수)"]
+//        var checkArray: [Bool] = [false, false, false]
+        var checkArray: [Bool] = [false, false]
         var checkAllState: Bool = false
         var successedSignIn: Bool = false
         var authorization: LocationAuthorizationStatus?
@@ -53,22 +55,24 @@ public class AccessReactor: Reactor{
         case .touchUpCheckAllButton:
             return Observable.concat([
                 Observable.just(Mutation.checkAllToggle).observe(on: MainScheduler.asyncInstance),
-                loginUseCase.checkUserCurrentLocationAuthorization().map{Mutation.setAuthorization($0)}.observe(on: MainScheduler.asyncInstance)
+//                loginUseCase.checkUserCurrentLocationAuthorization().map{Mutation.setAuthorization($0)}.observe(on: MainScheduler.asyncInstance)
             ])
         case .signIn:
             if let loginType = LoginType(rawValue: 
                                             UserDefaultsManager.get(forKey: .loginTypeKey) as! String){
                 switch loginType{
                 case .apple:
-                    return Observable.concat([
-                        loginUseCase.signWithApple(requestModel: .init(authorizationCode: loginUseCase.readKeyChain(key: .appleLoginAuthorizationCodeKey) ?? "", identityToken: loginUseCase.readKeyChain(key: .appleLoginIdentityTokenKey) ?? "")).map{ Mutation.signed($0, $1)}.observe(on: MainScheduler.asyncInstance),
-                        loginUseCase.setUserLocation(userLocationModel: UserLocation(latitude: currentState.currentLocation!.latitude, longitude: currentState.currentLocation!.latitude)).map{ _ in Mutation.successedUploadUserLocation}
-                    ])
+                    return loginUseCase.signWithApple(requestModel: .init(authorizationCode: loginUseCase.readKeyChain(key: .appleLoginAuthorizationCodeKey) ?? "", identityToken: loginUseCase.readKeyChain(key: .appleLoginIdentityTokenKey) ?? "")).map{ Mutation.signed($0, $1)}
+//                    return Observable.concat([
+//                        loginUseCase.signWithApple(requestModel: .init(authorizationCode: loginUseCase.readKeyChain(key: .appleLoginAuthorizationCodeKey) ?? "", identityToken: loginUseCase.readKeyChain(key: .appleLoginIdentityTokenKey) ?? "")).map{ Mutation.signed($0, $1)}.observe(on: MainScheduler.asyncInstance),
+//                        loginUseCase.setUserLocation(userLocationModel: UserLocation(latitude: currentState.currentLocation!.latitude, longitude: currentState.currentLocation!.latitude)).map{ _ in Mutation.successedUploadUserLocation}
+//                    ])
                 case .kakao:
-                    return Observable.concat([
-                        loginUseCase.signWithKakao(kakaoAccessToken: loginUseCase.readKeyChain(key: .kakaoLoginAccessTokenKey) ?? "").map{ Mutation.signed($0, $1) }.observe(on: MainScheduler.asyncInstance),
-                        loginUseCase.setUserLocation(userLocationModel: UserLocation(latitude: currentState.currentLocation!.latitude, longitude: currentState.currentLocation!.latitude)).map{ _ in Mutation.successedUploadUserLocation}
-                    ])
+                    return loginUseCase.signWithKakao(kakaoAccessToken: loginUseCase.readKeyChain(key: .kakaoLoginAccessTokenKey) ?? "").map{Mutation.signed($0, $1)}
+//                    return Observable.concat([
+//                        loginUseCase.signWithKakao(kakaoAccessToken: loginUseCase.readKeyChain(key: .kakaoLoginAccessTokenKey) ?? "").debug().map{ Mutation.signed($0, $1) }.observe(on: MainScheduler.asyncInstance),
+//                        loginUseCase.setUserLocation(userLocationModel: UserLocation(latitude: currentState.currentLocation!.latitude, longitude: currentState.currentLocation!.latitude)).map{ _ in Mutation.successedUploadUserLocation}
+//                    ])
                 }
             }
             
@@ -93,6 +97,7 @@ public class AccessReactor: Reactor{
         case .signed(let accessToken, let refreshToken):
             loginUseCase.createKeyChain(key: .runningHiAccessTokenkey, value: accessToken)
             loginUseCase.createKeyChain(key: .runningHiRefreshTokenKey, value: refreshToken)
+            newState.successedSignIn = true
         case .setAuthorization(let status):
             newState.authorization = status
             if newState.authorization == .allowed {
@@ -104,7 +109,7 @@ public class AccessReactor: Reactor{
             newState.currentLocation = location
         case .successedUploadUserLocation:
             loginUseCase.stopRunning()
-            newState.successedSignIn = true
+//            newState.successedSignIn = true
         }
         return newState
     }

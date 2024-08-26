@@ -20,13 +20,14 @@ class FeedCollectionViewCell: UICollectionViewCell {
     private lazy var thumbnailImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
+        
         return imageView
     }()
     
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = CommonAsset.defaultSmallProfile.image
+        imageView.clipsToBounds = true
         return imageView
     }()
     
@@ -126,7 +127,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
     private func configureUI(){
         self.layer.cornerRadius = 10
         self.layer.masksToBounds = true
-        self.backgroundColor = .systemBackground
+        self.backgroundColor = .clear
         self.addSubview(thumbnailImageView)
         self.addSubview(profileImageView)
         self.addSubview(nickNameLabel)
@@ -200,11 +201,11 @@ class FeedCollectionViewCell: UICollectionViewCell {
             setContentBackgrondView(isHidden: false)
             setContentColor(color: .white)
         }else{
-            if model.postId / 2 == 0{
-                self.backgroundColor = .white
+            if model.postId / 2 == 1{
+                self.backgroundColor = .BaseWhite
                 setContentColor(color: .black)
             }else{
-                self.backgroundColor = UIColor.colorWithRGB(r: 34, g: 101, b: 201)
+                self.backgroundColor = .Primary
                 setContentColor(color: .white)
             }
         }
