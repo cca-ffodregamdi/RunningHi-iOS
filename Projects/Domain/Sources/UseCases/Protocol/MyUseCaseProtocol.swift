@@ -14,6 +14,9 @@ protocol MyUseCaseProtocol{
     func fetchFeedback() -> Observable<[FeedbackModel]>
     func fetchUserInfo() -> Observable<MyUserInfoModel>
     
+    func editMyNickname(request: EditMyNicknameRequest) -> Observable<Any>
+    func editMyProfileImage(request: EditMyProfileImageRequestModel) -> Observable<Any>
+    func deleteMyProfileImage() -> Observable<Any>
     func fetchMyFeed(page: Int, size: Int) -> Observable<([FeedModel], Int)>
     func makeBookmark(post: BookmarkRequestDTO) -> Observable<Any>
     func deleteBookmark(postId: Int) -> Observable<Any>

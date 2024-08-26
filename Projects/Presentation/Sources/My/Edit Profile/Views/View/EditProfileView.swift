@@ -11,11 +11,16 @@ import SnapKit
 
 class EditProfileView: UIView {
 
-    private lazy var profileImageButton: UIButton = {
+    lazy var profileImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 24
+        return imageView
+    }()
+    
+    lazy var profileImageButton: UIButton = {
         let button = UIButton()
-        button.setImage(CommonAsset.defaultLargeProfile.image, for: .normal)
-        button.clipsToBounds = true
-        button.layer.cornerRadius = 24
         return button
     }()
     
@@ -40,16 +45,20 @@ class EditProfileView: UIView {
         return label
     }()
     
-    private lazy var nicknameTextField: UITextField = {
+    lazy var nicknameTextField: UITextField = {
         let textField = UITextField()
-        textField.clearButtonMode = .whileEditing
-        textField.borderStyle = .roundedRect
-//        textField.layer.borderWidth = 1
-//        textField.layer.borderColor = UIColor.Neutrals500.cgColor
-//        textField.layer.cornerRadius = 8
-//        textField.clipsToBounds = true
         textField.font = .Body1Regular
         textField.textColor = .BaseBlack
+        textField.clipsToBounds = true
+        
+        textField.clearButtonMode = .whileEditing
+        textField.borderStyle = .roundedRect
+        textField.layer.borderWidth = 1
+        textField.layer.borderColor = UIColor.Neutrals500.cgColor
+        textField.layer.cornerRadius = 8
+        
+        textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 8, height: 0))
+        textField.leftViewMode = .always
         return textField
     }()
     
@@ -102,10 +111,11 @@ class EditProfileView: UIView {
     }
     
     private func configureUI(){
-        [profileImageButton, cameraBackgroundView, nicknameLabel, nicknameTextField, bottomStackView].forEach {
+        [profileImageView, cameraBackgroundView, nicknameLabel, nicknameTextField, bottomStackView].forEach {
             self.addSubview($0)
         }
         cameraBackgroundView.addSubview(cameraImageView)
+        self.addSubview(profileImageButton)
         
         [logoutLabel, verticalBreakLine, signOutLabel].forEach {
             self.bottomStackView.addArrangedSubview($0)
@@ -115,15 +125,21 @@ class EditProfileView: UIView {
             self.addSubview($0)
         }
         
+        profileImageView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(60)
+            make.centerX.equalToSuperview()
+            make.width.height.equalTo(98)
+        }
+        
         profileImageButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(80)
+            make.top.equalToSuperview().offset(60)
             make.centerX.equalToSuperview()
             make.width.height.equalTo(98)
         }
         
         cameraBackgroundView.snp.makeConstraints { make in
-            make.centerY.equalTo(profileImageButton.snp.bottom)
-            make.centerX.equalTo(profileImageButton.snp.right)
+            make.centerY.equalTo(profileImageView.snp.bottom).offset(-5)
+            make.centerX.equalTo(profileImageView.snp.right).offset(-5)
             make.width.height.equalTo(32)
         }
         
@@ -133,7 +149,8 @@ class EditProfileView: UIView {
         }
         
         nicknameTextField.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
+            make.top.equalTo(profileImageButton.snp.bottom).offset(90)
+            make.height.equalTo(40)
             make.left.right.equalToSuperview().inset(25)
         }
         

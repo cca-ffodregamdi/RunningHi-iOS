@@ -22,6 +22,10 @@ public enum MyService{
     
     case signOutApple
     case signOutKakao
+    
+    case editMyNickname(request: EditMyNicknameRequest)
+    case editMyProfileImage(request: MultipartFormData)
+    case deleteMyProfileImage
 }
 
 extension MyService: TargetType{
@@ -44,6 +48,9 @@ extension MyService: TargetType{
         case .deleteBookmark(let postId): "/bookmark/\(postId)"
         case .signOutKakao: "/unlink/kakao"
         case .signOutApple: "/unlink/apple"
+        case .editMyProfileImage: "/member/profile-image"
+        case .editMyNickname: "/members"
+        case .deleteMyProfileImage: "/member/profile-image"
         }
     }
     
@@ -52,7 +59,8 @@ extension MyService: TargetType{
         case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed: .get
         case .makeBookmark: .post
         case .deleteBookmark: .delete
-        case .signOutApple, .signOutKakao: .put
+        case .signOutApple, .signOutKakao, .editMyProfileImage, .editMyNickname: .put
+        case .deleteMyProfileImage: .delete
         }
     }
     
@@ -62,14 +70,19 @@ extension MyService: TargetType{
         case .fetchMyFeed(let page, let size): .requestParameters(parameters: ["page" : page + 1, "size" : size], encoding: URLEncoding.queryString)
         case .makeBookmark(let postModel): .requestJSONEncodable(postModel)
         case .signOutApple, .signOutKakao: .requestPlain
-            
+        case .editMyProfileImage(let request): .uploadMultipart([request])
+        case .editMyNickname(let request): .requestJSONEncodable(request)
+        case .deleteMyProfileImage: .requestPlain
         }
     }
     
     public var headers: [String : String]?{
         switch self{
-        case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed, .makeBookmark, .deleteBookmark, .signOutApple, .signOutKakao:
+        case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed, .makeBookmark, .deleteBookmark, .signOutApple, .signOutKakao, .editMyNickname, .deleteMyProfileImage:
             ["Content-type": "application/json",
+                    "Authorization": accessToken]
+        case .editMyProfileImage:
+            ["Content-type": "multipart/form-data",
                     "Authorization": accessToken]
         }
     }

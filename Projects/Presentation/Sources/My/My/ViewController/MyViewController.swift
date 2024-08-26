@@ -112,7 +112,7 @@ extension MyViewController: View{
         reactor.state.compactMap{$0.userInfo}
             .bind{ [weak self] userInfoModel in
                 guard let self = self else { return }
-                self.myView.myProfileHeaderView.myProfileView.configureModel(profileImageURL: nil, nickname: userInfoModel.nickname)
+                self.myView.myProfileHeaderView.myProfileView.configureModel(profileImageURL: userInfoModel.profileImageUrl, nickname: userInfoModel.nickname)
                 self.myView.myProfileHeaderView.myLevelView.configureModel(totalDistance: userInfoModel.totalDistance, currentLevel: userInfoModel.level, remainDistance: userInfoModel.distanceToNextLevel)
             }.disposed(by: self.disposeBag)
         
@@ -133,7 +133,12 @@ extension MyViewController: View{
             .bind{[weak self] _ in
                 guard let self = self else { return }
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self.coordinator?.showEditProfile()
+                self.coordinator?.showEditProfile(viewController: self)
             }.disposed(by: self.disposeBag)
+    }
+}
+extension MyViewController: EditProfileViewControllerDelegate{
+    public func editProfile() {
+        reactor?.action.onNext(.fetchUserInfo)
     }
 }

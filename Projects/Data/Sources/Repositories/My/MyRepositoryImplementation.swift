@@ -117,4 +117,25 @@ public final class MyRepositoryImplementation: MyRepositoryProtocol{
                 .asObservable()
         }
     }
+    
+    public func editMyNickname(request: EditMyNicknameRequest) -> Observable<Any> {
+        return service.rx.request(.editMyNickname(request: request))
+            .filterSuccessfulStatusCodes()
+            .map{_ in return Observable.just(())}
+            .asObservable()
+    }
+    
+    public func editMyProfileImage(request: EditMyProfileImageRequestModel) -> Observable<Any> {
+        return service.rx.request(.editMyProfileImage(request: EditProfileImageRequestDTO(data: request).toRequsetMutipartFormData()))
+            .filterSuccessfulStatusCodes()
+            .map{_ in return Observable.just(())}
+            .asObservable()
+    }
+    
+    public func deleteMyProfileImage() -> Observable<Any> {
+        return service.rx.request(.deleteMyProfileImage)
+            .filterSuccessfulStatusCodes()
+            .map{_ in return Observable.just(())}
+            .asObservable()
+    }
 }

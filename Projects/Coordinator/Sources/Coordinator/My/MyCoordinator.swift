@@ -66,8 +66,9 @@ extension MyCoordinator: MyCoordinatorInterface{
         self.navigationController.pushViewController(vc, animated: true)
     }
     
-    func showEditProfile() {
+    func showEditProfile(viewController: MyViewController) {
         let vc = myDIContainer.makeEditProfileViewController(coordinator: self)
+        vc.delegate = viewController
         self.navigationController.pushViewController(vc, animated: true)
     }
     
