@@ -41,8 +41,6 @@ public class AppCoordinator: Coordinator{
     }
     
     private func showBaseTabBarController(){
-        self.navigationController.viewControllers.removeAll()
-        
         let coordinator = BaseTabBarCoordinator(navigationController: self.navigationController)
         coordinator.start()
         coordinator.delegate = self

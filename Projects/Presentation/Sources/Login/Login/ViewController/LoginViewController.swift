@@ -78,7 +78,7 @@ extension LoginViewController: View{
             .filter{$0}
             .bind{ [weak self] _ in
                 guard let self = self else { return }
-                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+//                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
                 self.coordinator?.showAccess()
             }.disposed(by: self.disposeBag)
         
