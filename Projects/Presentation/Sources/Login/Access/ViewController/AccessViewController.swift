@@ -33,6 +33,16 @@ public final class AccessViewController: UIViewController {
         configureNavigationBar()
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.isNavigationBarHidden = false
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        self.navigationController?.isNavigationBarHidden = true
+    }
+    
     public init(reactor: AccessReactor){
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
