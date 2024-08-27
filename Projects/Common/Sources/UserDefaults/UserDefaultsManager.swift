@@ -19,8 +19,6 @@ public class UserDefaultsManager{
     }
     
     public static func reset(){
-        for key in UserDefaultsKeys.allCases{
-            UserDefaults.standard.removeObject(forKey: key.rawValue)
-        }
+        UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.loginTypeKey.rawValue)
     }
 }
