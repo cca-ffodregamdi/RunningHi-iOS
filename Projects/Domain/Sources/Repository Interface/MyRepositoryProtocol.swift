@@ -12,6 +12,7 @@ public protocol MyRepositoryProtocol{
     func fetchNotice() -> Observable<[NoticeModel]>
     func fetchFAQ() -> Observable<[FAQModel]>
     func fetchFeedback() -> Observable<[FeedbackModel]>
+    func fetchFeedbackDetail(feedbackId: Int) -> Observable<FeedbackDetailModel>
     func fetchUserInfo() -> Observable<MyUserInfoModel>
     
     func editMyNickname(request: EditMyNicknameRequest) -> Observable<Any>

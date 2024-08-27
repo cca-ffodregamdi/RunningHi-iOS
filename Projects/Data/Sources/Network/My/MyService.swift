@@ -14,6 +14,7 @@ public enum MyService{
     case fetchNotice
     case fetchFAQ
     case fetchFeedback
+    case fetchFeedbackDetail(feedbackId: Int)
     case fetchUserInfo
     
     case fetchMyFeed(page: Int, size: Int)
@@ -42,6 +43,7 @@ extension MyService: TargetType{
         case .fetchNotice: "/notices"
         case .fetchFAQ: "/faq"
         case .fetchFeedback: "/feedbacks"
+        case .fetchFeedbackDetail(let feedbackId): "/feedbacks/\(feedbackId)"
         case .fetchUserInfo: "/members"
         case .fetchMyFeed: "/posts/my-feed"
         case .makeBookmark: "/bookmark"
@@ -56,7 +58,7 @@ extension MyService: TargetType{
     
     public var method: Moya.Method{
         switch self{
-        case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed: .get
+        case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed, .fetchFeedbackDetail: .get
         case .makeBookmark: .post
         case .deleteBookmark: .delete
         case .signOutApple, .signOutKakao, .editMyProfileImage, .editMyNickname: .put
@@ -72,13 +74,13 @@ extension MyService: TargetType{
         case .signOutApple, .signOutKakao: .requestPlain
         case .editMyProfileImage(let request): .uploadMultipart([request])
         case .editMyNickname(let request): .requestJSONEncodable(request)
-        case .deleteMyProfileImage: .requestPlain
+        case .deleteMyProfileImage, .fetchFeedbackDetail: .requestPlain
         }
     }
     
     public var headers: [String : String]?{
         switch self{
-        case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed, .makeBookmark, .deleteBookmark, .signOutApple, .signOutKakao, .editMyNickname, .deleteMyProfileImage:
+        case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed, .makeBookmark, .deleteBookmark, .signOutApple, .signOutKakao, .editMyNickname, .deleteMyProfileImage, .fetchFeedbackDetail:
             ["Content-type": "application/json",
                     "Authorization": accessToken]
         case .editMyProfileImage:

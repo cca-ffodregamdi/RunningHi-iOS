@@ -14,6 +14,7 @@ import Common
 public class AppCoordinator: Coordinator{
     
     var disposeBag: DisposeBag = DisposeBag()
+    
     var childCoordinator: [Coordinator] = []
     
     private var navigationController: UINavigationController!

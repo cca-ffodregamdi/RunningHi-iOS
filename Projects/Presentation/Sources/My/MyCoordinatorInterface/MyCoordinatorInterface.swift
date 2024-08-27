@@ -19,4 +19,5 @@ public protocol MyCoordinatorInterface{
     func showEditProfile(viewController: MyViewController)
     func showSignOut()
     func backLogin()
+    func showFeedbackDetail(feedbackId: Int)
 }
