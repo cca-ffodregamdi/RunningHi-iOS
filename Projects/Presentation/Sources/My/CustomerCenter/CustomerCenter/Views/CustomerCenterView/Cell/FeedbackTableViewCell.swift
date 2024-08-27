@@ -94,7 +94,7 @@ class FeedbackTableViewCell: UITableViewCell {
     func configureModel(feedbackModel: FeedbackModel){
         categoryLabel.text = feedbackModel.category.title
         titleLabel.text = feedbackModel.title
-        dateLabel.text = feedbackModel.createDate.toString()//Date().formatFeedbackCreateDate(dateString: feedbackModel.createDate)
+        dateLabel.text = Date.formatDateForFeedback(date: feedbackModel.createDate)
         if feedbackModel.hasReply{
             stateBadge.text = "답변 완료"
             stateBadge.backgroundColor = .Primary

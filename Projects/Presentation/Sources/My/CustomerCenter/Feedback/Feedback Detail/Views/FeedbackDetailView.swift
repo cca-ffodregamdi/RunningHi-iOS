@@ -200,7 +200,7 @@ class FeedbackDetailView: UIView {
     func configureModel(model: FeedbackDetailModel){
         titleLabel.text = model.title
         categoryLabel.text = model.category.title
-        createDateLabel.text = model.createData.toString()
+        createDateLabel.text = Date.formatDateForFeedback(date: model.createData)
         contentLabel.text = model.content
         
         if model.hasReply{
@@ -214,7 +214,7 @@ class FeedbackDetailView: UIView {
         if model.hasReply{ hasReply() }
         
         answerLabel.text = model.reply
-        answerDate.text = model.updateDate.toString()
+        answerDate.text = Date.formatDateForFeedback(date: model.updateDate)
     }
     
     func hasReply(){
