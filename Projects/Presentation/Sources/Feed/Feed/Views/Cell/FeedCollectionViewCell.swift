@@ -127,7 +127,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
     private func configureUI(){
         self.layer.cornerRadius = 10
         self.layer.masksToBounds = true
-        self.backgroundColor = .clear
+        
         self.addSubview(thumbnailImageView)
         self.addSubview(profileImageView)
         self.addSubview(nickNameLabel)
@@ -201,10 +201,10 @@ class FeedCollectionViewCell: UICollectionViewCell {
             setContentBackgrondView(isHidden: false)
             setContentColor(color: .white)
         }else{
-            if model.postId / 2 == 1{
+            if model.postId % 2 == 1{
                 self.backgroundColor = .BaseWhite
                 setContentColor(color: .black)
-            }else{
+            }else if model.postId % 2 == 0{
                 self.backgroundColor = .Primary
                 setContentColor(color: .white)
             }

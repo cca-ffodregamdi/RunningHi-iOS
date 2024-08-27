@@ -114,9 +114,8 @@ extension FeedViewController: View{
         
         self.dataSource = RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
-            
-            cell.configureModel(model: feed)
             cell.disposeBag = DisposeBag()
+            cell.configureModel(model: feed)
             cell.bookmarkButton.rx
                 .tap
                 .map{ _ in
