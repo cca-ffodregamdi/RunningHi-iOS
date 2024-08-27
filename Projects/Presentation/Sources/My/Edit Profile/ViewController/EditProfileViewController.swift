@@ -146,7 +146,7 @@ extension EditProfileViewController: View{
             .disposed(by: self.disposeBag)
         
         reactor.state.compactMap{$0.userInfo}
-            .map{$0.profileImageUrl}
+            .compactMap{$0.profileImageUrl}
             .take(1)
             .bind{ [weak self] in
                 guard let self = self else { return }
@@ -201,7 +201,7 @@ extension EditProfileViewController: View{
         editProfileView.logoutButton.rx.tap
             .bind{ [weak self] _ in
                 guard let self = self else { return }
-                self.showProfileImageActionSheet()
+                self.showLogoutAlert()
             }.disposed(by: self.disposeBag)
         
         editProfileView.signOutButton.rx.tap
