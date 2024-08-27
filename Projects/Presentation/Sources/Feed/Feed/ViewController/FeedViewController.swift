@@ -59,6 +59,10 @@ final public class FeedViewController: UIViewController{
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.tabBarController?.tabBar.isHidden = false
+        
+        Observable.just(Reactor.Action.refresh)
+            .bind(to: reactor!.action)
+            .disposed(by: self.disposeBag)
     }
     
     private func configureUI(){
@@ -107,9 +111,6 @@ final public class FeedViewController: UIViewController{
 extension FeedViewController: View{
     
     public func bind(reactor: FeedReactor) {
-        Observable.just(Reactor.Action.fetchFeeds)
-            .bind(to: reactor.action)
-            .disposed(by: self.disposeBag)
         
         self.dataSource = RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell

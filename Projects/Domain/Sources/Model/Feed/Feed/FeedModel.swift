@@ -11,10 +11,10 @@ public struct FeedModel: Decodable{
     public let postId: Int
     public let nickname: String?
     public let createDate: String?
-    public let postContent: String
+    public let postContent: String?
     public let role: String
     public let profileImageUrl: String?
-    public let mainData: String
+    public let mainData: String?
     public let imageUrl: String?
     public let commentCount: Int
     public let likeCount: Int
