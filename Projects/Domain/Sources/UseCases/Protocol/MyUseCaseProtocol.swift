@@ -12,8 +12,9 @@ protocol MyUseCaseProtocol{
     func fetchNotice() -> Observable<[NoticeModel]>
     func fetchFAQ() -> Observable<[FAQModel]>
     func fetchFeedback() -> Observable<[FeedbackModel]>
+    func fetchFeedbackDetail(feedbackId: Int) -> Observable<FeedbackDetailModel>
     func fetchUserInfo() -> Observable<MyUserInfoModel>
-    
+    func makeFeedback(request: MakeFeedbackRequestModel) -> Observable<Any>
     func editMyNickname(request: EditMyNicknameRequest) -> Observable<Any>
     func editMyProfileImage(request: EditMyProfileImageRequestModel) -> Observable<Any>
     func deleteMyProfileImage() -> Observable<Any>

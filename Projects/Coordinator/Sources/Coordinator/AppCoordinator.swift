@@ -14,6 +14,7 @@ import Common
 public class AppCoordinator: Coordinator{
     
     var disposeBag: DisposeBag = DisposeBag()
+    
     var childCoordinator: [Coordinator] = []
     
     private var navigationController: UINavigationController!
@@ -40,8 +41,6 @@ public class AppCoordinator: Coordinator{
     }
     
     private func showBaseTabBarController(){
-        self.navigationController.viewControllers.removeAll()
-        
         let coordinator = BaseTabBarCoordinator(navigationController: self.navigationController)
         coordinator.start()
         coordinator.delegate = self

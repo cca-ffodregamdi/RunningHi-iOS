@@ -27,6 +27,10 @@ public final class MyUseCase: MyUseCaseProtocol{
         return self.repository.fetchFeedback()
     }
     
+    public func fetchFeedbackDetail(feedbackId: Int) -> Observable<FeedbackDetailModel> {
+        return self.repository.fetchFeedbackDetail(feedbackId: feedbackId)
+    }
+    
     public func fetchUserInfo() -> Observable<MyUserInfoModel> {
         return self.repository.fetchUserInfo()
     }
@@ -61,5 +65,9 @@ public final class MyUseCase: MyUseCaseProtocol{
     
     public func deleteMyProfileImage() -> Observable<Any> {
         return self.repository.deleteMyProfileImage()
+    }
+    
+    public func makeFeedback(request: MakeFeedbackRequestModel) -> Observable<Any> {
+        return self.repository.makeFeedback(request: request)
     }
 }

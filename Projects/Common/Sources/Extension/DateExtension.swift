@@ -115,4 +115,10 @@ public extension Date{
         
         return currentDate.timeIntervalSince(date) > twoWeeks
     }
+    
+    static func formatDateForFeedback(date: Date) -> String{
+        let dataFormatter = DateFormatter()
+        dataFormatter.dateFormat = "yyyy.MM.dd HH:mm"
+        return dataFormatter.string(from: date)
+    }
 }

@@ -17,6 +17,8 @@ public class CustomerCenterViewController: UIViewController {
 
     public var disposeBag: DisposeBag = DisposeBag()
     
+    public var coordinator: MyCoordinatorInterface?
+    
     private lazy var customerCenterView: CustomerCenterView = {
         return CustomerCenterView()
     }()
@@ -47,12 +49,13 @@ public class CustomerCenterViewController: UIViewController {
     }
     
     private func configureUI(){
+        self.view.backgroundColor = .systemBackground
         self.view.addSubview(customerCenterView)
         
         customerCenterView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
             make.left.right.equalToSuperview()
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
         }
     }
 }
@@ -86,10 +89,23 @@ extension CustomerCenterViewController: View{
         })
         
         customerCenterView.customerCenterTableView.rx
+            .modelSelected(CustomerCenterItemType.self)
+            .subscribe(onNext:{ [weak self] item in
+                switch item{
+                case .faq(let _):
+                    break
+                case .feedback(let model):
+                    self?.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                    self?.coordinator?.showFeedbackDetail(feedbackId: model.feedbackId)
+                }
+            }).disposed(by: self.disposeBag)
+        
+        customerCenterView.customerCenterTableView.rx
             .itemSelected
             .map{ Reactor.Action.toggleExpand($0)}
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
+        
         
         reactor.state.map{$0.sections}
             .observe(on: MainScheduler.asyncInstance)
@@ -117,5 +133,18 @@ extension CustomerCenterViewController: View{
                 self.customerCenterView.isHiddenCreateFeedbackButton(mode: $0)
             }.disposed(by: self.disposeBag)
         
+        customerCenterView.createFeedbackButton.rx
+            .tap
+            .bind{ [weak self] in
+                guard let self = self else { return }
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showMakeFeedback(viewController: self)
+            }.disposed(by: self.disposeBag)
+    }
+}
+
+extension CustomerCenterViewController: MakeFeedbackViewControllerDelegate{
+    public func madeFeedback() {
+        reactor?.action.onNext(.fetchFeedback)
     }
 }

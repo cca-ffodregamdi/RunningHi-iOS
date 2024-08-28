@@ -37,8 +37,9 @@ class MyDIContainer{
         return vc
     }
     
-    func makeCustomerCenterViewController() -> CustomerCenterViewController{
+    func makeCustomerCenterViewController(coordinator: MyCoordinator) -> CustomerCenterViewController{
         let vc = CustomerCenterViewController(reactor: CustomerCenterReactor(myUseCase: myUsecase))
+        vc.coordinator = coordinator
         return vc
     }
     
@@ -72,6 +73,16 @@ class MyDIContainer{
     func makeSignOutViewController(coordinator: MyCoordinator) -> SignOutViewController{
         let vc = SignOutViewController(reactor: SignOutReactor(myUseCase: myUsecase))
         vc.coordinator = coordinator
+        return vc
+    }
+    
+    func makeMakeFeedbackViewController(coordinator: MyCoordinator) -> MakeFeedbackViewController{
+        let vc = MakeFeedbackViewController(reactor: MakeFeedBackReactor(myUseCase: myUsecase))
+        return vc
+    }
+    
+    func makeFeedbackDetailViewController(feedbackId: Int, coordinator: MyCoordinator) -> FeedbackDetailViewController{
+        let vc = FeedbackDetailViewController(reactor: FeedbackDetailReactor(feedbackId: feedbackId, myUseCase: myUsecase))
         return vc
     }
 }

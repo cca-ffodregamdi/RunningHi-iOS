@@ -32,9 +32,15 @@ public final class AccessViewController: UIViewController {
         configureUI()
         configureNavigationBar()
     }
-
+    
     public override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
+        super.viewWillAppear(animated)
+        self.navigationController?.isNavigationBarHidden = false
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        self.navigationController?.isNavigationBarHidden = true
     }
     
     public init(reactor: AccessReactor){
@@ -44,6 +50,10 @@ public final class AccessViewController: UIViewController {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit{
+        print("deinit AccessViewController")
     }
     
     private func configureUI(){
@@ -88,40 +98,21 @@ extension AccessViewController: View{
         
         reactor.state
             .map{$0.accessModel}
+            .take(1)
             .bind(to: accessView.accessTableView.rx.items(cellIdentifier: AccessTableViewCell.identifier, cellType: AccessTableViewCell.self)){ index, model, cell in
                 cell.configureModel(title: model)
-                
-//                if index == 2{
-//                    cell.checkButton.rx
-//                        .tap
-//                        .map{Reactor.Action.checkAuthorization}
-//                        .bind(to: reactor.action)
-//                        .disposed(by: cell.disposeBag)
-//                }else{
+
                 cell.checkButton.rx
                     .tap
                     .map{ Reactor.Action.checkRow(index) }
                     .bind(to: reactor.action)
                     .disposed(by: cell.disposeBag)
-//                }
-                
+
                 reactor.state
                     .map{$0.checkArray[index]}
                     .bind(to: cell.checkButton.rx.isSelected)
                     .disposed(by: cell.disposeBag)
             }.disposed(by: self.disposeBag)
-        
-//        reactor.state
-//            .map{$0.authorization}
-//            .distinctUntilChanged()
-//            .bind{ [weak self] status in
-//                guard let self = self, let status = status else { return }
-//                if status != .allowed {
-//                    self.showRequestLocationServiceAlert()
-//                }else{
-//                    reactor.action.onNext(.readCurrentLocation)
-//                }
-//            }.disposed(by: self.disposeBag)
         
         accessView.accessTableView.rx.itemSelected
             .bind{ [weak self] indexPath in
@@ -141,10 +132,12 @@ extension AccessViewController: View{
             .asObservable()
         
         checkArrayObserver
+            .distinctUntilChanged()
             .bind(to: accessView.nextButton.rx.isEnabled)
             .disposed(by: self.disposeBag)
             
         checkArrayObserver
+            .distinctUntilChanged()
             .bind{ [weak self] isEnabled in
                 guard let self = self else { return }
                 self.accessView.updateNextButtonUI(bool: isEnabled)
@@ -184,7 +177,6 @@ extension AccessViewController: UITableViewDelegate{
         
         footer.tapGesture.rx
             .event
-            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .map{_ in Reactor.Action.touchUpCheckAllButton}
             .bind(to: reactor.action)
             .disposed(by: footer.disposeBag)

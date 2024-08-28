@@ -40,6 +40,7 @@ public class AnnounceViewController: UIViewController {
     }
     
     private func configureUI(){
+        self.view.backgroundColor = .systemBackground
         self.view.addSubview(announceView)
         
         announceView.snp.makeConstraints { make in

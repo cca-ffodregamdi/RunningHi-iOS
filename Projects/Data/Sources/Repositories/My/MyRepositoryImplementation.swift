@@ -47,10 +47,23 @@ public final class MyRepositoryImplementation: MyRepositoryProtocol{
             .filterSuccessfulStatusCodes()
             .map{ response -> [FeedbackModel] in
                 let feedbackResponse = try JSONDecoder().decode(FeedbackResponseDTO.self, from: response.data)
-                return feedbackResponse.data.content
+                return feedbackResponse.data.content.map{$0.toEntity()}
             }.asObservable()
             .catch { error in
                 print("MyRepositoryImplementation fetchFeedback error = \(error)")
+                return Observable.error(error)
+            }
+    }
+    
+    public func fetchFeedbackDetail(feedbackId: Int) -> Observable<FeedbackDetailModel> {
+        return service.rx.request(.fetchFeedbackDetail(feedbackId: feedbackId))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> FeedbackDetailModel in
+                let feedbackDetailResponse = try JSONDecoder().decode(FeedbackDetailResponseDTO.self, from: response.data)
+                return feedbackDetailResponse.data.toEntity()
+            }.asObservable()
+            .catch { error in
+                print("MyRepositoryImplementation fetchFeedbackDetail error = \(error)")
                 return Observable.error(error)
             }
     }
@@ -134,6 +147,13 @@ public final class MyRepositoryImplementation: MyRepositoryProtocol{
     
     public func deleteMyProfileImage() -> Observable<Any> {
         return service.rx.request(.deleteMyProfileImage)
+            .filterSuccessfulStatusCodes()
+            .map{_ in return Observable.just(())}
+            .asObservable()
+    }
+    
+    public func makeFeedback(request: MakeFeedbackRequestModel) -> Observable<Any> {
+        return service.rx.request(.makeFeedback(request: request))
             .filterSuccessfulStatusCodes()
             .map{_ in return Observable.just(())}
             .asObservable()
