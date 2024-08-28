@@ -81,6 +81,13 @@ extension MyCoordinator: MyCoordinatorInterface{
         guard let baseTabCoordinator = self.parentCoordinator as? BaseTabBarCoordinator else { return }
         baseTabCoordinator.delegate?.backLogin(coordinator: baseTabCoordinator)
     }
+    
+    func showMakeFeedback(viewController: CustomerCenterViewController) {
+        let vc = myDIContainer.makeMakeFeedbackViewController(coordinator: self)
+        vc.delegate = viewController
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+    
     func showFeedbackDetail(feedbackId: Int) {
         let vc = myDIContainer.makeFeedbackDetailViewController(feedbackId: feedbackId, coordinator: self)
         self.navigationController.pushViewController(vc, animated: true)

@@ -16,6 +16,7 @@ public enum MyService{
     case fetchFeedback
     case fetchFeedbackDetail(feedbackId: Int)
     case fetchUserInfo
+    case makeFeedback(request: MakeFeedbackRequestModel)
     
     case fetchMyFeed(page: Int, size: Int)
     case makeBookmark(post: BookmarkRequestDTO)
@@ -53,13 +54,14 @@ extension MyService: TargetType{
         case .editMyProfileImage: "/member/profile-image"
         case .editMyNickname: "/members"
         case .deleteMyProfileImage: "/member/profile-image"
+        case .makeFeedback: "/feedbacks"
         }
     }
     
     public var method: Moya.Method{
         switch self{
         case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed, .fetchFeedbackDetail: .get
-        case .makeBookmark: .post
+        case .makeBookmark, .makeFeedback: .post
         case .deleteBookmark: .delete
         case .signOutApple, .signOutKakao, .editMyProfileImage, .editMyNickname: .put
         case .deleteMyProfileImage: .delete
@@ -75,12 +77,13 @@ extension MyService: TargetType{
         case .editMyProfileImage(let request): .uploadMultipart([request])
         case .editMyNickname(let request): .requestJSONEncodable(request)
         case .deleteMyProfileImage, .fetchFeedbackDetail: .requestPlain
+        case .makeFeedback(let request): .requestJSONEncodable(request)
         }
     }
     
     public var headers: [String : String]?{
         switch self{
-        case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed, .makeBookmark, .deleteBookmark, .signOutApple, .signOutKakao, .editMyNickname, .deleteMyProfileImage, .fetchFeedbackDetail:
+        case .fetchNotice, .fetchFAQ, .fetchFeedback, .fetchUserInfo, .fetchMyFeed, .makeBookmark, .deleteBookmark, .signOutApple, .signOutKakao, .editMyNickname, .deleteMyProfileImage, .fetchFeedbackDetail, .makeFeedback:
             ["Content-type": "application/json",
                     "Authorization": accessToken]
         case .editMyProfileImage:

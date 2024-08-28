@@ -151,4 +151,11 @@ public final class MyRepositoryImplementation: MyRepositoryProtocol{
             .map{_ in return Observable.just(())}
             .asObservable()
     }
+    
+    public func makeFeedback(request: MakeFeedbackRequestModel) -> Observable<Any> {
+        return service.rx.request(.makeFeedback(request: request))
+            .filterSuccessfulStatusCodes()
+            .map{_ in return Observable.just(())}
+            .asObservable()
+    }
 }

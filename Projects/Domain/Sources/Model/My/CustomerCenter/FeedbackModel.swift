@@ -31,7 +31,7 @@ public struct FeedbackModel: Decodable{
     }
 }
 
-public enum FeedbackCategory: String, Decodable, CaseIterable{
+public enum FeedbackCategory: String, Codable, CaseIterable{
     case INQUIRY
     case PROPOSAL
     case WEBERROR

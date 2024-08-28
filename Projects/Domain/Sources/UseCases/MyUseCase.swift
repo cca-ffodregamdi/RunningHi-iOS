@@ -66,4 +66,8 @@ public final class MyUseCase: MyUseCaseProtocol{
     public func deleteMyProfileImage() -> Observable<Any> {
         return self.repository.deleteMyProfileImage()
     }
+    
+    public func makeFeedback(request: MakeFeedbackRequestModel) -> Observable<Any> {
+        return self.repository.makeFeedback(request: request)
+    }
 }

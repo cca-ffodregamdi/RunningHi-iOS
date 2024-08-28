@@ -88,7 +88,6 @@ class FeedbackDetailView: UIView {
         return label
     }()
     
-    
     private lazy var answerBreakLine: UIView = {
         let view = UIView()
         view.backgroundColor = .Neutrals300

@@ -75,6 +75,12 @@ class MyDIContainer{
         vc.coordinator = coordinator
         return vc
     }
+    
+    func makeMakeFeedbackViewController(coordinator: MyCoordinator) -> MakeFeedbackViewController{
+        let vc = MakeFeedbackViewController(reactor: MakeFeedBackReactor(myUseCase: myUsecase))
+        return vc
+    }
+    
     func makeFeedbackDetailViewController(feedbackId: Int, coordinator: MyCoordinator) -> FeedbackDetailViewController{
         let vc = FeedbackDetailViewController(reactor: FeedbackDetailReactor(feedbackId: feedbackId, myUseCase: myUsecase))
         return vc

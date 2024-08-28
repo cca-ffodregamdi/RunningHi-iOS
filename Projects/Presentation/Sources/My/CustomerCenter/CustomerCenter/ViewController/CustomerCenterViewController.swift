@@ -133,5 +133,18 @@ extension CustomerCenterViewController: View{
                 self.customerCenterView.isHiddenCreateFeedbackButton(mode: $0)
             }.disposed(by: self.disposeBag)
         
+        customerCenterView.createFeedbackButton.rx
+            .tap
+            .bind{ [weak self] in
+                guard let self = self else { return }
+                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self.coordinator?.showMakeFeedback(viewController: self)
+            }.disposed(by: self.disposeBag)
+    }
+}
+
+extension CustomerCenterViewController: MakeFeedbackViewControllerDelegate{
+    public func madeFeedback() {
+        reactor?.action.onNext(.fetchFeedback)
     }
 }
