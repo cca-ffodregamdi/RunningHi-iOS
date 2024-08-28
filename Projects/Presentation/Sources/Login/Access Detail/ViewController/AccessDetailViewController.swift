@@ -24,7 +24,12 @@ public class AccessDetailViewController: UIViewController {
         configureUI()
         configureNavigationBar()
     }
-
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.isNavigationBarHidden = false
+    }
+    
     public init(reactor: AccessDetailReactor){
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
