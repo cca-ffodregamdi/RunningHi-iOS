@@ -27,7 +27,7 @@ public class FeedDetailReactor: Reactor{
     public enum Mutation{
         case setPost(FeedDetailModel)
         case setComment([CommentModel])
-        case writeComment(WriteCommentResponseModel)
+        case writeComment(WriteCommentModel)
         case setWroteComment(Bool)
         case setBookmark(Bool)
         case setLoading(Bool)

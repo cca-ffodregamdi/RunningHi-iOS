@@ -22,7 +22,7 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             .filterSuccessfulStatusCodes()
             .map{ response -> ([FeedModel], Int) in
                 let feedResponse = try JSONDecoder().decode(FeedResponseDTO.self, from: response.data)
-                return (feedResponse.data.content, feedResponse.data.totalPages)
+                return (feedResponse.data.content.map{$0.toEntity()}, feedResponse.data.totalPages)
             }
             .asObservable()
             .catch{ error in
@@ -35,8 +35,8 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
         return service.rx.request(.fetchPost(postId: postId))
             .filterSuccessfulStatusCodes()
             .map{ response -> FeedDetailModel in
-                    let feedDetailResponse = try JSONDecoder().decode(FeedDetailResponseDTO.self, from: response.data)
-                    return feedDetailResponse.data
+                let feedDetailResponse = try JSONDecoder().decode(FeedDetailResponseDTO.self, from: response.data)
+                return feedDetailResponse.data.toEntity()
             }.asObservable()
             .catch { error in
                 print("FeedRepositoryImplementation fetchPost error = \(error)")
@@ -49,7 +49,7 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             .filterSuccessfulStatusCodes()
             .map{ response -> [CommentModel] in
                 let commentReponse = try JSONDecoder().decode(CommentsResponseDTO.self, from: response.data)
-                return commentReponse.data.content
+                return commentReponse.data.content.map{$0.toEntity()}
             }.asObservable()
             .catch{ error in
                 print("FeedRepositoryImplementation fetchComment error = \(error)")
@@ -57,12 +57,12 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }
     }
     
-    public func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentResponseModel> {
+    public func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentModel> {
         return service.rx.request(.writeComment(commentModel: commentModel))
             .filterSuccessfulStatusCodes()
-            .map{ response -> WriteCommentResponseModel in
+            .map{ response -> WriteCommentModel in
                 let writeCommentResponse = try JSONDecoder().decode(WriteCommentResponseDTO.self, from: response.data)
-                return writeCommentResponse.data
+                return writeCommentResponse.data.toEntity()
             }.asObservable()
             .catch{ error in
                 print("FeedRepositoryImplementation writeComment error = \(error)")
@@ -119,12 +119,12 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }.asObservable()
     }
     
-    public func likePost(likePost: FeedLikeRequestDTO) -> Observable<FeedLikeResponseModel> {
+    public func likePost(likePost: FeedLikeRequestDTO) -> Observable<FeedLikeModel> {
         return service.rx.request(.likePost(likePost: likePost))
             .filterSuccessfulStatusCodes()
-            .map{ response -> FeedLikeResponseModel in
+            .map{ response -> FeedLikeModel in
                 let feedLikeResponse = try JSONDecoder().decode(FeedLikeResponseDTO.self, from: response.data)
-                return feedLikeResponse.data
+                return feedLikeResponse.data.toEntity()
             }.asObservable()
             .catch { error in
                 print("FeedRepositoryImplementation likePost error = \(error)")
@@ -132,12 +132,12 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }
     }
     
-    public func unLikePost(postId: Int) -> Observable<FeedLikeResponseModel> {
+    public func unLikePost(postId: Int) -> Observable<FeedLikeModel> {
         return service.rx.request(.unLikePost(postId: postId))
             .filterSuccessfulStatusCodes()
-            .map{ response -> FeedLikeResponseModel in
+            .map{ response -> FeedLikeModel in
                 let feedLikeResponse = try JSONDecoder().decode(FeedLikeResponseDTO.self, from: response.data)
-                return feedLikeResponse.data
+                return feedLikeResponse.data.toEntity()
             }.asObservable()
             .catch { error in
                 print("FeedRepositoryImplementation unLikePost error = \(error)")
@@ -153,34 +153,48 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }.asObservable()
     }
     
-    public func fetchBookmarkedFeeds(page: Int, size: Int) -> Observable<([FeedModel], Int)> {
-        return service.rx.request(.fetchBookmarkedFeeds(pages: page, size: size))
-            .filterSuccessfulStatusCodes()
-            .map{ response -> ([FeedModel], Int) in
-                let feedResponse = try JSONDecoder().decode(FeedResponseDTO.self, from: response.data)
-                return (feedResponse.data.content, feedResponse.data.totalPages)
-            }
-            .asObservable()
-            .catch{ error in
-                print("FeedRepositoryImplementation fetchBookmarkedFeeds error = \(error)")
-                return Observable.error(error)
-            }
+    public func fetchOptionFeed(page: Int, size: Int, option: FeedOptionType) -> Observable<([FeedModel], Int)> {
+        switch option{
+        case .bookmark:
+            return service.rx.request(.fetchBookmarkedFeeds(pages: page, size: size))
+                .filterSuccessfulStatusCodes()
+                .map{ response -> ([FeedModel], Int) in
+                    let feedResponse = try JSONDecoder().decode(FeedResponseDTO.self, from: response.data)
+                    return (feedResponse.data.content.map{$0.toEntity()}, feedResponse.data.totalPages)
+                }
+                .asObservable()
+                .catch{ error in
+                    print("FeedRepositoryImplementation fetchBookmarkedFeeds error = \(error)")
+                    return Observable.error(error)
+                }
+        case .myFeed:
+            return service.rx.request(.fetchMyFeed(page: page, size: size))
+                .filterSuccessfulStatusCodes()
+                .map{ response -> ([FeedModel], Int) in
+                    let feedResponse = try JSONDecoder().decode(FeedResponseDTO.self, from: response.data)
+                    return (feedResponse.data.content.map{$0.toEntity()}, feedResponse.data.totalPages)
+                }
+                .asObservable()
+                .catch{ error in
+                    print("FeedRepositoryImplementation fetchMyFeed error = \(error)")
+                    return Observable.error(error)
+                }
+        }
     }
-    
     public func editFeed(feedModel: EditFeedModel) -> Observable<Void> {
         return service.rx.request(.editFeed(feedData: CreateFeedRequestDTO(postNo: feedModel.postNo,
-                                                                            postContent: feedModel.postContent,
-                                                                            difficulty: "",
-                                                                            mainData: feedModel.mainData.typeNo,
-                                                                            imageUrl: feedModel.imageUrl)))
-            .filterSuccessfulStatusCodes()
-            .map{ response -> Void in
-                let _ = try JSONDecoder().decode(RunningResultResponseDTO.self, from: response.data)
-                return
-            }
-            .asObservable()
-            .catch{ error in
-                return Observable.error(error)
-            }
+                                                                           postContent: feedModel.postContent,
+                                                                           difficulty: "",
+                                                                           mainData: feedModel.mainData.typeNo,
+                                                                           imageUrl: feedModel.imageUrl)))
+        .filterSuccessfulStatusCodes()
+        .map{ response -> Void in
+            let _ = try JSONDecoder().decode(RunningResultResponseDTO.self, from: response.data)
+            return
+        }
+        .asObservable()
+        .catch{ error in
+            return Observable.error(error)
+        }
     }
 }

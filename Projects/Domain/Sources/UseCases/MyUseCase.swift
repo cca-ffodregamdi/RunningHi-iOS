@@ -35,18 +35,6 @@ public final class MyUseCase: MyUseCaseProtocol{
         return self.repository.fetchUserInfo()
     }
     
-    public func fetchMyFeed(page: Int, size: Int) -> Observable<([FeedModel], Int)> {
-        return self.repository.fetchMyFeed(page: page, size: size)
-    }
-    
-    public func makeBookmark(post: BookmarkRequestDTO) -> Observable<Any> {
-        return self.repository.makeBookmark(post: post)
-    }
-    
-    public func deleteBookmark(postId: Int) -> Observable<Any> {
-        return self.repository.deleteBookmark(postId: postId)
-    }
-    
     public func deleteKeyChain() {
         return self.repository.deleteKeyChain()
     }

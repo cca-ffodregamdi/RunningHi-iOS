@@ -53,12 +53,6 @@ class MyDIContainer{
         return vc
     }
     
-    func makeMyFeedViewController(coordinator: MyCoordinator) -> MyFeedViewController{
-        let vc = MyFeedViewController(reactor: MyFeedReactor(myUseCase: MyUseCase(repository: myRepository)))
-        vc.coordinator = coordinator
-        return vc
-    }
-    
     func makeFeedDetailViewController(postId: Int) -> FeedDetailViewController{
         let vc = FeedDetailViewController(reactor: FeedDetailReactor(feedUseCase: FeedUseCase(repository: FeedRepositoryImplementation()), postId: postId))
         return vc

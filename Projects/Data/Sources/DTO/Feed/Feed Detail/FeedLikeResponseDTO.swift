@@ -1,11 +1,13 @@
 //
 //  FeedLikeResponseDTO.swift
-//  Domain
+//  Data
 //
-//  Created by 유현진 on 7/10/24.
+//  Created by 유현진 on 8/30/24.
 //
 
 import Foundation
+import Domain
+
 public struct FeedLikeResponseDTO: Decodable{
     let timeStamp: String
     let status: String
@@ -21,9 +23,10 @@ public struct FeedLikeResponseDTO: Decodable{
 }
 
 public struct FeedLikeResponseModel: Decodable{
-    public let likeCount: Int
+    public let likeCnt: Int?
     
-    enum CodingKeys: String, CodingKey{
-        case likeCount = "likeCnt"
+    
+    func toEntity() -> FeedLikeModel{
+        return FeedLikeModel(likeCount: likeCnt ?? 0)
     }
 }

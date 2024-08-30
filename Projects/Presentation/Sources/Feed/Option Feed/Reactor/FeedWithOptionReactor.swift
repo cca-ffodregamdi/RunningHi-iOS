@@ -52,7 +52,7 @@ public class FeedWithOptionReactor: Reactor{
             guard currentState.pageNumber < currentState.totalPages else { return .empty()}
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                self.feedUseCase.fetchBookmarkedFeeds(page: currentState.pageNumber, size: 20).map{ Mutation.addFeeds($0.0, $0.1)},
+                self.feedUseCase.fetchOptionFeed(page: currentState.pageNumber, size: 20, option: currentState.feedOption).map{ Mutation.addFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false))
             ])
         case .refresh:
@@ -61,7 +61,7 @@ public class FeedWithOptionReactor: Reactor{
             return Observable.concat([
                 Observable.just(Mutation.setRefreshing(true)),
                 Observable.just(Mutation.setLoading(true)),
-                feedUseCase.fetchBookmarkedFeeds(page: 0, size: 20)
+                feedUseCase.fetchOptionFeed(page: 0, size: 20, option: currentState.feedOption)
                     .map{ Mutation.setFeeds($0.0, $0.1)},
                 Observable.just(Mutation.setLoading(false)),
                 Observable.just(Mutation.setRefreshing(false)),

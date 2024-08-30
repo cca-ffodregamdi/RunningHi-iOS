@@ -214,7 +214,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
             self.profileImageView.setImage(urlString: url)
         }
         
-        self.nickNameLabel.text = model.nickname ?? "러닝하이"
+        self.nickNameLabel.text = model.nickname
         self.contentLabel.text = model.postContent
         self.likeCountLabel.text = "\(model.likeCount)"
         self.commentCountLabel.text = "\(model.commentCount)"

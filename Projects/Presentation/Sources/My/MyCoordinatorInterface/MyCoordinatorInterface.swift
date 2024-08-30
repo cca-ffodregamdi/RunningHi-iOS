@@ -15,7 +15,6 @@ public protocol MyCoordinatorInterface{
     func showLevelHelp()
     func showAnnounce()
     func showMyFeed()
-    func showFeedDetailByMyFeed(viewController: MyFeedViewController, postId: Int)
     func showEditProfile(viewController: MyViewController)
     func showSignOut()
     func backLogin()
