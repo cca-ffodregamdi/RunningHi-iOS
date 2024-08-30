@@ -18,12 +18,16 @@ public enum EditFeedEnterType {
     case running
 }
 
+public protocol EditFeedViewControllerDelegate: AnyObject{
+    func updateFeedDetail()
+}
+
 final public class EditFeedViewController: UIViewController {
     
     //MARK: - Properties
     
     public var coordinator: FeedCoordinatorInterface?
-    
+    public weak var delegate: EditFeedViewControllerDelegate?
     private var postNo: Int?
     private var enterType: EditFeedEnterType = .feed
     
@@ -124,7 +128,8 @@ extension EditFeedViewController: View {
                 
                 switch enterType {
                 case .feed: 
-                    break
+                    self.delegate?.updateFeedDetail()
+                    self.navigationController?.popViewController(animated: true)
                 case .record:
                     self.tabBarController?.tabBar.isHidden = false
                     self.navigationController?.popToRootViewController(animated: true)
