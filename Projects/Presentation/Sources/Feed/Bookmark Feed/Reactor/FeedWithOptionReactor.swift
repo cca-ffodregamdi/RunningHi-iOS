@@ -1,5 +1,5 @@
 //
-//  BookmarkedReactor.swift
+//  FeedWithOptionReactor.swift
 //  Presentation
 //
 //  Created by 유현진 on 7/27/24.
@@ -10,7 +10,7 @@ import ReactorKit
 import Domain
 import RxSwift
 
-public class BookmarkedReactor: Reactor{
+public class FeedWithOptionReactor: Reactor{
     public enum Action{
         case fetchFeeds
         case refresh
@@ -34,13 +34,14 @@ public class BookmarkedReactor: Reactor{
         var isLoading: Bool = false
         var pageNumber: Int = 0
         var totalPages: Int = 1
+        let feedOption: FeedOptionType
     }
 
     public let initialState: State
     private let feedUseCase: FeedUseCase
     
-    public init(feedUseCase: FeedUseCase){
-        self.initialState = State()
+    public init(feedUseCase: FeedUseCase, feedOption: FeedOptionType){
+        self.initialState = State(feedOption: feedOption)
         self.feedUseCase = feedUseCase
     }
     

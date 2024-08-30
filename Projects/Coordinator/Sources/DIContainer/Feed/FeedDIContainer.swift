@@ -51,8 +51,8 @@ class FeedDIContainer{
         return vc
     }
     
-    func makeBookmarkedFeedViewController(coordinator: FeedCoordinator) -> BookmarkedFeedViewController{
-        let vc = BookmarkedFeedViewController(reactor: BookmarkedReactor(feedUseCase: feedUseCase))
+    func makeFeedWithOptionViewController(coordinator: FeedCoordinator, feedOption: FeedOptionType) -> FeedWithOptionViewController{
+        let vc = FeedWithOptionViewController(reactor: FeedWithOptionReactor(feedUseCase: feedUseCase, feedOption: feedOption))
         vc.coordinator = coordinator
         return vc
     }

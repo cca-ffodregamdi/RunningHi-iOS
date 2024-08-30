@@ -53,11 +53,11 @@ extension FeedCoordinator: FeedCoordinatorInterface{
     }
     
     func showBookmarkedFeed() {
-        let vc = feedDIContainer.makeBookmarkedFeedViewController(coordinator: self)
+        let vc = feedDIContainer.makeFeedWithOptionViewController(coordinator: self, feedOption: .bookmark)
         self.navigationController.pushViewController(vc, animated: true)
     }
     
-    func showFeedDetailByBookmarkedFeed(viewController: BookmarkedFeedViewController, postId: Int) {
+    func showFeedDetailByBookmarkedFeed(viewController: FeedWithOptionViewController, postId: Int) {
         let vc = feedDIContainer.makeFeedDetailViewController(postId: postId, coordinator: self)
         vc.delegate = viewController
         self.navigationController.pushViewController(vc, animated: true)

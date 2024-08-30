@@ -1,5 +1,5 @@
 //
-//  BookmarkedFeedViewController.swift
+//  FeedWithOptionViewController.swift
 //  Presentation
 //
 //  Created by 유현진 on 7/27/24.
@@ -14,7 +14,13 @@ import RxSwift
 import RxCocoa
 import Domain
 
-public class BookmarkedFeedViewController: UIViewController {
+public enum FeedOptionType{
+    case bookmark
+    case myFeed
+}
+
+
+public class FeedWithOptionViewController: UIViewController {
     
     public var disposeBag: DisposeBag = DisposeBag()
     
@@ -37,7 +43,7 @@ public class BookmarkedFeedViewController: UIViewController {
         setFeedCollectionView()
     }
     
-    public init(reactor: BookmarkedReactor){
+    public init(reactor: FeedWithOptionReactor){
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -79,8 +85,8 @@ public class BookmarkedFeedViewController: UIViewController {
     }
 }
 
-extension BookmarkedFeedViewController: View{
-    public func bind(reactor: BookmarkedReactor) {
+extension FeedWithOptionViewController: View{
+    public func bind(reactor: FeedWithOptionReactor) {
         
         reactor.action.onNext(.fetchFeeds)
         
@@ -148,13 +154,13 @@ extension BookmarkedFeedViewController: View{
     }
 }
 
-extension BookmarkedFeedViewController: FeedDetailViewControllerDelegate{
+extension FeedWithOptionViewController: FeedDetailViewControllerDelegate{
     public func deleteFeed(postId: Int) {
         reactor?.action.onNext(.deleteFeed(postId))
     }
 }
 
-extension BookmarkedFeedViewController: PinterestLayoutDelegate{
+extension FeedWithOptionViewController: PinterestLayoutDelegate{
     public func collectionView(_ collectionView: UICollectionView, heightForPhotoAtIndexPath indexPath: IndexPath) -> CGFloat {
         let model = self.dataSource[indexPath]
         return model.imageUrl == nil ? collectionView.bounds.height / 3 : collectionView.bounds.height / 2
