@@ -1,5 +1,5 @@
 //
-//  MyFeedViewController.swift
+//  FeedWithOptionViewController.swift
 //  Presentation
 //
 //  Created by 유현진 on 7/27/24.
@@ -14,13 +14,13 @@ import RxSwift
 import RxCocoa
 import Domain
 
-final public class MyFeedViewController: UIViewController {
-
+public class FeedWithOptionViewController: UIViewController {
+    
     public var disposeBag: DisposeBag = DisposeBag()
     
-    private var dataSource: RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>!
+    public var coordinator: FeedCoordinatorInterface?
     
-    public var coordinator: MyCoordinatorInterface?
+    private var dataSource: RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>!
     
     private lazy var feedView: FeedView = {
         return FeedView()
@@ -37,12 +37,7 @@ final public class MyFeedViewController: UIViewController {
         setFeedCollectionView()
     }
     
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.tabBarController?.tabBar.isHidden = true
-    }
-    
-    public init(reactor: MyFeedReactor){
+    public init(reactor: FeedWithOptionReactor){
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -69,7 +64,7 @@ final public class MyFeedViewController: UIViewController {
     }
     
     private func configureNavigationBar(){
-        self.title = "나의 피드"
+        self.title = "북마크"
         self.navigationController?.navigationBar.tintColor = .black
     }
     
@@ -84,9 +79,10 @@ final public class MyFeedViewController: UIViewController {
     }
 }
 
-extension MyFeedViewController: View{
-    public func bind(reactor: MyFeedReactor) {
-        reactor.action.onNext(.fetchMyFeeds)
+extension FeedWithOptionViewController: View{
+    public func bind(reactor: FeedWithOptionReactor) {
+        
+        reactor.action.onNext(.fetchFeeds)
         
         self.dataSource = RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>(configureCell: {
             dataSource, collectionView, indexPath, model in
@@ -137,7 +133,7 @@ extension MyFeedViewController: View{
                 guard let self = self else { return }
                 let model = self.dataSource[indexPath]
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self.coordinator?.showFeedDetailByMyFeed(viewController: self, postId: model.postId)
+                self.coordinator?.showFeedDetailByBookmarkedFeed(viewController: self, postId: model.postId)
             }.disposed(by: self.disposeBag)
         
         self.feedView.feedCollectionView.rx.contentOffset
@@ -146,19 +142,19 @@ extension MyFeedViewController: View{
             .filter{ [weak self] offset in
                 guard let self = self else { return false }
                 return offset + self.feedView.feedCollectionView.frame.size.height + 300 > self.feedView.feedCollectionView.contentSize.height
-            }.map{ _ in Reactor.Action.fetchMyFeeds }
+            }.map{ _ in Reactor.Action.fetchFeeds }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
-    }   
+    }
 }
 
-extension MyFeedViewController: FeedDetailViewControllerDelegate{
+extension FeedWithOptionViewController: FeedDetailViewControllerDelegate{
     public func deleteFeed(postId: Int) {
         reactor?.action.onNext(.deleteFeed(postId))
     }
 }
 
-extension MyFeedViewController: PinterestLayoutDelegate{
+extension FeedWithOptionViewController: PinterestLayoutDelegate{
     public func collectionView(_ collectionView: UICollectionView, heightForPhotoAtIndexPath indexPath: IndexPath) -> CGFloat {
         let model = self.dataSource[indexPath]
         return model.imageUrl == nil ? collectionView.bounds.height / 3 : collectionView.bounds.height / 2

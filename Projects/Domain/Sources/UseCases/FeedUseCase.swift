@@ -28,7 +28,7 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         return  repository.fetchComment(postId: postId)
     }
     
-    public func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentResponseModel> {
+    public func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentModel> {
         return repository.writeComment(commentModel: commentModel)
     }
     
@@ -56,11 +56,11 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         return repository.editPost(postId: postId, editPostModel: editPostModel)
     }
     
-    public func likePost(likePost: FeedLikeRequestDTO) -> Observable<FeedLikeResponseModel> {
+    public func likePost(likePost: FeedLikeRequestDTO) -> Observable<FeedLikeModel> {
         return repository.likePost(likePost: likePost)
     }
     
-    public func unLikePost(postId: Int) -> Observable<FeedLikeResponseModel> {
+    public func unLikePost(postId: Int) -> Observable<FeedLikeModel> {
         return repository.unLikePost(postId: postId)
     }
     
@@ -68,8 +68,8 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         return repository.editComment(commentId: commentId, editCommentModel: editCommentModel)
     }
     
-    public func fetchBookmarkedFeeds(page: Int, size: Int) -> Observable<([FeedModel], Int)> {
-        return repository.fetchBookmarkedFeeds(page: page, size: size)
+    public func fetchOptionFeed(page: Int, size: Int, option: FeedOptionType) -> Observable<([FeedModel], Int)> {
+        return self.repository.fetchOptionFeed(page: page, size: size, option: option)
     }
     
     public func editFeed(feedModel: EditFeedModel) -> Observable<Void> {

@@ -1,11 +1,12 @@
 //
 //  WriteCommentResponseDTO.swift
-//  Domain
+//  Data
 //
-//  Created by 유현진 on 6/13/24.
+//  Created by 유현진 on 8/31/24.
 //
 
 import Foundation
+import Domain
 
 public struct WriteCommentResponseDTO: Decodable{
     let timeStamp: String
@@ -22,9 +23,9 @@ public struct WriteCommentResponseDTO: Decodable{
 }
 
 public struct WriteCommentResponseModel: Decodable{
-    public let likeCount: Int
-    
-    enum CodingKeys: String, CodingKey {
-        case likeCount = "likeCnt"
+    public let likeCnt: Int?
+
+    func toEntity() -> WriteCommentModel{
+        return WriteCommentModel(likeCount: likeCnt ?? 0)
     }
 }

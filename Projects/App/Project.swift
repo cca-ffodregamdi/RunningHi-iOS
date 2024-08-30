@@ -4,7 +4,7 @@ let project = Project(
     name: "RunningHi",
     targets: [
         .target(
-            name: "RunningHi",
+            name: "러닝하이",
             destinations: .iOS,
             product: .app,
             bundleId: "com.runninghi.app",

@@ -56,13 +56,9 @@ extension MyCoordinator: MyCoordinatorInterface{
     }
     
     func showMyFeed() {
-        let vc = myDIContainer.makeMyFeedViewController(coordinator: self)
-        self.navigationController.pushViewController(vc, animated: true)
-    }
-    
-    func showFeedDetailByMyFeed(viewController: MyFeedViewController, postId: Int) {
-        let vc = myDIContainer.makeFeedDetailViewController(postId: postId)
-        vc.delegate = viewController
+        let feedCoordinator: FeedCoordinator = FeedCoordinator(navigationController: navigationController)
+        let feedDIContainer = feedCoordinator.feedDIContainer
+        let vc = feedDIContainer.makeFeedWithOptionViewController(coordinator: feedCoordinator, feedOption: .myFeed)
         self.navigationController.pushViewController(vc, animated: true)
     }
     
