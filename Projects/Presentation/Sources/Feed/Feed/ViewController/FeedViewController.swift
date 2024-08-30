@@ -199,18 +199,18 @@ extension FeedViewController: View{
                 self.coordinator?.showSortFilter(viewController: self, sortState: reactor.currentState.sortState)
             }.disposed(by: self.disposeBag)
         
-        reactor.state.map{$0.distanceState.title}
-            .bind{[weak self] title in
-                guard let self = self else { return }
-                self.feedAndFilterView.feedFilterView.distanceButton.configuration?.attributedTitle = .init(title, attributes: .init([.font: UIFont.CaptionRegular, .foregroundColor: UIColor.BaseBlack]))
-            }.disposed(by: self.disposeBag)
+//        reactor.state.map{$0.distanceState.title}
+//            .bind{[weak self] title in
+//                guard let self = self else { return }
+//                self.feedAndFilterView.feedFilterView.distanceButton.configuration?.attributedTitle = .init(title, attributes: .init([.font: UIFont.CaptionRegular, .foregroundColor: UIColor.BaseBlack]))
+//            }.disposed(by: self.disposeBag)
         
-        feedAndFilterView.feedFilterView.distanceButton.rx
-            .tap
-            .bind{ [weak self] _ in
-                guard let self = self else { return }
-                self.coordinator?.showDistanceFilter(viewController: self, distanceState: reactor.currentState.distanceState)
-            }.disposed(by: self.disposeBag)
+//        feedAndFilterView.feedFilterView.distanceButton.rx
+//            .tap
+//            .bind{ [weak self] _ in
+//                guard let self = self else { return }
+//                self.coordinator?.showDistanceFilter(viewController: self, distanceState: reactor.currentState.distanceState)
+//            }.disposed(by: self.disposeBag)
         
         
         Observable.combineLatest(
@@ -234,7 +234,7 @@ extension FeedViewController: FeedDetailViewControllerDelegate{
 
 extension FeedViewController: DistanceFilterViewControllerDelegate{
     public func updatedDistanceState(distanceState: DistanceFilter) {
-        reactor?.action.onNext(.updateDistanceFilter(distanceState))
+//        reactor?.action.onNext(.updateDistanceFilter(distanceState))
         reactor?.action.onNext(.refresh)
     }
 }
