@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 import Common
 import Domain
+import Kingfisher
 
 class RecordRunningListTableViewCell: UITableViewCell {
     
@@ -23,8 +24,8 @@ class RecordRunningListTableViewCell: UITableViewCell {
         return view
     }()
     
-    private lazy var mapView: UIView = {
-        let view = UIView()
+    private lazy var recordImageView: UIImageView = {
+        let view = UIImageView()
         view.backgroundColor = .Neutrals500
         return view
     }()
@@ -90,7 +91,7 @@ class RecordRunningListTableViewCell: UITableViewCell {
         contentView.backgroundColor = .Secondary100
         
         addSubview(containerView)
-        addSubview(mapView)
+        addSubview(recordImageView)
         addSubview(badgeImageView)
         
         containerView.addSubview(titleLabel)
@@ -99,7 +100,7 @@ class RecordRunningListTableViewCell: UITableViewCell {
         containerView.addSubview(arrowButton)
         containerView.addSubview(difficultyLabel)
         
-        mapView.snp.makeConstraints { make in
+        recordImageView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(2)
             make.left.equalToSuperview()
             make.width.equalTo(89)
@@ -128,13 +129,13 @@ class RecordRunningListTableViewCell: UITableViewCell {
         
         titleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(16)
-            make.left.equalTo(mapView.snp.right).offset(16)
+            make.left.equalTo(recordImageView.snp.right).offset(16)
             make.right.equalTo(arrowButton.snp.left)
         }
         
         descriptionLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(7)
-            make.left.equalTo(mapView.snp.right).offset(16)
+            make.left.equalTo(recordImageView.snp.right).offset(16)
         }
         
         difficultyLabel.snp.makeConstraints { make in
@@ -145,7 +146,7 @@ class RecordRunningListTableViewCell: UITableViewCell {
         
         locationLabel.snp.makeConstraints { make in
             make.top.equalTo(descriptionLabel.snp.bottom).offset(5)
-            make.left.equalTo(mapView.snp.right).offset(16)
+            make.left.equalTo(recordImageView.snp.right).offset(16)
             make.bottom.equalToSuperview().offset(-16)
             make.right.equalTo(arrowButton.snp.left)
         }
@@ -160,5 +161,9 @@ class RecordRunningListTableViewCell: UITableViewCell {
         
         self.badgeImageView.isHidden = !data.status
         self.difficultyLabel.setTitle(difficulty: FeedDetailDifficultyType.allCases.filter{$0.rawValue == data.difficulty}.first ?? .NORMAL)
+        
+        if let url = URL(string: data.imageUrl) {
+            recordImageView.kf.setImage(with: url)
+        }
     }
 }
