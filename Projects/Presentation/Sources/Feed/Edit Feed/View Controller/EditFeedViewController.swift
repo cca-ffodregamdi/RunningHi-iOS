@@ -11,6 +11,8 @@ import ReactorKit
 import RxRelay
 import Domain
 import CoreLocation
+import PhotosUI
+import Common
 
 public enum EditFeedEnterType {
     case feed
@@ -152,6 +154,14 @@ extension EditFeedViewController: View {
                 }
             })
             .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap{$0.representType}
+            .distinctUntilChanged()
+            .bind{ [weak self] type in
+                guard let self = self else { return }
+                feedEditView.setRepresentType(type: type)
+            }.disposed(by: self.disposeBag)
     }
     
     private func bindingButtonAction(reactor: EditFeedReactor) {
@@ -174,12 +184,94 @@ extension EditFeedViewController: View {
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
-        reactor.state
-            .compactMap{$0.representType}
-            .distinctUntilChanged()
-            .bind{ [weak self] type in
-                guard let self = self else { return }
-                feedEditView.setRepresentType(type: type)
-            }.disposed(by: self.disposeBag)
+        // 러닝 이미지 첨부
+        let tapGesture = UITapGestureRecognizer()
+        feedEditView.runningImageView.addGestureRecognizer(tapGesture)
+        tapGesture.addTarget(self, action: #selector(showProfileImageActionSheet))
+    }
+    
+    //MARK: - Helpers
+    
+    @objc func showProfileImageActionSheet() {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//        let showCamera = UIAlertAction(title: "카메라 촬영", style: .default) { [weak self] _ in
+//            guard let self = self else { return }
+//            self.showCamera()
+//        }
+        let showAlbum = UIAlertAction(title: "앨범에서 선택", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.showAlbum()
+        }
+        let deleteProfileImage = UIAlertAction(title: "사진 제거", style: .destructive) { [weak self] _ in
+            guard let self = self else { return }
+            self.feedEditView.runningImageView.image = CommonAsset.defaultLargeProfile.image
+            self.reactor?.action.onNext(.selectedImage(nil))
+        }
+        let cancel = UIAlertAction(title: "닫기", style: .cancel)
+//        actionSheet.addAction(showCamera)
+        actionSheet.addAction(showAlbum)
+        actionSheet.addAction(deleteProfileImage)
+        actionSheet.addAction(cancel)
+        
+        self.present(actionSheet, animated: true)
     }
 }
+
+extension EditFeedViewController: PHPickerViewControllerDelegate {
+    
+    public func showAlbum(){
+        var configuration = PHPickerConfiguration()
+        configuration.filter = .any(of: [.images])
+        configuration.selectionLimit = 1
+        
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        self.present(picker, animated: true)
+    }
+    
+    public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        
+        let itemProvider = results.first?.itemProvider
+        if let itemProvider = itemProvider,
+           itemProvider.canLoadObject(ofClass: UIImage.self){
+            itemProvider.loadObject(ofClass: UIImage.self) { (imageData, error) in
+                DispatchQueue.main.async { [weak self] in
+                    if let image = imageData as? UIImage{
+                        self?.feedEditView.runningImageView.image = image
+                        if let jpegImage = image.jpegData(compressionQuality: 0.8){
+                            self?.reactor?.action.onNext(.selectedImage(jpegImage))
+                        }
+                    }
+                }
+            }
+        }
+        
+        picker.dismiss(animated: true)
+    }
+}
+
+//extension EditFeedViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+//    public func showCamera() {
+//        guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
+//            print("카메라를 사용할 수 없습니다.")
+//            return
+//        }
+//
+//        let cameraPicker = UIImagePickerController()
+//        cameraPicker.sourceType = .camera
+//        cameraPicker.delegate = self
+//        present(cameraPicker, animated: true, completion: nil)
+//    }
+//
+//    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+//        picker.dismiss(animated: true, completion: nil)
+//
+//        if let image = info[.originalImage] as? UIImage {
+//            // 촬영한 이미지 처리
+//        }
+//    }
+//
+//    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+//        picker.dismiss(animated: true, completion: nil)
+//    }
+//}

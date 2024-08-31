@@ -24,5 +24,5 @@ public protocol FeedRepositoryProtocol{
     func unLikePost(postId: Int) -> Observable<FeedLikeModel>
     func editComment(commentId: Int, editCommentModel: EditCommentRequestDTO) -> Observable<Any>
     func fetchOptionFeed(page: Int, size: Int, option: FeedOptionType) -> Observable<([FeedModel], Int)>
-    func editFeed(feedModel: EditFeedModel) -> Observable<Void>
+    func editFeed(feedModel: EditFeedModel, selectedImage: Data?) -> Observable<Void>
 }

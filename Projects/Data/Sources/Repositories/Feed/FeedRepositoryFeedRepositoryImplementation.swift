@@ -181,20 +181,50 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
                 }
         }
     }
-    public func editFeed(feedModel: EditFeedModel) -> Observable<Void> {
-        return service.rx.request(.editFeed(feedData: CreateFeedRequestDTO(postNo: feedModel.postNo,
-                                                                           postContent: feedModel.postContent,
-                                                                           difficulty: "",
-                                                                           mainData: feedModel.mainData.typeNo,
-                                                                           imageUrl: feedModel.imageUrl)))
-        .filterSuccessfulStatusCodes()
-        .map{ response -> Void in
-            let _ = try JSONDecoder().decode(RunningResultResponseDTO.self, from: response.data)
-            return
-        }
-        .asObservable()
-        .catch{ error in
-            return Observable.error(error)
+    
+    public func editFeed(feedModel: EditFeedModel, selectedImage: Data?) -> Observable<Void> {
+        if let image = selectedImage {
+            return service.rx.request(.saveRunningImage(image: image))
+                .filterSuccessfulStatusCodes()
+                .asObservable()
+                .flatMap { response -> Observable<Void> in
+                    do {
+                        let recordResponse = try JSONDecoder().decode(FeedImageResponseDTO.self, from: response.data)
+                        
+                        return self.service.rx.request(.editFeed(feedData: CreateFeedRequestDTO(postNo: feedModel.postNo,
+                                                                                            postContent: feedModel.postContent,
+                                                                                            difficulty: "",
+                                                                                            mainData: feedModel.mainData.typeNo,
+                                                                                            imageUrl: recordResponse.data)))
+                        .filterSuccessfulStatusCodes()
+                        .map{ response -> Void in
+                            let _ = try JSONDecoder().decode(RunningResultResponseDTO.self, from: response.data)
+                            return
+                        }
+                        .asObservable()
+                        .catch{ error in
+                            return Observable.error(error)
+                        }
+                    }
+                }
+                .catch { error in
+                    return Observable.error(error)
+                }
+        } else {
+            return service.rx.request(.editFeed(feedData: CreateFeedRequestDTO(postNo: feedModel.postNo,
+                                                                               postContent: feedModel.postContent,
+                                                                               difficulty: "",
+                                                                               mainData: feedModel.mainData.typeNo,
+                                                                               imageUrl: "")))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> Void in
+                let _ = try JSONDecoder().decode(RunningResultResponseDTO.self, from: response.data)
+                return
+            }
+            .asObservable()
+            .catch{ error in
+                return Observable.error(error)
+            }
         }
     }
 }
