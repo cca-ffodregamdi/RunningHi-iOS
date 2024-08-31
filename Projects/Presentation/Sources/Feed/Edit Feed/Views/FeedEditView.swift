@@ -20,8 +20,18 @@ class FeedEditView: UIView {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = true
         scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.addSubview(runningImageView)
         scrollView.addSubview(stackView)
         return scrollView
+    }()
+    
+    var runningImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.image = CommonAsset.defaultLargeProfile.image
+        imageView.clipsToBounds = true
+        imageView.isUserInteractionEnabled = true
+        return imageView
     }()
     
     private var contentTitleLabel: UILabel = {
@@ -109,9 +119,15 @@ class FeedEditView: UIView {
             make.left.right.equalToSuperview().inset(20)
         }
         
+        runningImageView.snp.makeConstraints { make in
+            make.top.equalToSuperview().inset(16)
+            make.centerX.equalToSuperview()
+            make.height.width.equalTo(100)
+        }
+        
         stackView.snp.makeConstraints { make in
             make.width.equalToSuperview()
-            make.top.equalToSuperview().inset(16)
+            make.top.equalTo(runningImageView.snp.bottom).offset(16)
             make.bottom.equalToSuperview()
         }
         

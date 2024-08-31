@@ -27,6 +27,7 @@ public enum FeedService{
     case fetchBookmarkedFeeds(pages: Int, size: Int)
     case fetchMyFeed(page: Int, size: Int)
     case editFeed(feedData: CreateFeedRequestDTO)
+    case saveRunningImage(image: Data)
 }
 
 extension FeedService: TargetType{
@@ -71,7 +72,9 @@ extension FeedService: TargetType{
         case .fetchMyFeed:
             return "/posts/my-feed"
         case .editFeed:
-            return "posts"
+            return "/posts"
+        case .saveRunningImage:
+            return "/image"
         }
     }
     
@@ -86,7 +89,8 @@ extension FeedService: TargetType{
         case .writeComment,
                 .makeBookmark,
                 .reportComment,
-                .likePost:
+                .likePost,
+                .saveRunningImage:
             return .post
         case .deleteBookmark,
                 .deletePost,
@@ -130,6 +134,9 @@ extension FeedService: TargetType{
                 return .requestParameters(parameters: ["page" : page + 1, "size" : size], encoding: URLEncoding.queryString)
         case .editFeed(let feedData):
             return .requestJSONEncodable(feedData)
+        case .saveRunningImage(let image):
+            let request = MultipartFormData(provider: .data(image), name: "image", fileName: "fileName.jpeg", mimeType: "image/jpeg")
+            return .uploadMultipart([request])
         }
     }
     
@@ -152,6 +159,9 @@ extension FeedService: TargetType{
                 .editFeed,
                 .fetchMyFeed:
             return ["Content-type": "application/json",
+                    "Authorization": accessToken]
+        case .saveRunningImage:
+            return ["Content-type": "multipart/form-data",
                     "Authorization": accessToken]
         }
     }

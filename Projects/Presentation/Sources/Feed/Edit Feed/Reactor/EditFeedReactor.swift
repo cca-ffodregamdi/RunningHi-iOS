@@ -19,16 +19,19 @@ public class EditFeedReactor: Reactor{
     public enum Action{
         case createRunningFeed(EditFeedModel)
         case tapRepresentButton(FeedRepresentType)
+        case selectedImage(Data?)
     }
     
     public enum Mutation{
         case finishCreateRunningFeed
         case setFeedRepresentType(FeedRepresentType)
+        case setSelectedImage(Data?)
     }
     
     public struct State{
         var isFinishCreateRunningFeed = false
         var representType: FeedRepresentType?
+        var selectedImage: Data?
     }
     
     //MARK: - Lifecycle
@@ -43,10 +46,12 @@ public class EditFeedReactor: Reactor{
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .createRunningFeed(let feedModel):
-            return feedUseCase.editFeed(feedModel: feedModel)
+            return feedUseCase.editFeed(feedModel: feedModel, selectedImage: currentState.selectedImage)
                 .map { Mutation.finishCreateRunningFeed }
         case .tapRepresentButton(let type):
             return Observable.just(Mutation.setFeedRepresentType(type))
+        case .selectedImage(let image):
+            return Observable.just(Mutation.setSelectedImage(image))
         }
     }
     
@@ -57,6 +62,8 @@ public class EditFeedReactor: Reactor{
             newState.isFinishCreateRunningFeed = true
         case .setFeedRepresentType(let type):
             newState.representType = type
+        case .setSelectedImage(let image):
+            newState.selectedImage = image
         }
         return newState
     }
