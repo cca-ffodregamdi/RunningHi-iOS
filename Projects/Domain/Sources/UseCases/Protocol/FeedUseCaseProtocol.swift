@@ -25,4 +25,5 @@ protocol FeedUseCaseProtocol{
     func fetchOptionFeed(page: Int, size: Int, option: FeedOptionType) -> Observable<([FeedModel], Int)>
     func saveFeedImage(image: Data) -> Observable<String>
     func saveFeed(feedModel: EditFeedModel, imageURL: String) -> Observable<Void>
+    func editFeed(feedModel: EditFeedModel, imageURL: String) -> Observable<Void>
 }

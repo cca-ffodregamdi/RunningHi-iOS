@@ -100,11 +100,19 @@ final public class EditFeedViewController: UIViewController {
             return
         }
         
-        if let postNo = reactor?.currentState.postNo {
-            reactor?.action.onNext(.createRunningFeed(EditFeedModel(postNo: postNo,
-                                                                    postContent: feedEditView.contentTextView.text,
-                                                                    mainData: reactor?.currentState.representType ?? .none,
-                                                                    imageUrl: "")))
+        if let reactor = reactor {
+            let editFeedModel = EditFeedModel(postNo: reactor.currentState.postNo,
+                                              postContent: feedEditView.contentTextView.text,
+                                              mainData: reactor.currentState.representType ?? .none,
+                                              imageUrl: "")
+            
+            if reactor.currentState.isPosted {
+                // 수정요청
+                reactor.action.onNext(.editRunningFeed(editFeedModel))
+            } else {
+                // 등록요청
+                reactor.action.onNext(.createRunningFeed(editFeedModel))
+            }
         }
     }
 }
@@ -119,6 +127,16 @@ extension EditFeedViewController: View {
     }
     
     private func bindingView(reactor: EditFeedReactor) {
+        
+        // 수정 모드인 경우 기존 피드 데이터 셋팅
+        self.rx.viewDidLoad
+            .filter {reactor.currentState.isPosted}
+            .bind { [weak self] _ in
+                guard let self = self else {return}
+                reactor.action.onNext(.fetchFeedDetail)
+            }
+            .disposed(by: disposeBag)
+        
         reactor.state
             .compactMap{$0.isFinishCreateRunningFeed}
             .distinctUntilChanged()
@@ -144,10 +162,8 @@ extension EditFeedViewController: View {
                 
                 if text == "" || representType == nil {
                     self.navigationItem.rightBarButtonItem?.tintColor = .Neutrals300
-//                    self.navigationItem.rightBarButtonItem?.isEnabled = false
                 } else {
                     self.navigationItem.rightBarButtonItem?.tintColor = .Primary
-//                    self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
             })
             .disposed(by: disposeBag)
@@ -158,6 +174,20 @@ extension EditFeedViewController: View {
             .bind{ [weak self] type in
                 guard let self = self else { return }
                 feedEditView.setRepresentType(type: type)
+            }.disposed(by: self.disposeBag)
+        
+        reactor.state
+            .compactMap{$0.postContent}
+            .distinctUntilChanged()
+            .withLatestFrom(reactor.state.compactMap { $0.postImageURL }) { ($0, $1) }
+            .bind{ [weak self] (content, url) in
+                guard let self = self else { return }
+                feedEditView.contentTextView.placeholder = ""
+                feedEditView.contentTextView.text = content
+                
+                if let url = URL(string: url) {
+                    feedEditView.runningImageView.kf.setImage(with: url)
+                }
             }.disposed(by: self.disposeBag)
     }
     

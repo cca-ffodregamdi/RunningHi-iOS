@@ -79,4 +79,8 @@ public final class FeedUseCase: FeedUseCaseProtocol{
     public func saveFeed(feedModel: EditFeedModel, imageURL: String) -> Observable<Void> {
         return repository.saveFeed(feedModel: feedModel, imageURL: imageURL)
     }
+    
+    public func editFeed(feedModel: EditFeedModel, imageURL: String) -> Observable<Void> {
+        return repository.editFeed(feedModel: feedModel, imageURL: imageURL)
+    }
 }

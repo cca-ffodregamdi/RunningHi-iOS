@@ -29,14 +29,17 @@ final public class RecordDetailReactor: Reactor {
     }
     
     public struct State{
+        var postNo: Int
+        var isPosted: Bool
+        
         var runningResult: RunningResult?
         var isFinishDeleteRunningRecord = false
     }
     
     //MARK: - Lifecycle
     
-    public init(recordUseCase: RecordUseCase){
-        self.initialState = State()
+    public init(recordUseCase: RecordUseCase, postNo: Int, isPosted: Bool){
+        self.initialState = State(postNo: postNo, isPosted: isPosted)
         self.recordUseCase = recordUseCase
     }
     

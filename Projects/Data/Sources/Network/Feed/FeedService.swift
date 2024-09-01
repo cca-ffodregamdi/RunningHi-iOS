@@ -26,8 +26,9 @@ public enum FeedService{
     case editComment(commentId: Int, editCommentModel: EditCommentRequestDTO)
     case fetchBookmarkedFeeds(pages: Int, size: Int)
     case fetchMyFeed(page: Int, size: Int)
-    case editFeed(feedData: CreateFeedRequestDTO)
     case saveRunningImage(image: Data)
+    case createFeed(feedData: CreateFeedRequestDTO)
+    case editFeed(postNo: Int, feedData: EditFeedRequestDTO)
 }
 
 extension FeedService: TargetType{
@@ -71,8 +72,10 @@ extension FeedService: TargetType{
             return "/posts/bookmarked"
         case .fetchMyFeed:
             return "/posts/my-feed"
-        case .editFeed:
+        case .createFeed:
             return "/posts"
+        case .editFeed(let postNo, _):
+            return "/posts/\(postNo)"
         case .saveRunningImage:
             return "/image"
         }
@@ -99,6 +102,7 @@ extension FeedService: TargetType{
         case .deleteComment,
                 .editPost,
                 .editComment,
+                .createFeed,
                 .editFeed:
             return .put
         }
@@ -132,7 +136,9 @@ extension FeedService: TargetType{
             return .requestParameters(parameters: ["page" : page + 1, "size" : size], encoding: URLEncoding.queryString)
         case .fetchMyFeed(let page, let size):
                 return .requestParameters(parameters: ["page" : page + 1, "size" : size], encoding: URLEncoding.queryString)
-        case .editFeed(let feedData):
+        case .createFeed(let feedData):
+            return .requestJSONEncodable(feedData)
+        case .editFeed(_, let feedData):
             return .requestJSONEncodable(feedData)
         case .saveRunningImage(let image):
             let request = MultipartFormData(provider: .data(image), name: "image", fileName: "fileName.jpeg", mimeType: "image/jpeg")
@@ -157,6 +163,7 @@ extension FeedService: TargetType{
                 .editComment,
                 .fetchBookmarkedFeeds,
                 .editFeed,
+                .createFeed,
                 .fetchMyFeed:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]
