@@ -29,6 +29,9 @@ public class EditFeedReactor: Reactor{
     }
     
     public struct State{
+        var postNo: Int
+        var enterType: EditFeedEnterType
+        
         var isFinishCreateRunningFeed = false
         var representType: FeedRepresentType?
         var selectedImage: Data?
@@ -36,8 +39,8 @@ public class EditFeedReactor: Reactor{
     
     //MARK: - Lifecycle
     
-    public init(feedUseCase: FeedUseCase) {
-        self.initialState = State()
+    public init(feedUseCase: FeedUseCase, postNo: Int, enterType: EditFeedEnterType) {
+        self.initialState = State(postNo: postNo, enterType: enterType)
         self.feedUseCase = feedUseCase
     }
     
@@ -46,8 +49,18 @@ public class EditFeedReactor: Reactor{
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .createRunningFeed(let feedModel):
-            return feedUseCase.editFeed(feedModel: feedModel, selectedImage: currentState.selectedImage)
-                .map { Mutation.finishCreateRunningFeed }
+            if let selectedImage = currentState.selectedImage {
+                // 이미지를 설정한 경우 (이미지 저장 API -> 피드 저장 API)
+                return feedUseCase.saveFeedImage(image: selectedImage)
+                    .flatMap { feedImageURL in
+                        return self.feedUseCase.saveFeed(feedModel: feedModel, imageURL: feedImageURL)
+                    }
+                    .map { Mutation.finishCreateRunningFeed }
+            } else {
+                // 이미지를 설정하지 않은 경우 (피드 저장 API)
+                return feedUseCase.saveFeed(feedModel: feedModel, imageURL: "")
+                    .map { Mutation.finishCreateRunningFeed }
+            }
         case .tapRepresentButton(let type):
             return Observable.just(Mutation.setFeedRepresentType(type))
         case .selectedImage(let image):

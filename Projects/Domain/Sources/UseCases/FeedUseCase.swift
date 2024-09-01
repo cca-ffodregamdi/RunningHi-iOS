@@ -72,7 +72,11 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         return self.repository.fetchOptionFeed(page: page, size: size, option: option)
     }
     
-    public func editFeed(feedModel: EditFeedModel, selectedImage: Data?) -> Observable<Void> {
-        return repository.editFeed(feedModel: feedModel, selectedImage: selectedImage)
+    public func saveFeedImage(image: Data) -> Observable<String> {
+        return repository.saveFeedImage(image: image)
+    }
+    
+    public func saveFeed(feedModel: EditFeedModel, imageURL: String) -> Observable<Void> {
+        return repository.saveFeed(feedModel: feedModel, imageURL: imageURL)
     }
 }

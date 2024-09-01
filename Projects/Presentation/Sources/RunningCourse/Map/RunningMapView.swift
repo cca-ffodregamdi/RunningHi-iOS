@@ -58,13 +58,14 @@ class RunningMapView: MKMapView {
             latitude: (minLat + maxLat) / 2,
             longitude: (minLon + maxLon) / 2
         )
+        
         let span = MKCoordinateSpan(
             latitudeDelta: (maxLat - minLat) * 1.2, // 여유를 주기 위해 1.2배
             longitudeDelta: (maxLon - minLon) * 1.2 // 여유를 주기 위해 1.2배
         )
         
         let region = MKCoordinateRegion(center: center, span: span)
-        setRegion(region, animated: true)
+        setRegion(region, animated: true) // animated: 지도 표출 시 zoomIn효과
         
         // 시작점 마커 추가
         if let latitude = runningResult.routeList.first?.latitude, let longitude = runningResult.routeList.first?.longitude {
