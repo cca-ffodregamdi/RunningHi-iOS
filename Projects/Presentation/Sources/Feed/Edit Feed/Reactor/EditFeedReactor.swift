@@ -29,6 +29,9 @@ public class EditFeedReactor: Reactor{
     }
     
     public struct State{
+        var postNo: Int
+        var enterType: EditFeedEnterType
+        
         var isFinishCreateRunningFeed = false
         var representType: FeedRepresentType?
         var selectedImage: Data?
@@ -36,8 +39,8 @@ public class EditFeedReactor: Reactor{
     
     //MARK: - Lifecycle
     
-    public init(feedUseCase: FeedUseCase) {
-        self.initialState = State()
+    public init(feedUseCase: FeedUseCase, postNo: Int, enterType: EditFeedEnterType) {
+        self.initialState = State(postNo: postNo, enterType: enterType)
         self.feedUseCase = feedUseCase
     }
     

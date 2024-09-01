@@ -29,9 +29,8 @@ final public class EditFeedViewController: UIViewController {
     //MARK: - Properties
     
     public var coordinator: FeedCoordinatorInterface?
+    
     public weak var delegate: EditFeedViewControllerDelegate?
-    private var postNo: Int?
-    private var enterType: EditFeedEnterType = .feed
     
     public var disposeBag = DisposeBag()
     
@@ -45,11 +44,9 @@ final public class EditFeedViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public init(reactor: EditFeedReactor, postNo: Int, enterType: EditFeedEnterType){
+    public init(reactor: EditFeedReactor){
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
-        self.postNo = postNo
-        self.enterType = enterType
     }
     
     deinit {
@@ -90,7 +87,7 @@ final public class EditFeedViewController: UIViewController {
     //MARK: - Helpers
     
     @objc func customBackAction() {
-        if enterType == .running {
+        if reactor?.currentState.enterType == .running {
             self.navigationController?.isNavigationBarHidden = true
             self.navigationController?.popToRootViewController(animated: true)
         } else {
@@ -103,7 +100,7 @@ final public class EditFeedViewController: UIViewController {
             return
         }
         
-        if let postNo = postNo {
+        if let postNo = reactor?.currentState.postNo {
             reactor?.action.onNext(.createRunningFeed(EditFeedModel(postNo: postNo,
                                                                     postContent: feedEditView.contentTextView.text,
                                                                     mainData: reactor?.currentState.representType ?? .none,
@@ -128,8 +125,8 @@ extension EditFeedViewController: View {
             .bind{ [weak self] type in
                 guard let self = self else { return }
                 
-                switch enterType {
-                case .feed: 
+                switch reactor.currentState.enterType {
+                case .feed:
                     self.delegate?.updateFeedDetail()
                     self.navigationController?.popViewController(animated: true)
                 case .record:
