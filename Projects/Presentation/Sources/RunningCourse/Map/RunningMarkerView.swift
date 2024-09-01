@@ -8,20 +8,20 @@
 import UIKit
 import MapKit
 
+// Map에 마커를 나타내기 위한 객체
 class RunningAnnotation: NSObject, MKAnnotation {
+    static var identifier = "RunningAnnotation"
+    
     var coordinate: CLLocationCoordinate2D
-    var title: String?
-    var subtitle: String?
     var isStart: Bool = true
     
     init(coordinate: CLLocationCoordinate2D, isStart: Bool) {
         self.coordinate = coordinate
         self.isStart = isStart
-        self.title = ""
-        self.subtitle = ""
     }
 }
 
+// Map에 나타낼 마커 View
 class RunningMarkerView: UIView {
     
     let borderWidth: CGFloat = 3.0
@@ -43,7 +43,7 @@ class RunningMarkerView: UIView {
         configureUI()
         
         fillColor = isStart ? .Primary700 : .white
-        borderColor = isStart ? .white : .Primary700 //.Primary500
+        borderColor = isStart ? .white : .Primary700
     }
     
     private func configureUI() {

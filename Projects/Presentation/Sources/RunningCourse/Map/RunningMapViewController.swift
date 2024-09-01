@@ -12,13 +12,10 @@ import Domain
 final public class RunningMapViewController: UIViewController, MKMapViewDelegate {
     
     lazy var mapView = RunningMapView()
+    
     let delegate = RunningMapDelegate()
     
     //MARK: - Lifecycle
-    
-    public init() {
-        super.init(nibName: nil, bundle: nil)
-    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -33,14 +30,6 @@ final public class RunningMapViewController: UIViewController, MKMapViewDelegate
     
     deinit {
         print("deinit RunningMapViewController")
-    }
-    
-    public override func viewWillAppear(_ animated: Bool) {
-        self.tabBarController?.tabBar.isHidden = true
-    }
-    
-    public override func viewWillDisappear(_ animated: Bool) {
-        self.tabBarController?.tabBar.isHidden = false
     }
     
     public override func viewDidLoad() {
