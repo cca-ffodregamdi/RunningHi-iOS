@@ -29,16 +29,16 @@ class RecordCoordinator: Coordinator {
 }
 
 extension RecordCoordinator: RecordCoordinatorInterface {
-    func showRecordDetail(postNo: Int) {
-        let vc = recordDIContainer.makeRecordDetailViewController(coordinator: self, postNo: postNo)
+    func showRecordDetail(postNo: Int, isPosted: Bool) {
+        let vc = recordDIContainer.makeRecordDetailViewController(coordinator: self, postNo: postNo, isPosted: isPosted)
         self.navigationController.pushViewController(vc, animated: true)
     }
     
-    func showEditFeed(postNo: Int) {
+    func showEditFeed(postNo: Int, isPosted: Bool) {
         let feedCoordinator: FeedCoordinator = FeedCoordinator(navigationController: navigationController)
         let feedDIContainer = feedCoordinator.feedDIContainer
         
-        let vc = feedDIContainer.makeEditPostViewController(postId: postNo, coordinator: feedCoordinator, enterType: .record)
+        let vc = feedDIContainer.makeEditPostViewController(postId: postNo, coordinator: feedCoordinator, enterType: .record, isPosted: isPosted)
         self.navigationController.pushViewController(vc, animated: true)
     }
 }

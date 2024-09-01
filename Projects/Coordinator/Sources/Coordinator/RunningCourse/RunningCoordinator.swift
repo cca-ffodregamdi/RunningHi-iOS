@@ -54,7 +54,7 @@ extension RunningCoordinator: RunningCoordinatorInterface {
         let feedCoordinator: FeedCoordinator = FeedCoordinator(navigationController: navigationController)
         let feedDIContainer = feedCoordinator.feedDIContainer
         
-        let vc = feedDIContainer.makeEditPostViewController(postId: postNo, coordinator: feedCoordinator, enterType: .running)
+        let vc = feedDIContainer.makeEditPostViewController(postId: postNo, coordinator: feedCoordinator, enterType: .running, isPosted: false)
         self.navigationController.pushViewController(vc, animated: true)
     }
     

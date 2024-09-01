@@ -197,10 +197,24 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
     
     public func saveFeed(feedModel: EditFeedModel, imageURL: String) -> Observable<Void> {
         let requestDTO = CreateFeedRequestDTO(postNo: feedModel.postNo, postContent: feedModel.postContent, difficulty: "",                                            mainData: feedModel.mainData.typeNo, imageUrl: imageURL)
-        return service.rx.request(.editFeed(feedData: requestDTO))
+        return service.rx.request(.createFeed(feedData: requestDTO))
             .filterSuccessfulStatusCodes()
             .map{ response -> Void in
-                let _ = try JSONDecoder().decode(RunningResultResponseDTO.self, from: response.data)
+                let _ = try JSONDecoder().decode(FeedEditResponseDTO.self, from: response.data)
+                return
+            }
+            .asObservable()
+            .catch { error in
+                return Observable.error(error)
+            }
+    }
+    
+    public func editFeed(feedModel: EditFeedModel, imageURL: String) -> Observable<Void> {
+        let requestDTO = EditFeedRequestDTO(postContent: feedModel.postContent, dataType: feedModel.mainData.typeNo, imageUrl: imageURL)
+        return service.rx.request(.editFeed(postNo: feedModel.postNo, feedData: requestDTO))
+            .filterSuccessfulStatusCodes()
+            .map{ response -> Void in
+                let _ = try JSONDecoder().decode(FeedEditResponseDTO.self, from: response.data)
                 return
             }
             .asObservable()

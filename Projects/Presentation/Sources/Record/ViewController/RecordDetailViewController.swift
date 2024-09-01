@@ -21,7 +21,6 @@ final public class RecordDetailViewController: UIViewController {
     
     public var coordinator: RecordCoordinatorInterface?
     
-    public var postNo: Int?
     private let delegate = RunningMapDelegate()
     
     public var disposeBag = DisposeBag()
@@ -32,18 +31,13 @@ final public class RecordDetailViewController: UIViewController {
     
     //MARK: - Lifecycle
     
-    public init() {
-        super.init(nibName: nil, bundle: nil)
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public init(reactor: RecordDetailReactor, postNo: Int){
+    public init(reactor: RecordDetailReactor){
         super.init(nibName: nil, bundle: nil)
         
-        self.postNo = postNo
         self.reactor = reactor
     }
     
@@ -104,20 +98,21 @@ final public class RecordDetailViewController: UIViewController {
             preferredStyle: .actionSheet
         )
         
-        let writeAlertAction = UIAlertAction(title: "현재 기록으로 게시글 쓰기", style: .default) { _ in self.writeAction() }
+        let editMode = (reactor?.currentState.isPosted ?? false) ? "현재 기록의 게시글 수정" : "현재 기록으로 게시글 쓰기"
+        let editAlertAction = UIAlertAction(title: editMode, style: .default) { _ in self.editAction() }
         let deleteAlertAction = UIAlertAction(title: "삭제", style: .destructive) { _ in self.deleteAction() }
         let cancelAlertAction = UIAlertAction(title: "취소", style: .cancel)
         
-        moreAlert.addAction(writeAlertAction)
+        moreAlert.addAction(editAlertAction)
         moreAlert.addAction(deleteAlertAction)
         moreAlert.addAction(cancelAlertAction)
         
         self.present(moreAlert, animated: true)
     }
     
-    @objc func writeAction() {
-        if let postNo = postNo {
-            coordinator?.showEditFeed(postNo: postNo)
+    @objc func editAction() {
+        if let postNo = reactor?.currentState.postNo, let isPosted = reactor?.currentState.isPosted {
+            coordinator?.showEditFeed(postNo: postNo, isPosted: isPosted)
         }
     }
     
@@ -128,8 +123,8 @@ final public class RecordDetailViewController: UIViewController {
             preferredStyle: .alert
         )
         let confirm = UIAlertAction(title: "삭제", style: .destructive) { _ in
-            if let reactor = self.reactor, let postNo = self.postNo {
-                reactor.action.onNext(.deleteRunningRecord(postNo))
+            if let reactor = self.reactor {
+                reactor.action.onNext(.deleteRunningRecord(reactor.currentState.postNo))
             }
         }
         let cancel = UIAlertAction(title: "아니오", style: .default)
@@ -153,8 +148,8 @@ extension RecordDetailViewController: View {
     private func bindingView(reactor: RecordDetailReactor) {
         rx.viewDidLoad
             .bind { [weak self] _ in
-                guard let self = self, let postNo = postNo else {return}
-                reactor.action.onNext(.fetchRecordDetailData(postNo))
+                guard let self = self else {return}
+                reactor.action.onNext(.fetchRecordDetailData(reactor.currentState.postNo))
             }
             .disposed(by: disposeBag)
         

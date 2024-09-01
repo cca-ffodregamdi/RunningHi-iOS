@@ -9,6 +9,6 @@ import Foundation
 import Domain
 
 public protocol RecordCoordinatorInterface {
-    func showRecordDetail(postNo: Int)
-    func showEditFeed(postNo: Int)
+    func showRecordDetail(postNo: Int, isPosted: Bool)
+    func showEditFeed(postNo: Int, isPosted: Bool)
 }

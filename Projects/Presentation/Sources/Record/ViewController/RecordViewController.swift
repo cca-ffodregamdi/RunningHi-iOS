@@ -100,8 +100,8 @@ extension RecordViewController: View {
         
         self.recordView.runningListView.tableView.rx.itemSelected
             .subscribe(onNext: { [weak self] indexPath in
-                if let self = self, let postNo = reactor.currentState.recordData?.runningRecords[indexPath.row].postNo {
-                    self.coordinator?.showRecordDetail(postNo: postNo)
+                if let self = self, let data = reactor.currentState.recordData?.runningRecords[indexPath.row] {
+                    self.coordinator?.showRecordDetail(postNo: data.postNo, isPosted: data.status)
                 }
             })
             .disposed(by: disposeBag)
