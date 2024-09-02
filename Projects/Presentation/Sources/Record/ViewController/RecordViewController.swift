@@ -85,7 +85,7 @@ extension RecordViewController: View {
         self.rx.viewWillAppear
             .bind { [weak self] _ in
                 guard let self = self else {return}
-                self.recordView.chartTypeView.setChartType(type: .weekly)
+                self.recordView.chartTypeView.setChartType(type: reactor.currentState.recordData?.chartType ?? .weekly)
                 reactor.action.onNext(.viewDidLoad)
             }
             .disposed(by: disposeBag)

@@ -46,7 +46,8 @@ final public class RecordReactor: Reactor {
         switch action{
             
         case .viewDidLoad:
-            return recordUseCase.fetchRecordData(type: .weekly, date: Date())
+            return recordUseCase.fetchRecordData(type: currentState.recordData?.chartType ?? .weekly,
+                                                 date: currentState.recordData?.date ?? Date())
                 .map { Mutation.setRecordData($0) }
             
         case .tapChartType(let type):
