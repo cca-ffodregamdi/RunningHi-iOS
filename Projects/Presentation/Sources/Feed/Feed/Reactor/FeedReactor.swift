@@ -20,6 +20,8 @@ final public class FeedReactor: Reactor{
         case deleteFeed(Int)
         case updateSortFilter(SortFilter)
 //        case updateDistanceFilter(DistanceFilter)
+        case updateBookmark(Int)
+        case fetchOneOfFeeds(Int)
     }
     
     public enum Mutation{
@@ -31,6 +33,8 @@ final public class FeedReactor: Reactor{
         case removeFeed(Int)
         case setSortFilter(SortFilter)
 //        case setDistanceFilter(DistanceFilter)
+        case updateBookmarkedWithPostId(Int)
+        case changeOneOfFeeds(Int, FeedModel)
     }
     
     public struct State{
@@ -82,6 +86,10 @@ final public class FeedReactor: Reactor{
             return Observable.just(Mutation.setSortFilter(sort))
 //        case .updateDistanceFilter(let distance):
 //            return Observable.just(Mutation.setDistanceFilter(distance))
+        case .updateBookmark(let postId):
+            return Observable.just(Mutation.updateBookmarkedWithPostId(postId))
+        case .fetchOneOfFeeds(let postId):
+            return feedUseCase.fetchFeed(postId: postId).map{Mutation.changeOneOfFeeds(postId, $0)}
         }
     }
     
@@ -108,6 +116,18 @@ final public class FeedReactor: Reactor{
             newState.sortState = sort
 //        case .setDistanceFilter(let distance):
 //            newState.distanceState = distance
+        case .updateBookmarkedWithPostId(let postId):
+            if let index = newState.feeds.firstIndex(where: {
+                $0.postId == postId
+            }){
+                newState.feeds[index].isBookmarked = !newState.feeds[index].isBookmarked
+            }
+        case .changeOneOfFeeds(let postId, let feedModel):
+            if let index = newState.feeds.firstIndex(where: {
+                $0.postId == postId
+            }){
+                newState.feeds[index] = feedModel
+            }
         }
         return newState
     }

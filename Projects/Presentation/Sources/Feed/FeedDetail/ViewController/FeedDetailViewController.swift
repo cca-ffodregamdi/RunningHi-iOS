@@ -16,6 +16,8 @@ import RxCocoa
 
 public protocol FeedDetailViewControllerDelegate: AnyObject{
     func deleteFeed(postId: Int)
+    func editedFeed(postId: Int)
+    func bookmarkedFeed(postId: Int)
 }
 
 final public class FeedDetailViewController: UIViewController {
@@ -433,7 +435,8 @@ extension FeedDetailViewController: View{
         
         bookmarkButton.rx
             .tap
-            .map{ _ in
+            .map{ [weak self] _ in
+                self?.delegate?.bookmarkedFeed(postId: reactor.currentState.postId)
                 if reactor.currentState.isBookmark{
                     return Reactor.Action.deleteBookmark(reactor.currentState.postId)
                 }else{
@@ -524,5 +527,7 @@ extension FeedDetailViewController: EditCommentViewControllerDelegate{
 extension FeedDetailViewController: EditFeedViewControllerDelegate{
     public func updateFeedDetail() {
         reactor?.action.onNext(.fetchPost)
+        guard let reactor = reactor else { return }
+        delegate?.editedFeed(postId: reactor.currentState.postId)
     }
 }

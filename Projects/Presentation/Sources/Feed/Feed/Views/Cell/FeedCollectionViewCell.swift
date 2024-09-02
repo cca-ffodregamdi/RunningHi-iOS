@@ -257,6 +257,7 @@ class FeedCollectionViewCell: UICollectionViewCell {
         commentCountLabel.textColor = .black
         bookmarkButton.isSelected = false
         self.contentBackgroundView.isHidden = true
+        bookmarkButton.isHidden = false
     }
     
     override func layoutSubviews() {

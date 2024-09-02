@@ -60,9 +60,9 @@ final public class FeedViewController: UIViewController{
         super.viewWillAppear(animated)
         self.tabBarController?.tabBar.isHidden = false
         
-        Observable.just(Reactor.Action.refresh)
-            .bind(to: reactor!.action)
-            .disposed(by: self.disposeBag)
+//        Observable.just(Reactor.Action.refresh)
+//            .bind(to: reactor!.action)
+//            .disposed(by: self.disposeBag)
     }
     
     private func configureUI(){
@@ -111,6 +111,8 @@ final public class FeedViewController: UIViewController{
 extension FeedViewController: View{
     
     public func bind(reactor: FeedReactor) {
+        
+        reactor.action.onNext(.refresh)
         
         self.dataSource = RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>(configureCell: { a, collectionView, indexPath, feed in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
@@ -176,7 +178,7 @@ extension FeedViewController: View{
             .bind{ [weak self] _ in
                 guard let self = self else { return }
                 self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self.coordinator?.showBookmarkedFeed()
+                self.coordinator?.showBookmarkedFeed(viewController: self)
             }.disposed(by: self.disposeBag)
         
         announceButton.rx.tap
@@ -226,9 +228,30 @@ extension FeedViewController: View{
     }
 }
 
+extension FeedViewController: PinterestLayoutDelegate {
+    public func collectionView(_ collectionView: UICollectionView, heightForPhotoAtIndexPath indexPath: IndexPath) -> CGFloat {
+        let model = self.dataSource[indexPath]
+        return model.imageUrl == nil ? collectionView.bounds.height / 3 : collectionView.bounds.height / 2
+    }
+}
+
 extension FeedViewController: FeedDetailViewControllerDelegate{
     public func deleteFeed(postId: Int) {
         reactor?.action.onNext(.deleteFeed(postId))
+    }
+    
+    public func editedFeed(postId: Int) {
+        reactor?.action.onNext(.fetchOneOfFeeds(postId))
+    }
+    
+    public func bookmarkedFeed(postId: Int) {
+        reactor?.action.onNext(.updateBookmark(postId))
+    }
+}
+
+extension FeedViewController: FeedWithOptionViewControllerDelgate{
+    public func updatedBookmarkFeed(postId: Int){
+        reactor?.action.onNext(.updateBookmark(postId))
     }
 }
 
@@ -243,12 +266,5 @@ extension FeedViewController: SortfilterViewControllerDelegate{
     public func updatedSortState(sortState: SortFilter) {
         reactor?.action.onNext(.updateSortFilter(sortState))
         reactor?.action.onNext(.refresh)
-    }
-}
-
-extension FeedViewController: PinterestLayoutDelegate {
-    public func collectionView(_ collectionView: UICollectionView, heightForPhotoAtIndexPath indexPath: IndexPath) -> CGFloat {
-        let model = self.dataSource[indexPath]
-        return model.imageUrl == nil ? collectionView.bounds.height / 3 : collectionView.bounds.height / 2
     }
 }

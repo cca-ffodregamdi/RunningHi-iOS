@@ -11,6 +11,7 @@ import RxSwift
 
 public protocol FeedRepositoryProtocol{
     func fetchFeeds(page: Int, size: Int, sort: String, distance: Int) -> Observable<([FeedModel], Int)>
+    func fetchFeed(postId: Int) -> Observable<FeedModel>
     func fetchPost(postId: Int) -> Observable<FeedDetailModel>
     func fetchComment(postId: Int) -> Observable<[CommentModel]>
     func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentModel>

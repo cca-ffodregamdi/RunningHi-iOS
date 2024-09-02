@@ -14,11 +14,17 @@ import RxSwift
 import RxCocoa
 import Domain
 
+public protocol FeedWithOptionViewControllerDelgate: AnyObject{
+    func updatedBookmarkFeed(postId: Int)
+}
+
 public class FeedWithOptionViewController: UIViewController {
     
     public var disposeBag: DisposeBag = DisposeBag()
     
     public var coordinator: FeedCoordinatorInterface?
+    
+    public weak var delegate: FeedWithOptionViewControllerDelgate?
     
     private var dataSource: RxCollectionViewSectionedAnimatedDataSource<AnimatableSectionModel<String, FeedModel>>!
     
@@ -90,16 +96,16 @@ extension FeedWithOptionViewController: View{
             
             cell.configureModel(model: model)
             cell.disposeBag = DisposeBag()
-            cell.bookmarkButton.rx
-                .tap
-                .map{ _ in
-                    if cell.bookmarkButton.isSelected{
-                        return Reactor.Action.deleteBookmark(model.postId, indexPath.item)
-                    }else{
-                        return Reactor.Action.makeBookmark(BookmarkRequestDTO(postNo: model.postId), indexPath.item)
-                    }
-                }.bind(to: reactor.action)
-                .disposed(by: cell.disposeBag)
+            
+            if reactor.currentState.feedOption == .bookmark{
+                cell.bookmarkButton.rx
+                    .tap
+                    .map{ Reactor.Action.deleteBookmark(model.postId) }
+                    .bind(to: reactor.action)
+                    .disposed(by: cell.disposeBag)
+            }else{
+                cell.bookmarkButton.isHidden = true
+            }
             return cell
         })
         
@@ -151,6 +157,18 @@ extension FeedWithOptionViewController: View{
 extension FeedWithOptionViewController: FeedDetailViewControllerDelegate{
     public func deleteFeed(postId: Int) {
         reactor?.action.onNext(.deleteFeed(postId))
+    }
+    
+    public func editedFeed(postId: Int) {
+        reactor?.action.onNext(.fetchOneOfFeeds(postId))
+    }
+    
+    public func bookmarkedFeed(postId: Int) {
+        guard let reactor = reactor else { return }
+        if reactor.currentState.feedOption == .bookmark{
+            reactor.action.onNext(.deleteFeed(postId))
+            delegate?.updatedBookmarkFeed(postId: postId)
+        }
     }
 }
 
