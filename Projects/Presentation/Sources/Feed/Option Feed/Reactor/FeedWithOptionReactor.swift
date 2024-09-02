@@ -14,9 +14,9 @@ public class FeedWithOptionReactor: Reactor{
     public enum Action{
         case fetchFeeds
         case refresh
-        case makeBookmark(BookmarkRequestDTO, Int)
-        case deleteBookmark(Int, Int)
+        case deleteBookmark(Int)
         case deleteFeed(Int)
+        case updateBookmark(Int)
     }
     
     public enum Mutation{
@@ -24,8 +24,9 @@ public class FeedWithOptionReactor: Reactor{
         case addFeeds([FeedModel], Int)
         case setRefreshing(Bool)
         case setLoading(Bool)
-        case updateBookmarked(Int, Bool)
         case removeFeed(Int)
+        case updateBookmarkedWithPostId(Int)
+        case deleteBookmark(Int)
     }
     
     public struct State{
@@ -66,12 +67,12 @@ public class FeedWithOptionReactor: Reactor{
                 Observable.just(Mutation.setLoading(false)),
                 Observable.just(Mutation.setRefreshing(false)),
             ])
-        case .makeBookmark(let bookmarkRequest, let index):
-            return feedUseCase.makeBookmark(post: bookmarkRequest).map{ _ in Mutation.updateBookmarked(index, true) }
-        case .deleteBookmark(let postId, let index):
-            return feedUseCase.deleteBookmark(postId: postId).map{_ in Mutation.updateBookmarked(index, false) }
+        case .deleteBookmark(let postId):
+            return feedUseCase.deleteBookmark(postId: postId).map{_ in Mutation.deleteBookmark(postId) }
         case .deleteFeed(let postId):
             return Observable.just(Mutation.removeFeed(postId))
+        case .updateBookmark(let postId):
+            return Observable.just(Mutation.updateBookmarkedWithPostId(postId))
         }
     }
     
@@ -90,10 +91,20 @@ public class FeedWithOptionReactor: Reactor{
             newState.isRefreshing = value
         case .setLoading(let value):
             newState.isLoading = value
-        case .updateBookmarked(let index, let isBookmarked):
-            newState.feeds[index].isBookmarked = isBookmarked
         case .removeFeed(let postId):
             newState.feeds.removeAll{ $0.postId == postId }
+        case .deleteBookmark(let postId):
+            if let index = newState.feeds.firstIndex(where: {
+                $0.postId == postId
+            }){
+                newState.feeds.remove(at: index)
+            }
+        case .updateBookmarkedWithPostId(let postId):
+            if let index = newState.feeds.firstIndex(where: {
+                $0.postId == postId
+            }){
+                newState.feeds[index].isBookmarked = !newState.feeds[index].isBookmarked
+            }
         }
         return newState
     }
