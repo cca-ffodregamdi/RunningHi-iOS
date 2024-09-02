@@ -12,6 +12,7 @@ import Domain
 
 public enum FeedService{
     case fetchFeeds(page: Int, size: Int = 10, sort: String, distance: Int)
+    case fetchFeed(postId: Int)
     case fetchPost(postId: Int)
     case fetchComment(postId: Int)
     case writeComment(commentModel: WriteCommentReqesutDTO)
@@ -44,6 +45,8 @@ extension FeedService: TargetType{
         switch self{
         case .fetchFeeds:
             return "/posts"
+        case .fetchFeed(let postId):
+            return "/posts/only/\(postId)"
         case .fetchPost(let postId):
             return "/posts/\(postId)"
         case .fetchComment:
@@ -84,6 +87,7 @@ extension FeedService: TargetType{
     public var method: Moya.Method {
         switch self{
         case .fetchFeeds,
+                .fetchFeed,
                 .fetchPost,
                 .fetchComment,
                 .fetchBookmarkedFeeds,
@@ -124,7 +128,8 @@ extension FeedService: TargetType{
                 .deleteBookmark,
                 .deleteComment,
                 .deletePost,
-                .unLikePost:
+                .unLikePost,
+                .fetchFeed:
             return .requestPlain
         case .writeComment(let commentModel):
             return .requestJSONEncodable(commentModel)
@@ -149,6 +154,7 @@ extension FeedService: TargetType{
     public var headers: [String : String]? {
         switch self{
         case .fetchFeeds,
+                .fetchFeed,
                 .fetchPost,
                 .fetchComment,
                 .writeComment,

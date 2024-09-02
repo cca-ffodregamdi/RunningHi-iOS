@@ -16,7 +16,7 @@ public class FeedWithOptionReactor: Reactor{
         case refresh
         case deleteBookmark(Int)
         case deleteFeed(Int)
-        case updateBookmark(Int)
+        case fetchOneOfFeeds(Int)
     }
     
     public enum Mutation{
@@ -27,6 +27,7 @@ public class FeedWithOptionReactor: Reactor{
         case removeFeed(Int)
         case updateBookmarkedWithPostId(Int)
         case deleteBookmark(Int)
+        case changeOneOfFeeds(Int, FeedModel)
     }
     
     public struct State{
@@ -71,8 +72,8 @@ public class FeedWithOptionReactor: Reactor{
             return feedUseCase.deleteBookmark(postId: postId).map{_ in Mutation.deleteBookmark(postId) }
         case .deleteFeed(let postId):
             return Observable.just(Mutation.removeFeed(postId))
-        case .updateBookmark(let postId):
-            return Observable.just(Mutation.updateBookmarkedWithPostId(postId))
+        case .fetchOneOfFeeds(let postId):
+            return feedUseCase.fetchFeed(postId: postId).map{Mutation.changeOneOfFeeds(postId, $0)}
         }
     }
     
@@ -104,6 +105,12 @@ public class FeedWithOptionReactor: Reactor{
                 $0.postId == postId
             }){
                 newState.feeds[index].isBookmarked = !newState.feeds[index].isBookmarked
+            }
+        case .changeOneOfFeeds(let postId, let feedModel):
+            if let index = newState.feeds.firstIndex(where: {
+                $0.postId == postId
+            }){
+                newState.feeds[index] = feedModel
             }
         }
         return newState

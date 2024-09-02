@@ -241,7 +241,7 @@ extension FeedViewController: FeedDetailViewControllerDelegate{
     }
     
     public func editedFeed(postId: Int) {
-        reactor?.action.onNext(.refresh)
+        reactor?.action.onNext(.fetchOneOfFeeds(postId))
     }
     
     public func bookmarkedFeed(postId: Int) {
