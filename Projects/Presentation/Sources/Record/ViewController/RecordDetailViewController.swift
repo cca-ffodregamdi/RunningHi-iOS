@@ -103,7 +103,10 @@ final public class RecordDetailViewController: UIViewController {
         let deleteAlertAction = UIAlertAction(title: "삭제", style: .destructive) { _ in self.deleteAction() }
         let cancelAlertAction = UIAlertAction(title: "취소", style: .cancel)
         
-        moreAlert.addAction(editAlertAction)
+        //TODO: njshin 추후 수정기능 추가되면 주석 해제
+        if !(reactor?.currentState.isPosted ?? false) {
+            moreAlert.addAction(editAlertAction)
+        }
         moreAlert.addAction(deleteAlertAction)
         moreAlert.addAction(cancelAlertAction)
         
