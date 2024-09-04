@@ -17,7 +17,7 @@ public final class ChallengeRepositoryImplementation: ChallengeRepositoryProtoco
     
     public init() { }
     
-    public func fetchChallenge(status: Bool) -> Observable<[ChallengeModel]> {
+    public func fetchChallenge(status: ChallengeStatus) -> Observable<[ChallengeModel]> {
         return service.rx.request(.fetchChallenge(status: status))
             .filterSuccessfulStatusCodes()
             .map{ response -> [ChallengeModel] in
@@ -31,7 +31,7 @@ public final class ChallengeRepositoryImplementation: ChallengeRepositoryProtoco
             
     }
     
-    public func fetchMyChallenge(status: Bool) -> Observable<[MyChallengeModel]> {
+    public func fetchMyChallenge(status: ChallengeStatus) -> Observable<[MyChallengeModel]> {
         return service.rx.request(.fetchMyChallenge(status: status))
             .filterSuccessfulStatusCodes()
             .map{ response -> [MyChallengeModel] in

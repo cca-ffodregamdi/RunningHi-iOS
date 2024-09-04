@@ -8,8 +8,8 @@
 import Foundation
 import RxSwift
 public protocol ChallengeRepositoryProtocol{
-    func fetchChallenge(status: Bool) -> Observable<[ChallengeModel]>
-    func fetchMyChallenge(status: Bool) -> Observable<[MyChallengeModel]>
+    func fetchChallenge(status: ChallengeStatus) -> Observable<[ChallengeModel]>
+    func fetchMyChallenge(status: ChallengeStatus) -> Observable<[MyChallengeModel]>
     func fetcOtherhChallengeDetail(challengeId: Int) -> Observable<OtherChallengeDetailModel>
     func fetchMyChallengeDetail(challengeId: Int) -> Observable<MyChallengeDetailModel>
     func joinChallenge(joinChallengeRequestModel: JoinChallengeRequestDTO) -> Observable<Any>

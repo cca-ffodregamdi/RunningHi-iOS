@@ -11,8 +11,8 @@ import RxSwift
 import Domain
 
 public enum ChallengeService{
-    case fetchChallenge(status: Bool)
-    case fetchMyChallenge(status: Bool)
+    case fetchChallenge(status: ChallengeStatus)
+    case fetchMyChallenge(status: ChallengeStatus)
     case fetchOtherChallengeDetail(challengeId: Int)
     case fetchMyChallengeDetail(challengeId: Int)
     case joinChallenge(joinChallengeRequestModel: JoinChallengeRequestDTO)
