@@ -4,7 +4,7 @@ let project = Project(
     name: "RunningHi",
     targets: [
         .target(
-            name: "러닝하이",
+            name: "RunningHi",
             destinations: .iOS,
             product: .app,
             bundleId: "com.runninghi.app",
@@ -35,6 +35,9 @@ let project = Project(
                             ]
                         ]
                     ],
+                    "CFBundleDisplayName": "러닝하이",
+                    "CFBundleShortVersionString": "1.0.1",
+                    "CFBundleVersion" : "1",
                     "NSAppTransportSecurity" : [
                         "NSAllowsArbitraryLoads": true
                     ],
