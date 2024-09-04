@@ -39,7 +39,7 @@ public struct CommentsResponseModel: Decodable{
     public let replyContent: String?
     public let reportedCount: Int?
     public let isDeleted: Bool?
-    public let profileUrl: String?
+    public let profileImageUrl: String?
     public let createDate: String?
     public let isUpdated: Bool?
     public let isOwner: Bool?
@@ -52,7 +52,7 @@ public struct CommentsResponseModel: Decodable{
                             content: replyContent ?? "",
                             reportedCount: reportedCount ?? 0,
                             isDeleted: isDeleted ?? false,
-                            profileUrl: profileUrl,
+                            profileUrl: profileImageUrl,
                             createDate: Date.formatDateStringToDate(dateString: createDate ?? "") ?? Date(),
                             isUpdated: isUpdated ?? false,
                             isOwner: isOwner ?? false)
