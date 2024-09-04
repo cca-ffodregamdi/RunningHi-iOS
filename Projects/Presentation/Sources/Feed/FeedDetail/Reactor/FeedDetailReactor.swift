@@ -119,6 +119,7 @@ public class FeedDetailReactor: Reactor{
             newState.isBookmark = model.isBookmarked
         case .setComment(let models):
             newState.commentModels = models
+            newState.postModel?.commentCount = models.count
         case .setLoading(let value):
             newState.isLoading = value
         case .writeComment(let model):

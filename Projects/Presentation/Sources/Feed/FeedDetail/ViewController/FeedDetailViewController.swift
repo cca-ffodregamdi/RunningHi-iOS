@@ -411,6 +411,7 @@ extension FeedDetailViewController: View{
         
         commentInputView.sendButton.rx
             .tap
+            .throttle(.seconds(3), latest: false, scheduler: MainScheduler.instance)
             .map{ [weak self] in
                 Reactor.Action.writeComment(WriteCommentReqesutDTO(postId: reactor.currentState.postId, content: self?.commentInputView.getCommentText() ?? ""))
             }

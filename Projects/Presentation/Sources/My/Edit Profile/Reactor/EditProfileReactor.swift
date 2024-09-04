@@ -76,15 +76,12 @@ public class EditProfileReactor: Reactor{
                                       myUseCase.editMyProfileImage(request: .init(jpegData: currentState.selectedImage!)).asObservable())
                 .map{ _ in Mutation.updateSuccessedEditProfile}
             }else if currentState.isChangedNickname, currentState.isDeleteProfileImage{
-                print("changed nickname, deleteProfile")
                 return Observable.zip(myUseCase.editMyNickname(request: .init(nickname: currentState.changedNickname!)).asObservable(),
                                       myUseCase.deleteMyProfileImage().asObservable())
                 .map{ _ in Mutation.updateSuccessedEditProfile}
             }else if currentState.isChangedNickname{
-                print("changed profileImage")
                 return myUseCase.editMyNickname(request: .init(nickname: currentState.changedNickname!)).map{_ in Mutation.updateSuccessedEditProfile}
             }else if currentState.isChangedProfileImage{
-                print("changed profileImage")
                 return myUseCase.editMyProfileImage(request: .init(jpegData: currentState.selectedImage!)).map{_ in Mutation.updateSuccessedEditProfile}
             }else{
                 return myUseCase.deleteMyProfileImage().map{_ in Mutation.updateSuccessedEditProfile }
