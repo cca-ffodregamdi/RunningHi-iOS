@@ -46,11 +46,11 @@ public class ChallengeReactor: Reactor{
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
         case .fetchChallenge:
-            return self.challengeUseCase.fetchChallenge(status: true)
+            return self.challengeUseCase.fetchChallenge(status: .IN_PROGRESS)
                 .map{ Mutation.setTotalChallenge($0) }
             
         case .fetchMyChallenge:
-            return challengeUseCase.fetchMyChallenge(status: true).map{ Mutation.setMyChallenge($0)}
+            return challengeUseCase.fetchMyChallenge(status: .IN_PROGRESS).map{ Mutation.setMyChallenge($0)}
         }
     }
     
