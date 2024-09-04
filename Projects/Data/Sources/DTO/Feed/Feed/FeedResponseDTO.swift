@@ -44,7 +44,7 @@ public struct FeedResponseModel: Decodable{
     public let replyCnt: Int?
     public let likeCnt: Int?
     public var isBookmarked: Bool?
-    
+    public let isWriter: Bool?
     func toEntity() -> FeedModel{
         return FeedModel(postId: postNo,
                          nickname: nickname ?? "",
@@ -56,6 +56,7 @@ public struct FeedResponseModel: Decodable{
                          imageUrl: imageUrl,
                          commentCount: replyCnt ?? 0,
                          likeCount: likeCnt ?? 0,
-                         isBookmarked: isBookmarked ?? false)
+                         isBookmarked: isBookmarked ?? false,
+                         isWriter: isWriter ?? false)
     }
 }
