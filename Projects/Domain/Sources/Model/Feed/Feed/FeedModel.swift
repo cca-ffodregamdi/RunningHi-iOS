@@ -19,8 +19,9 @@ public struct FeedModel: Decodable{
     public let commentCount: Int
     public let likeCount: Int
     public var isBookmarked: Bool
+    public let isWriter: Bool
     
-    public init(postId: Int, nickname: String, createDate: Date, postContent: String, role: String, profileImageUrl: String?, mainData: String, imageUrl: String?, commentCount: Int, likeCount: Int, isBookmarked: Bool) {
+    public init(postId: Int, nickname: String, createDate: Date, postContent: String, role: String, profileImageUrl: String?, mainData: String, imageUrl: String?, commentCount: Int, likeCount: Int, isBookmarked: Bool, isWriter: Bool) {
         self.postId = postId
         self.nickname = nickname
         self.createDate = createDate
@@ -32,5 +33,6 @@ public struct FeedModel: Decodable{
         self.commentCount = commentCount
         self.likeCount = likeCount
         self.isBookmarked = isBookmarked
+        self.isWriter = isWriter
     }
 }

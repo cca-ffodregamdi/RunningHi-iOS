@@ -118,16 +118,20 @@ extension FeedViewController: View{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "feedCell", for: indexPath) as! FeedCollectionViewCell
             cell.disposeBag = DisposeBag()
             cell.configureModel(model: feed)
-            cell.bookmarkButton.rx
-                .tap
-                .map{ _ in
-                    if cell.bookmarkButton.isSelected{
-                        return Reactor.Action.deleteBookmark(feed.postId, indexPath.item)
-                    }else{
-                        return Reactor.Action.makeBookmark(BookmarkRequestDTO(postNo: feed.postId), indexPath.item)
-                    }
-                }.bind(to: reactor.action)
-                .disposed(by: cell.disposeBag)
+            if feed.isWriter{
+                cell.bookmarkButton.isHidden = true
+            }else{
+                cell.bookmarkButton.rx
+                    .tap
+                    .map{ _ in
+                        if cell.bookmarkButton.isSelected{
+                            return Reactor.Action.deleteBookmark(feed.postId, indexPath.item)
+                        }else{
+                            return Reactor.Action.makeBookmark(BookmarkRequestDTO(postNo: feed.postId), indexPath.item)
+                        }
+                    }.bind(to: reactor.action)
+                    .disposed(by: cell.disposeBag)
+            }
             return cell
         })
 
