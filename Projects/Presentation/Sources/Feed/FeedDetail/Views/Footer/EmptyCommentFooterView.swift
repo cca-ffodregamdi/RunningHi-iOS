@@ -10,6 +10,8 @@ import SnapKit
 
 class EmptyCommentFooterView: UITableViewHeaderFooterView {
     
+    static let identifier: String = "commentFooterView"
+    
     private lazy var warningLabel: UILabel = {
         let label = UILabel()
         label.text = "가장 먼저 댓글을 남겨보세요."

@@ -10,6 +10,8 @@ import SnapKit
 
 class CommentHeaderFooterView: UITableViewHeaderFooterView {
     
+    static let identifier: String = "commentHeaderView"
+    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "댓글"
