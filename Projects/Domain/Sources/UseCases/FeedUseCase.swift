@@ -25,7 +25,7 @@ public final class FeedUseCase: FeedUseCaseProtocol{
     }
     
     public func fetchPost(postId: Int) -> Observable<FeedDetailModel> {
-        return repository.fetchPost(postId: postId)
+        return repository.fetchFeedDetail(postId: postId)
     }
     
     public func fetchComment(postId: Int) -> Observable<[CommentModel]> {

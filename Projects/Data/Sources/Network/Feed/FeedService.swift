@@ -30,11 +30,19 @@ public enum FeedService{
     case saveRunningImage(image: Data)
     case createFeed(feedData: CreateFeedRequestDTO)
     case editFeed(postNo: Int, feedData: EditFeedRequestDTO)
+    case fetchGPSData(url: String)
 }
 
 extension FeedService: TargetType{
     public var baseURL: URL {
-        return .init(string: "https://runninghi.store/api/v1")!
+        
+        switch self{
+        case .fetchGPSData(let url):
+            return .init(string: url)!
+        default:
+            return .init(string: "https://runninghi.store/api/v1")!
+        }
+        
     }
     
     public var accessToken: String{
@@ -81,6 +89,8 @@ extension FeedService: TargetType{
             return "/posts/\(postNo)"
         case .saveRunningImage:
             return "/image"
+        case .fetchGPSData:
+            return ""
         }
     }
     
@@ -91,7 +101,8 @@ extension FeedService: TargetType{
                 .fetchPost,
                 .fetchComment,
                 .fetchBookmarkedFeeds,
-                .fetchMyFeed:
+                .fetchMyFeed,
+                .fetchGPSData:
             return .get
         case .writeComment,
                 .makeBookmark,
@@ -129,7 +140,8 @@ extension FeedService: TargetType{
                 .deleteComment,
                 .deletePost,
                 .unLikePost,
-                .fetchFeed:
+                .fetchFeed,
+                .fetchGPSData:
             return .requestPlain
         case .writeComment(let commentModel):
             return .requestJSONEncodable(commentModel)
@@ -153,6 +165,8 @@ extension FeedService: TargetType{
     
     public var headers: [String : String]? {
         switch self{
+        case .fetchGPSData:
+            return nil
         case .fetchFeeds,
                 .fetchFeed,
                 .fetchPost,

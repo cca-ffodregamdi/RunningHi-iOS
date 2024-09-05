@@ -79,4 +79,51 @@ class RunningMapView: MKMapView {
             addAnnotation(annotation)
         }
     }
+    
+    func configureMapForFeedDetail(routeList: [RouteInfo]) {
+        let coordinates = routeList.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+        let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        addOverlay(polyline)
+        
+        if routeList.count == 0 { return }
+
+        // 경로의 최대/최소 좌표를 계산
+        var minLat = routeList[0].latitude
+        var maxLat = routeList[0].latitude
+        var minLon = routeList[0].longitude
+        var maxLon = routeList[0].longitude
+
+        for coordinate in routeList {
+            minLat = min(minLat, coordinate.latitude)
+            maxLat = max(maxLat, coordinate.latitude)
+            minLon = min(minLon, coordinate.longitude)
+            maxLon = max(maxLon, coordinate.longitude)
+        }
+
+        // 중심 좌표와 span(확대/축소 정도)를 계산
+        let center = CLLocationCoordinate2D(
+            latitude: (minLat + maxLat) / 2,
+            longitude: (minLon + maxLon) / 2
+        )
+        
+        let span = MKCoordinateSpan(
+            latitudeDelta: (maxLat - minLat) * 1.2, // 여유를 주기 위해 1.2배
+            longitudeDelta: (maxLon - minLon) * 1.2 // 여유를 주기 위해 1.2배
+        )
+        
+        let region = MKCoordinateRegion(center: center, span: span)
+        setRegion(region, animated: true) // animated: 지도 표출 시 zoomIn효과
+        
+        // 시작점 마커 추가
+        if let latitude = routeList.first?.latitude, let longitude = routeList.first?.longitude {
+            let annotation = RunningAnnotation(coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), isStart: true)
+            addAnnotation(annotation)
+        }
+        
+        // 종료점 마커 추가
+        if let latitude = routeList.last?.latitude, let longitude = routeList.last?.longitude {
+            let annotation = RunningAnnotation(coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), isStart: false)
+            addAnnotation(annotation)
+        }
+    }
 }

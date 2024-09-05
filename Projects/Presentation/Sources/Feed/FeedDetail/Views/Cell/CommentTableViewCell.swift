@@ -13,6 +13,8 @@ import RxSwift
 
 class CommentTableViewCell: UITableViewCell {
     
+    static let identifier: String = "commentCell"
+    
     var disposeBag: DisposeBag = DisposeBag()
     
     private lazy var profileImageView: UIImageView = {

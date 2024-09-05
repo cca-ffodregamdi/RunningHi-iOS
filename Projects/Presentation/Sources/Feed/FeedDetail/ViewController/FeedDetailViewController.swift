@@ -13,6 +13,7 @@ import RxDataSources
 import Domain
 import RxSwift
 import RxCocoa
+import MapKit
 
 public protocol FeedDetailViewControllerDelegate: AnyObject{
     func deleteFeed(postId: Int)
@@ -28,6 +29,8 @@ final public class FeedDetailViewController: UIViewController {
     public var coordinator: FeedCoordinatorInterface?
     
     public weak var delegate: FeedDetailViewControllerDelegate?
+    
+    private let mapDelegate = RunningMapDelegate()
     
     private var stickyViewHeight: NSLayoutConstraint?
     
@@ -46,57 +49,8 @@ final public class FeedDetailViewController: UIViewController {
         return button
     }()
     
-    private lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.clipsToBounds = true
-        scrollView.showsHorizontalScrollIndicator = false
-        scrollView.showsVerticalScrollIndicator = false
-        scrollView.alwaysBounceVertical = false
-        scrollView.backgroundColor = .clear
-        return scrollView
-    }()
-    
-    private lazy var stickyImageView: StickyImageView = {
-        return StickyImageView(frame: .zero)
-    }()
-    
-    private lazy var postView: PostView = {
-        return PostView()
-    }()
-    
-    private lazy var postRecordBreakLine: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
-        return view
-    }()
-    
-    private lazy var recordView: FeedDetailRecordView = {
-        return FeedDetailRecordView()
-    }()
-    
-    private lazy var recordCommentBreakLine: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
-        return view
-    }()
-    
-    private lazy var commentTableView: UITableView = {
-        var tableView = UITableView(frame: .zero, style: .plain)
-        tableView.isScrollEnabled = false
-        tableView.showsVerticalScrollIndicator = false
-        tableView.showsHorizontalScrollIndicator = false
-        tableView.register(CommentTableViewCell.self, forCellReuseIdentifier: "commentCell")
-        tableView.register(CommentHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: "commentHeader")
-        tableView.register(EmptyCommentFooterView.self, forHeaderFooterViewReuseIdentifier: "commentFooter")
-        tableView.separatorStyle = .none
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.sectionHeaderTopPadding = 0
-        return tableView
-    }()
-    
-    private lazy var commentInputView: CommentInputView = {
-        return CommentInputView()
+    private lazy var feedDetailView: FeedDetailView = {
+        return FeedDetailView()
     }()
     
     // MARK: LifeCyecle
@@ -105,6 +59,7 @@ final public class FeedDetailViewController: UIViewController {
         super.viewDidLoad()
         configureUI()
         hideKeyboardWhenTouchUpBackground()
+        feedDetailView.runningResultMapView.mapView.delegate = mapDelegate
     }
     
     deinit{
@@ -120,7 +75,7 @@ final public class FeedDetailViewController: UIViewController {
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        commentInputView.resignResponderTextView()
+        feedDetailView.commentInputView.resignResponderTextView()
     }
     
     public init(reactor: FeedDetailReactor){
@@ -148,51 +103,12 @@ final public class FeedDetailViewController: UIViewController {
     
     private func configureUI(){
         self.view.backgroundColor = .systemBackground
-        self.view.addSubview(scrollView)
-        self.scrollView.addSubview(postView)
-        self.scrollView.addSubview(postRecordBreakLine)
-        self.scrollView.addSubview(recordView)
-        self.scrollView.addSubview(recordCommentBreakLine)
-        self.scrollView.addSubview(commentTableView)
-        self.view.addSubview(commentInputView)
+        self.view.addSubview(feedDetailView)
         
-        scrollView.snp.makeConstraints { make in
-            make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
-            make.left.right.equalToSuperview()
-            make.bottom.equalTo(commentInputView.snp.top)
-        }
-        
-        postView.snp.makeConstraints { make in
-            make.top.left.right.equalToSuperview()
-            make.width.equalToSuperview()
-        }
-        
-        postRecordBreakLine.snp.makeConstraints { make in
-            make.top.equalTo(postView.snp.bottom)
-            make.left.right.equalToSuperview()
-            make.height.equalTo(8)
-        }
-        
-        recordView.snp.makeConstraints { make in
-            make.top.equalTo(postRecordBreakLine.snp.bottom)
-            make.left.right.width.equalToSuperview()
-        }
-        
-        recordCommentBreakLine.snp.makeConstraints { make in
-            make.top.equalTo(recordView.snp.bottom)
-            make.left.right.equalToSuperview()
-            make.height.equalTo(8)
-        }
-        
-        commentTableView.snp.makeConstraints { make in
-            make.top.equalTo(recordCommentBreakLine.snp.bottom)
-            make.left.right.width.equalToSuperview()
-            make.bottom.equalToSuperview()
-        }
-        
-        commentInputView.snp.makeConstraints { make in
+        feedDetailView.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.left.right.equalTo(self.view.safeAreaLayoutGuide)
             make.bottom.equalTo(self.view.keyboardLayoutGuide.snp.top)
-            make.left.right.equalToSuperview()
         }
     }
     
@@ -275,12 +191,12 @@ final public class FeedDetailViewController: UIViewController {
         
         if stopExpandHeaderHeight, lowerThanTop {
             // 초기 상태, UIImageView가 지정한 크기만큼 커졌고, 스크롤뷰의 시작점이 최상단보다 아래 존재
-            scrollView.contentInset = .init(top: remainingTopSpacing, left: 0, bottom: 0, right: 0)
+            feedDetailView.scrollView.contentInset = .init(top: remainingTopSpacing, left: 0, bottom: 0, right: 0)
             constraint.constant = remainingTopSpacing
             view.layoutIfNeeded()
         } else if !lowerThanTop {
             // 스크롤 뷰의 시작점이 최상단보다 위에 존재
-            scrollView.contentInset = .zero
+            feedDetailView.scrollView.contentInset = .zero
             constraint.constant = 0
         } else {
             // 3) 스크롤 뷰의 시작점이 최상단보다 밑에 있고, 스크롤뷰 상단 contentInset이 미리 지정한 stickViewDefaultHeight 보다 큰 경우
@@ -309,34 +225,34 @@ final public class FeedDetailViewController: UIViewController {
     private func configureStickyView(imageUrl: String?){
         guard let url = imageUrl else { return }
         
-        if stickyImageView.superview != nil {
-            stickyImageView.removeFromSuperview()
+        if feedDetailView.stickyImageView.superview != nil {
+            feedDetailView.stickyImageView.removeFromSuperview()
         }
         
-        self.scrollView.contentInset = .init(top: stickViewDefaultHeight, left: 0, bottom: 0, right: 0)
-        self.scrollView.contentOffset = .init(x: 0, y: -stickViewDefaultHeight)
+        feedDetailView.scrollView.contentInset = .init(top: stickViewDefaultHeight, left: 0, bottom: 0, right: 0)
+        feedDetailView.scrollView.contentOffset = .init(x: 0, y: -stickViewDefaultHeight)
         
         
-        self.view.addSubview(stickyImageView)
-        self.stickyImageView.setImage(urlString: url)
+        feedDetailView.addSubview(feedDetailView.stickyImageView)
+        feedDetailView.stickyImageView.setImage(urlString: url)
         
-        stickyImageView.snp.makeConstraints { make in
+        feedDetailView.stickyImageView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.left.right.equalToSuperview()
         }
         
-        scrollView.snp.remakeConstraints { make in
+        feedDetailView.scrollView.snp.remakeConstraints { make in
             make.top.equalToSuperview()
             make.left.right.equalToSuperview()
-            make.bottom.equalTo(self.commentInputView.snp.top)
+            make.bottom.equalTo(feedDetailView.commentInputView.snp.top)
         }
         
-        stickyViewHeight = stickyImageView.heightAnchor.constraint(equalToConstant: stickViewDefaultHeight)
+        stickyViewHeight = feedDetailView.stickyImageView.heightAnchor.constraint(equalToConstant: stickViewDefaultHeight)
         stickyViewHeight?.isActive = true
         
         let tapGesture = UITapGestureRecognizer()
-        stickyImageView.addGestureRecognizer(tapGesture)
-        stickyImageView.isUserInteractionEnabled = true
+        feedDetailView.stickyImageView.addGestureRecognizer(tapGesture)
+        feedDetailView.stickyImageView.isUserInteractionEnabled = true
         tapGesture.rx.event
             .bind{ [weak self] _ in
                 guard let self = self else { return }
@@ -364,8 +280,10 @@ extension FeedDetailViewController: View{
             .distinctUntilChanged()
             .bind{ [weak self] model in
                 guard let self = self else { return }
-                self.postView.configureModel(model: model)
-                self.recordView.configureModel(difficulty: model.difficulty, time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
+                self.feedDetailView.postView.configureModel(model: model)
+                self.feedDetailView.recordView.configureModel(difficulty: model.difficulty, time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
+                self.feedDetailView.runningResultMapView.configureModelForFeedDetail(location: model.locationName)
+                self.feedDetailView.runningResultMapView.mapView.configureMapForFeedDetail(routeList: model.routeList)
             }.disposed(by: self.disposeBag)
         
         reactor.state.compactMap{$0.postModel?.imageUrl}
@@ -384,7 +302,7 @@ extension FeedDetailViewController: View{
             }.disposed(by: self.disposeBag)
             
         let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, CommentModel>> (configureCell: { dataSource, tableView, indexPath, item in
-            let cell = tableView.dequeueReusableCell(withIdentifier: "commentCell", for: indexPath) as! CommentTableViewCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: CommentTableViewCell.identifier, for: indexPath) as! CommentTableViewCell
             cell.configureModel(model: item)
             
             cell.optionButton.rx.tap
@@ -397,23 +315,23 @@ extension FeedDetailViewController: View{
         
         reactor.state
             .map{[SectionModel(model: "commentModel", items: $0.commentModels)]}
-            .bind(to: commentTableView.rx.items(dataSource: dataSource))
+            .bind(to: feedDetailView.commentTableView.rx.items(dataSource: dataSource))
             .disposed(by: self.disposeBag)
         
         
-        commentTableView.rx.observe(CGSize.self, "contentSize")
+        feedDetailView.commentTableView.rx.observe(CGSize.self, "contentSize")
             .bind{ [weak self] size in
                 guard let size = size, let self = self else {return}
-                self.commentTableView.snp.updateConstraints({ make in
+                self.feedDetailView.commentTableView.snp.updateConstraints({ make in
                     make.height.equalTo(size.height)
                 })
             }.disposed(by: self.disposeBag)
         
-        commentInputView.sendButton.rx
+        feedDetailView.commentInputView.sendButton.rx
             .tap
             .throttle(.seconds(3), latest: false, scheduler: MainScheduler.instance)
             .map{ [weak self] in
-                Reactor.Action.writeComment(WriteCommentReqesutDTO(postId: reactor.currentState.postId, content: self?.commentInputView.getCommentText() ?? ""))
+                Reactor.Action.writeComment(WriteCommentReqesutDTO(postId: reactor.currentState.postId, content: self?.feedDetailView.commentInputView.getCommentText() ?? ""))
             }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
@@ -423,10 +341,10 @@ extension FeedDetailViewController: View{
             .filter{ $0 }
             .bind{ [weak self] _ in
                 guard let self = self else { return }
-                self.commentInputView.resetTextViewAndSendButton()
-                self.commentInputView.resignResponderTextView()
+                self.feedDetailView.commentInputView.resetTextViewAndSendButton()
+                self.feedDetailView.commentInputView.resignResponderTextView()
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3) {
-                    self.scrollView.setContentOffset(.init(x: 0, y: self.scrollView.contentSize.height - self.scrollView.bounds.height), animated: true)
+                    self.feedDetailView.scrollView.setContentOffset(.init(x: 0, y: self.feedDetailView.scrollView.contentSize.height - self.feedDetailView.scrollView.bounds.height), animated: true)
                 }
             }.disposed(by: self.disposeBag)
         
@@ -453,17 +371,17 @@ extension FeedDetailViewController: View{
                 self?.touchUpNavigationBarOptionButton()
             }.disposed(by: self.disposeBag)
         
-        scrollView.rx.contentOffset
+        feedDetailView.scrollView.rx.contentOffset
             .map{$0.y}
             .distinctUntilChanged()
             .bind{ [weak self] offset in
                 guard let self = self else { return }
-                let isAtBottom = offset + self.scrollView.frame.size.height >= self.scrollView.contentSize.height
+                let isAtBottom = offset + self.feedDetailView.scrollView.frame.size.height >= self.feedDetailView.scrollView.contentSize.height
                 guard !isAtBottom else { return }
                 self.updateStickyImageView(offsetY: offset)
             }.disposed(by: self.disposeBag)
         
-        self.commentTableView.rx.setDelegate(self)
+        feedDetailView.commentTableView.rx.setDelegate(self)
             .disposed(by: self.disposeBag)
         
         reactor.state
@@ -477,10 +395,10 @@ extension FeedDetailViewController: View{
         
         reactor.state
             .map{$0.isLike}
-            .bind(to: postView.likeButton.rx.isSelected)
+            .bind(to: feedDetailView.postView.likeButton.rx.isSelected)
             .disposed(by: self.disposeBag)
         
-        postView.likeButton.rx
+        feedDetailView.postView.likeButton.rx
             .tap
             .map{ _ in
                 if reactor.currentState.isLike{
@@ -496,7 +414,7 @@ extension FeedDetailViewController: View{
 
 extension FeedDetailViewController: UITableViewDelegate{
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: "commentHeader") as! CommentHeaderFooterView
+        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: CommentHeaderFooterView.identifier) as! CommentHeaderFooterView
         guard let reactor = reactor else { return nil }
         view.configureModel(title: "댓글 \(reactor.currentState.commentModels.count)")
         return view
@@ -507,7 +425,7 @@ extension FeedDetailViewController: UITableViewDelegate{
     }
     
     public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: "commentFooter")
+        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: EmptyCommentFooterView.identifier)
         guard let reactor = reactor else {return nil}
         if reactor.currentState.commentModels.count != 0 { return nil }
         return view
