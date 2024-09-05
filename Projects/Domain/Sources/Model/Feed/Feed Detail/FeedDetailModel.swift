@@ -27,6 +27,10 @@ public struct FeedDetailModel: Decodable, Equatable{
     public var isBookmarked: Bool
     public var difficulty: FeedDetailDifficultyType
     
+    public var routeList: [RouteInfo] = []
+    public var sectionPace: [Int] = []
+    public var sectionKcal: [Int] = []
+    
     public static func == (lhs: FeedDetailModel, rhs: FeedDetailModel) -> Bool {
         return lhs.nickname == rhs.nickname &&
         lhs.profileImageUrl == rhs.profileImageUrl &&

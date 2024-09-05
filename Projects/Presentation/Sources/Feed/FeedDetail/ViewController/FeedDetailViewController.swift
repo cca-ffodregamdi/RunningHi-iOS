@@ -13,6 +13,7 @@ import RxDataSources
 import Domain
 import RxSwift
 import RxCocoa
+import MapKit
 
 public protocol FeedDetailViewControllerDelegate: AnyObject{
     func deleteFeed(postId: Int)
@@ -28,6 +29,8 @@ final public class FeedDetailViewController: UIViewController {
     public var coordinator: FeedCoordinatorInterface?
     
     public weak var delegate: FeedDetailViewControllerDelegate?
+    
+    private let mapDelegate = RunningMapDelegate()
     
     private var stickyViewHeight: NSLayoutConstraint?
     
@@ -56,6 +59,7 @@ final public class FeedDetailViewController: UIViewController {
         super.viewDidLoad()
         configureUI()
         hideKeyboardWhenTouchUpBackground()
+        feedDetailView.runningResultMapView.mapView.delegate = mapDelegate
     }
     
     deinit{
@@ -278,6 +282,8 @@ extension FeedDetailViewController: View{
                 guard let self = self else { return }
                 self.feedDetailView.postView.configureModel(model: model)
                 self.feedDetailView.recordView.configureModel(difficulty: model.difficulty, time: model.time, distance: model.distance, meanPace: model.meanPace, kcal: model.kcal)
+                self.feedDetailView.runningResultMapView.configureModelForFeedDetail(location: model.locationName)
+                self.feedDetailView.runningResultMapView.mapView.configureMapForFeedDetail(routeList: model.routeList)
             }.disposed(by: self.disposeBag)
         
         reactor.state.compactMap{$0.postModel?.imageUrl}

@@ -35,12 +35,13 @@ public struct FeedDetailResponseModel: Decodable{
     public let kcal: Int?
     public let imageUrl: String?
     public let createDate: String?
-    public var replyCnt: Int?
-    public var likeCnt: Int?
+    public let replyCnt: Int?
+    public let likeCnt: Int?
     public let owner: Bool?
-    public var isLiked: Bool?
-    public var isBookmarked: Bool?
-    public var difficulty: String?
+    public let isLiked: Bool?
+    public let isBookmarked: Bool?
+    public let difficulty: String?
+    public let gpsUrl: String?
     
     func toEntity() -> FeedDetailModel{
         return FeedDetailModel(nickname: nickname ?? "",

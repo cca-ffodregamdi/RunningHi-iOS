@@ -42,18 +42,41 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
                 print("FeedRepositoryImplementation fetchFeed error = \(error)")
                 return Observable.error(error)
             }
-            
+        
     }
     
-    public func fetchPost(postId: Int) -> Observable<FeedDetailModel> {
+    public func fetchFeedDetail(postId: Int) -> Observable<FeedDetailModel> {
         return service.rx.request(.fetchPost(postId: postId))
             .filterSuccessfulStatusCodes()
-            .map{ response -> FeedDetailModel in
-                let feedDetailResponse = try JSONDecoder().decode(FeedDetailResponseDTO.self, from: response.data)
-                return feedDetailResponse.data.toEntity()
-            }.asObservable()
+            .asObservable()
+            .flatMap { response -> Observable<FeedDetailModel> in
+                do {
+                    // 1. FeedDetailResponseDTO 디코딩
+                    let feedDetailResponse = try JSONDecoder().decode(FeedDetailResponseDTO.self, from: response.data)
+                    var feedDetailModel = feedDetailResponse.data.toEntity()
+                    
+                    // 2. GPS URL이 있을 경우 getRunningRouteData 호출
+                    return self.getRunningRouteData(url: feedDetailResponse.data.gpsUrl ?? "")
+                        .map { gpsData in
+                            // 3. GPS 데이터를 FeedDetailModel에 추가
+                            feedDetailModel.routeList = gpsData.gpsData?.compactMap { data in
+                                return RouteInfo(
+                                    latitude: Double(data.lat) ?? 0.0,
+                                    longitude: Double(data.lon) ?? 0.0,
+                                    timestamp: Date.formatDateStringToDate(dateString: data.time) ?? Date()
+                                )
+                            } ?? []
+                            feedDetailModel.sectionPace = gpsData.sectionData?.pace ?? []
+                            feedDetailModel.sectionKcal = gpsData.sectionData?.kcal ?? []
+                            return feedDetailModel
+                        }
+                    
+                } catch {
+                    return Observable.error(error)
+                }
+            }
             .catch { error in
-                print("FeedRepositoryImplementation fetchPost error = \(error)")
+                print("FeedRepositoryImplementation fetchFeedDetail error = \(error)")
                 return Observable.error(error)
             }
     }
@@ -235,5 +258,12 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             .catch { error in
                 return Observable.error(error)
             }
+    }
+    
+    private func getRunningRouteData(url: String) -> Observable<RunningResultDTO> {
+        return service.rx.request(.fetchGPSData(url: url))
+            .filterSuccessfulStatusCodes()
+            .asObservable()
+            .map(RunningResultDTO.self)
     }
 }

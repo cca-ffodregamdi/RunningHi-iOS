@@ -38,6 +38,10 @@ class FeedDetailView: UIView {
         return FeedDetailRecordView()
     }()
     
+    lazy var runningResultMapView: RunningResultMapView = {
+        return RunningResultMapView()
+    }()
+    
     private lazy var recordCommentBreakLine: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.colorWithRGB(r: 232, g: 235, b: 237)
@@ -78,6 +82,7 @@ class FeedDetailView: UIView {
         self.scrollView.addSubview(postView)
         self.scrollView.addSubview(postRecordBreakLine)
         self.scrollView.addSubview(recordView)
+        self.scrollView.addSubview(runningResultMapView)
         self.scrollView.addSubview(recordCommentBreakLine)
         self.scrollView.addSubview(commentTableView)
         self.addSubview(commentInputView)
@@ -104,8 +109,13 @@ class FeedDetailView: UIView {
             make.left.right.width.equalToSuperview()
         }
         
-        recordCommentBreakLine.snp.makeConstraints { make in
+        runningResultMapView.snp.makeConstraints { make in
             make.top.equalTo(recordView.snp.bottom)
+            make.left.right.equalToSuperview()
+        }
+        
+        recordCommentBreakLine.snp.makeConstraints { make in
+            make.top.equalTo(runningResultMapView.snp.bottom).offset(20)
             make.left.right.equalToSuperview()
             make.height.equalTo(8)
         }
