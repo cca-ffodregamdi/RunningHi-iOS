@@ -142,7 +142,17 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
                 let refreshToken = response.response?.allHeaderFields["Refresh-Token"] as! String
                 return (accessToken, refreshToken)
             }.asObservable()
-    } 
+    }
+    
+    public func loginFromReviewer() -> Observable<(String, String)> {
+        return service.rx.request(.loginFromReviewer)
+            .filterSuccessfulStatusCodes()
+            .map{ response in
+                let responseData = try JSONDecoder().decode(CheckReviewerResponseDTO.self, from: response.data)
+                let reviewer = responseData.data?.user
+                return (reviewer?.accessToken ?? "", reviewer?.refreshToken ?? "")
+            }.asObservable()
+    }
 }
 
 extension LoginRepositoryImplementation: ASAuthorizationControllerDelegate{

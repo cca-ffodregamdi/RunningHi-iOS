@@ -29,14 +29,18 @@ public class AppCoordinator: Coordinator{
             KeyChainManager.reset()
         }
         
-        AuthManager.shared.isValidAccessToken()
-            .bind{ bool in
-                print(KeyChainManager.read(key: .runningHiAccessTokenkey))
-                if bool{
-                    self.showBaseTabBarController()
-                }else{
-                    self.showLoginViewController()
-                }
+        AuthManager.shared.isReviewerVersion()
+            .bind { _ in
+                AuthManager.shared.isValidAccessToken()
+                    .bind{ bool in
+                        print(KeyChainManager.read(key: .runningHiAccessTokenkey))
+                        if bool{
+                            self.showBaseTabBarController()
+                        }else{
+                            // 테스터인지 확인
+                            self.showLoginViewController()
+                        }
+                    }.disposed(by: self.disposeBag)
             }.disposed(by: self.disposeBag)
     }
     

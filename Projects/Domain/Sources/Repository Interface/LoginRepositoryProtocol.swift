@@ -14,6 +14,7 @@ public protocol LoginRepositoryProtocol{
     func signWithKakao(kakaoAccessToken: String) -> Observable<(String, String)>
     func signWithApple(requestModel: SignWithApple) -> Observable<(String, String)>
     func loginWithApple() -> Observable<(String, String)>
+    func loginFromReviewer() -> Observable<(String, String)>
     
     func createKeyChain(key: KeyChainKeys, value: String)
     func readKeyChain(key: KeyChainKeys) -> String?

@@ -26,8 +26,13 @@ class LoginCoordinator: Coordinator{
     }
     
     func start() {
-        let vc = loginDiContainer.makeLoginViewController(coordinator: self)
-        self.navigationController.pushViewController(vc, animated: true)
+        if AuthManager.isReviewer {
+            let vc = loginDiContainer.makeReviewerLoginViewController(coordinator: self)
+            self.navigationController.pushViewController(vc, animated: true)
+        } else {
+            let vc = loginDiContainer.makeLoginViewController(coordinator: self)
+            self.navigationController.pushViewController(vc, animated: true)
+        }
     }
 }
 
