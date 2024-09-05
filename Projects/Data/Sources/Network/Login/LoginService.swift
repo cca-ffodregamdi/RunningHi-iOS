@@ -12,12 +12,18 @@ import Domain
 public enum LoginService{
     case signWithKakao(SignWithKakao)
     case signWithApple(SignWithApple)
+    case loginFromReviewer
     case setUserLocation(UserLocation)
 }
 
 extension LoginService: TargetType{
     public var baseURL: URL{
-        return .init(string: "https://runninghi.store/api/v1")!
+        switch self {
+        case .loginFromReviewer:
+            return .init(string: "https://runninghi.store")!
+        default:
+            return .init(string: "https://runninghi.store/api/v1")!
+        }
     }
     
     public var accessToken: String{
@@ -29,13 +35,15 @@ extension LoginService: TargetType{
         case .signWithKakao: "/login/kakao"
         case .signWithApple: "/login/apple"
         case .setUserLocation:  "/member/geometry"
+        case .loginFromReviewer: "/test/token"
         }
     }
 
     public var method: Moya.Method{
         switch self{
         case .signWithKakao,
-                .signWithApple:
+            .signWithApple,
+            .loginFromReviewer:
                 .post
         case .setUserLocation:
                 .put
@@ -50,6 +58,8 @@ extension LoginService: TargetType{
                 .requestJSONEncodable(request)
         case .setUserLocation(let request):
                 .requestJSONEncodable(request)
+        case .loginFromReviewer:
+                .requestPlain
         }
     }
     
@@ -61,6 +71,8 @@ extension LoginService: TargetType{
         case .setUserLocation:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]
+        case .loginFromReviewer:
+            return nil
         }
     }
 }

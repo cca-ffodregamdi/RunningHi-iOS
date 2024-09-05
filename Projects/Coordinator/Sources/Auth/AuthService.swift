@@ -12,11 +12,18 @@ import Data
 public enum AuthService{
     case isValidAccessToken
     case isValidRefreshToken
+    case isReviewerVersion(String)
 }
 
 extension AuthService: TargetType{
     public var baseURL: URL {
-        return .init(string: "https://runninghi.store/api/v1")!
+        switch self {
+        case .isValidAccessToken,
+             .isValidRefreshToken :
+            return .init(string: "https://runninghi.store/api/v1")!
+        case .isReviewerVersion:
+            return .init(string: "https://runninghi.store")!
+        }
     }
     
     public var accessToken: String{
@@ -29,7 +36,7 @@ extension AuthService: TargetType{
     
     public var authorizationType: AuthorizationType{
         switch self{
-        case .isValidAccessToken, .isValidRefreshToken:
+        case .isValidAccessToken, .isValidRefreshToken, .isReviewerVersion:
                 .bearer
         }
     }
@@ -40,6 +47,8 @@ extension AuthService: TargetType{
             return "/login/access-token/validate"
         case .isValidRefreshToken:
             return "/login/refresh-token/validate"
+        case .isReviewerVersion:
+            return "/test/app-review"
         }
     }
     
@@ -48,7 +57,8 @@ extension AuthService: TargetType{
         case .isValidAccessToken,
                 .isValidRefreshToken:
             return .post
-            
+        case .isReviewerVersion:
+            return .get
         }
     }
     
@@ -57,6 +67,8 @@ extension AuthService: TargetType{
         case .isValidAccessToken,
                 .isValidRefreshToken:
             return .requestPlain
+        case .isReviewerVersion(let version):
+            return .requestParameters(parameters: ["ver" : version], encoding: URLEncoding.queryString)
         }
     }
     
@@ -68,6 +80,8 @@ extension AuthService: TargetType{
         case .isValidRefreshToken:
             return ["Content-type": "application/json",
                     "Authorization" : refreshToken]
+        case .isReviewerVersion:
+            return nil
         }
     }
 }

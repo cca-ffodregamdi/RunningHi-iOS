@@ -32,6 +32,10 @@ final public class LoginUseCase: LoginUseCaseProtocol{
         return loginRepository.loginWithApple()
     }
     
+    public func loginFromReviewer() -> Observable<(String, String)> {
+        return loginRepository.loginFromReviewer()
+    }
+    
     public func checkUserCurrentLocationAuthorization() -> Observable<LocationAuthorizationStatus> {
         self.loginRepository.checkUserCurrentLocationAuthorization()
         

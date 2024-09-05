@@ -11,11 +11,14 @@ import RxMoya
 import RxSwift
 import Domain
 import Data
+import Common
 
 public class AuthManager{
     public static let shared = AuthManager()
     
     private let service: MoyaProvider<AuthService>
+    
+    static var isReviewer: Bool = false
     
     public init(){
         let authPlugIn = AccessTokenPlugin { _ in
@@ -57,4 +60,17 @@ public class AuthManager{
             }.asObservable()
     }
     
+    public func isReviewerVersion() -> Observable<Void>{
+        if let dictionary = Bundle.main.infoDictionary, let version = dictionary["CFBundleShortVersionString"] as? String {
+            return service.rx.request(.isReviewerVersion(version))
+                .map{ response in
+                    let responseData = try JSONDecoder().decode(CheckReviewerResponseDTO.self, from: response.data)
+                    AuthManager.isReviewer = responseData.data?.isReviewer ?? false
+                    return
+                }.asObservable()
+        } else {
+            return Observable.just(())
+        }
+    }
 }
+

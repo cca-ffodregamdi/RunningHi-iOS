@@ -21,6 +21,7 @@ final public class LoginReactor: Reactor{
     public enum Action{
         case kakaoLogin
         case appleLogin
+        case reviewerLogin
         case resetSuccessed
     }
     
@@ -29,6 +30,7 @@ final public class LoginReactor: Reactor{
         case resetSuccessed(Bool)
         case successdKakaoLogin(String)
         case successedAppleLogin(String, String)
+        case successedReviewerLogin(String)
     }
     
     public struct State{
@@ -68,6 +70,11 @@ final public class LoginReactor: Reactor{
                     }.catchAndReturn(Mutation.setLoading(false)),
                 Observable.just(Mutation.setLoading(false))
             ])
+        case .reviewerLogin:
+            return loginUseCase.loginFromReviewer()
+                .map { accessToken, refreshToken in
+                    Mutation.successedReviewerLogin(accessToken)
+                }
         case .resetSuccessed:
             return Observable.just(Mutation.resetSuccessed(false))
         }
@@ -88,6 +95,9 @@ final public class LoginReactor: Reactor{
             UserDefaultsManager.set(to: LoginType.apple.rawValue, forKey: .loginTypeKey)
             loginUseCase.createKeyChain(key: .appleLoginIdentityTokenKey, value: identityToken)
             loginUseCase.createKeyChain(key: .appleLoginAuthorizationCodeKey, value: authorizationCode)
+            state.successed = true
+        case .successedReviewerLogin(let accessToken):
+            loginUseCase.createKeyChain(key: .runningHiAccessTokenkey, value: accessToken)
             state.successed = true
         }
         return state
