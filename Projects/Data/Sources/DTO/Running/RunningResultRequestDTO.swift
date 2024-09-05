@@ -25,8 +25,8 @@ public struct RunningResultDTO: Codable {
                                        sectionData: RunningResultSectionDTO(pace: data.sectionPace,
                                                                             kcal: data.sectionKcal),
                                        gpsData: data.routeList.map {
-                                                return RunningResultGPSDTO(lon: "\($0.longitude)",
-                                                                           lat: "\($0.latitude)",
+                                                return RunningResultGPSDTO(lon: $0.longitude,
+                                                                           lat: $0.latitude,
                                                                            time: "\($0.timestamp.convertDateToFormat(format: "yyyy-MM-dd'T'HH:mm:ss"))")
         })
     }
@@ -48,7 +48,7 @@ public struct RunningResultSectionDTO: Codable {
 }
 
 public struct RunningResultGPSDTO: Codable {
-    let lon: String
-    let lat: String
+    let lon: Double
+    let lat: Double
     let time: String
 }
