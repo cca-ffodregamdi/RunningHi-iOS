@@ -6,12 +6,8 @@
 //
 
 import Foundation
+import Domain
 import Common
-enum ChallengeCategoryType: String{
-    case DISTANCE
-    case SPEED
-    case ATTENDANCE
-}
 
 struct ChallengeCategory{
     let category: ChallengeCategoryType

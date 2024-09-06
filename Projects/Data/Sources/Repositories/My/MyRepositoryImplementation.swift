@@ -21,7 +21,7 @@ public final class MyRepositoryImplementation: MyRepositoryProtocol{
             .filterSuccessfulStatusCodes()
             .map{ response -> [NoticeModel] in
                 let noticesResponse = try JSONDecoder().decode(NoticeResponseDTO.self, from: response.data)
-                return noticesResponse.data.content
+                return noticesResponse.data.content.map{$0.toEntity()}
             }.asObservable()
             .catch { error in
                 print("MyRepositoryImplementation fetchNotice error = \(error)")
@@ -34,7 +34,7 @@ public final class MyRepositoryImplementation: MyRepositoryProtocol{
             .filterSuccessfulStatusCodes()
             .map{ response -> [FAQModel] in
                 let FAQResponse = try JSONDecoder().decode(FAQResponseDTO.self, from: response.data)
-                return FAQResponse.data
+                return FAQResponse.data.map{$0.toEntity()}
             }.asObservable()
             .catch { error in
                 print("MyRepositoryImplementation fetchFAQ error = \(error)")

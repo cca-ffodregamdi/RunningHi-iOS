@@ -12,13 +12,14 @@ import Domain
 
 class RankTableViewCell: UITableViewCell {
 
+    static let identifier: String = "rankCell"
+    
     private lazy var rankLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         label.textColor = UIColor.colorWithRGB(r: 10, g: 10, b: 11)
         return label
     }()
-    
     
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
@@ -92,16 +93,18 @@ class RankTableViewCell: UITableViewCell {
         }
     }
     
-    func configureModel(model: RankModel, challengeCategory: String){
+    func configureModel(model: RankModel, challengeCategory: ChallengeCategoryType){
         rankLabel.text = "\(model.rank)"
-        nickNameLabel.text = model.nickName
-        if challengeCategory == "SPEED"{
-            recordLabel.text = Int.convertMeanPaceToString(meanPace: Int(model.record))
-        }else if challengeCategory == "ATTENDANCE"{
+        nickNameLabel.text = model.nickname
+        switch challengeCategory{
+        case .ATTENDANCE:
             recordLabel.text = "\(Int(model.record))회"
-        }else{
+        case .DISTANCE:
             recordLabel.text = "\(model.record)km"
+        case .SPEED:
+            recordLabel.text = Int.convertMeanPaceToString(meanPace: Int(model.record))
         }
+
         if let url = model.profileImageUrl { profileImageView.setImage(urlString: url) }
     }
     

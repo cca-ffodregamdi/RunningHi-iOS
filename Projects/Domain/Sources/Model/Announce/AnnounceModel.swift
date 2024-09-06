@@ -10,16 +10,13 @@ import Foundation
 public struct AnnounceModel: Decodable{
     public let title: String
     public let announceId: Int
-//    public let alarmType: String
-//    public let targetPage: String
-//    public let targetId: Int
     public let isRead: Bool
-    public let createDate: String
+    public let createDate: Date
     
-    enum CodingKeys: String, CodingKey {
-        case title
-        case announceId = "alarmId"
-        case isRead
-        case createDate
+    public init(title: String, announceId: Int, isRead: Bool, createDate: Date) {
+        self.title = title
+        self.announceId = announceId
+        self.isRead = isRead
+        self.createDate = createDate
     }
 }

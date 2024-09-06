@@ -95,7 +95,7 @@ final class NoticeDetailView: UIView {
     
     func configureModel(noticeModel: NoticeModel){
         titleLabel.text = noticeModel.title
-        dateLabel.text = Date().formatNoticeCreateDate(dateString: noticeModel.createDate)
+        dateLabel.text = Date.formatDateForNotice(date: noticeModel.createDate)
         contentLabel.text = noticeModel.content
     }
 }

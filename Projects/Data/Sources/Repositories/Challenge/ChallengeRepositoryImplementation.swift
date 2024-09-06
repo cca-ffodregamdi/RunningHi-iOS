@@ -49,7 +49,7 @@ public final class ChallengeRepositoryImplementation: ChallengeRepositoryProtoco
             .filterSuccessfulStatusCodes()
             .map{ response -> OtherChallengeDetailModel in
                 let otherChallengeResponse = try JSONDecoder().decode(OtherChallengeDetailResponseDTO.self, from: response.data)
-                return otherChallengeResponse.data
+                return otherChallengeResponse.data.toEntity()
             }.asObservable()
             .catch { error in
                 print("ChallengeRepositoryImplementation fetcOtherhChallengeDetail decoding error: \(error)")
@@ -62,7 +62,7 @@ public final class ChallengeRepositoryImplementation: ChallengeRepositoryProtoco
             .filterSuccessfulStatusCodes()
             .map{ response -> MyChallengeDetailModel in
                 let myChallengeResponse = try JSONDecoder().decode(MyChallengeDetailResponseDTO.self, from: response.data)
-                return myChallengeResponse.data
+                return myChallengeResponse.data.toEntity()
             }.asObservable()
             .catch { error in
                 print("ChallengeRepositoryImplementation fetchMyChallengeDetail decoding error: \(error)")

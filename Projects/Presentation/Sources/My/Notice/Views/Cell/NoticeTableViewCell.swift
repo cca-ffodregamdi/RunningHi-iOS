@@ -12,6 +12,8 @@ import Domain
 
 final class NoticeTableViewCell: UITableViewCell {
 
+    static let identifier: String = "noticeCell"
+    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .Body1Regular
@@ -88,9 +90,7 @@ final class NoticeTableViewCell: UITableViewCell {
     
     func configureModel(noticeModel: NoticeModel){
         titleLabel.text = noticeModel.title
-        dateLabel.text = Date().formatNoticeCreateDate(dateString: noticeModel.createDate)
-        if Date().isTwoWeeksPassedForNotice(dateString: noticeModel.createDate){
-            newBadgeImageView.isHidden = true
-        }
+        dateLabel.text = Date.formatDateForNotice(date: noticeModel.createDate)
+        newBadgeImageView.isHidden = Date.isMoreThanTwoWeeksPast(date: noticeModel.createDate)
     }
 }
