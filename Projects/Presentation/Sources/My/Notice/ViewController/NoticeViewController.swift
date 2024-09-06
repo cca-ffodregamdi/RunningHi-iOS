@@ -60,7 +60,7 @@ extension NoticeViewController: View{
         reactor.action.onNext(.fetchNotice)
         
         reactor.state.map{$0.notices}
-            .bind(to: self.noticeView.noticeTableView.rx.items(cellIdentifier: "noticeCell", cellType: NoticeTableViewCell.self)){ index, model, cell in
+            .bind(to: self.noticeView.noticeTableView.rx.items(cellIdentifier: NoticeTableViewCell.identifier, cellType: NoticeTableViewCell.self)){ index, model, cell in
                 cell.configureModel(noticeModel: model)
             }.disposed(by: self.disposeBag)
         

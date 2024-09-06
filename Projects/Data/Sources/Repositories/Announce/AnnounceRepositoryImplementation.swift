@@ -22,7 +22,7 @@ final public class AnnounceRepositoryImplementation: AnnounceRespositoryProtocol
             .filterSuccessfulStatusCodes()
             .map{ response -> [AnnounceModel] in
                 let announceResponse = try JSONDecoder().decode(AnnounceResponseDTO.self, from: response.data)
-                return announceResponse.data
+                return announceResponse.data.map{$0.toEntity()}
             }.asObservable()
             .catch{ error in
                 print("AnnounceRepositoryImplementation fetchAnnounce error: \(error)")

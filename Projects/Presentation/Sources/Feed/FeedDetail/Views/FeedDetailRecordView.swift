@@ -133,7 +133,7 @@ final class FeedDetailRecordView: UIView {
     }
     
     func configureModel(difficulty: FeedDetailDifficultyType, time: Int, distance: Float, meanPace: Int, kcal: Int){
-        timeElementView.configureModel(title: "시간", value: Date().formatSecondsToHHMMSS(seconds: time))
+        timeElementView.configureModel(title: "시간", value: Date.formatSecondsToHHMMSS(seconds: time))
         distanceElementView.configureModel(title: "거리", value: "\(distance) km")
         meanPaceElementView.configureModel(title: "평균 페이스", value: Int.convertMeanPaceToString(meanPace: meanPace))
         kcalElementView.configureModel(title: "소모 칼로리", value: "\(kcal) kcal")
