@@ -12,6 +12,8 @@ import Common
 
 class RankHeaderFooterView: UITableViewHeaderFooterView {
     
+    static let identifier: String = "rankHeaderView"
+    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "랭킹"
@@ -73,7 +75,7 @@ class RankHeaderFooterView: UITableViewHeaderFooterView {
         }
     }
     
-    func configureModel(models: [RankModel], challengeCategory: String){
+    func configureModel(models: [RankModel], challengeCategory: ChallengeCategoryType){
         self.titleLabel.text = "랭킹"
         for (offset, model) in models.enumerated(){
             if offset == 0{

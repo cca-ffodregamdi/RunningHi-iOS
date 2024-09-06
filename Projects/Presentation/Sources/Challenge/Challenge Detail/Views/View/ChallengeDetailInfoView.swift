@@ -8,6 +8,7 @@
 import UIKit
 import Common
 import SnapKit
+import Domain
 
 class ChallengeDetailInfoView: UIView {
     
@@ -108,25 +109,19 @@ class ChallengeDetailInfoView: UIView {
         }
     }
     
-    func configureModel(content: String, goalDetail: String, startDate: String, endDate: String, participatedCount: Int){
+    func configureModel(content: String, goalDetail: String, startDate: Date, endDate: Date, participatedCount: Int){
         contentLabel.text = content
         goalElementView.configureModel(title: "챌린지 목표", value: goalDetail)
-        termElementView.configureModel(title: "기간", value: Date().formatChallengeTermToMd(dateString: startDate) + " ~ " + Date().formatChallengeTermToMd(dateString: endDate))
+        termElementView.configureModel(title: "기간", value: Date.convertDateToChallengeDetail(date: startDate) + " ~ " + Date.convertDateToChallengeDetail(date: endDate))
         participatedCountElementView.configureModel(title: "참여자", value: "\(participatedCount)명")
     }
     
-    func configureAchievementRateView(category: String, isParticipated: Bool, record: Float?, goal: Float?){
+    func configureAchievementRateView(categoryModel: ChallengeCategory?, isParticipated: Bool){
         if isParticipated{
             self.addSubview(challengeAchievementRateView)
-            var challengeCategoryModel: ChallengeCategory?{
-                guard let categoryType = ChallengeCategoryType(rawValue: category) else {
-                        return nil
-                    }
-                    return ChallengeCategory(category: categoryType, record: record ?? 0.0, goal: goal ?? 0.0)
-            }
             
-            guard let challengeCategoryModel = challengeCategoryModel else { return }
-            challengeAchievementRateView.configureModel(challengeCategoryModel: challengeCategoryModel)
+            challengeAchievementRateView.configureModel(challengeCategoryModel: categoryModel!)
+            
             challengeAchievementRateView.snp.makeConstraints { make in
                 make.top.equalTo(contentLabel.snp.bottom).offset(20)
                 make.left.equalToSuperview()

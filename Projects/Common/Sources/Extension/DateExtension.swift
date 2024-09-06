@@ -39,6 +39,16 @@ public extension Date{
         return "알 수 없음"
     }
     
+    static func convertDateToChallengeDetail(date: Date) -> String {
+        // 변환할 출력 형식을 설정하는 DateFormatter
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR") // 한국어 설정
+        formatter.dateFormat = "M월 d일" // "8월 31일" 형식
+        
+        // Date를 문자열로 변환하여 반환
+        return formatter.string(from: date)
+    }
+    
     func convertDateToFormat(format: String) -> String{
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format

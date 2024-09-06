@@ -83,16 +83,19 @@ class MyRankView: UIView{
         }
     }
     
-    func configureModel(model: RankModel, challengeCategory: String){
+    func configureModel(model: RankModel, challengeCategory: ChallengeCategoryType){
         rankLabel.text = "\(model.rank)"
-        nickNameLabel.text = model.nickName
-        if challengeCategory == "SPEED"{
-            recordLabel.text = Int.convertMeanPaceToString(meanPace: Int(model.record))
-        }else if challengeCategory == "ATTENDANCE"{
-            recordLabel.text = "\(Int(model.record))회"
-        }else{
+        nickNameLabel.text = model.nickname
+        
+        switch challengeCategory {
+        case .DISTANCE:
             recordLabel.text = "\(model.record)km"
+        case .SPEED:
+            recordLabel.text = Int.convertMeanPaceToString(meanPace: Int(model.record))
+        case .ATTENDANCE:
+            recordLabel.text = "\(Int(model.record))회"
         }
+
         if let url = model.profileImageUrl { profileImageView.setImage(urlString: url) }
     }
     
