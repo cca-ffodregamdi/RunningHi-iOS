@@ -23,14 +23,14 @@ public struct FeedbackContentResponse: Decodable{
 
 public struct FeedbackReseponseModel: Decodable{
     public let feedbackId: Int
-    public let title: String
-    public let content: String
-    public let category: String
-    public let createDate: String
+    public let title: String?
+    public let content: String?
+    public let category: String?
+    public let createDate: String?
     public let updateDate: String?
-    public let hasReply: Bool
+    public let hasReply: Bool?
     public let reply: String?
-    public let nickname: String
+    public let nickname: String?
     
     enum CodingKeys: String, CodingKey {
         case feedbackId = "feedbackNo"
@@ -46,13 +46,13 @@ public struct FeedbackReseponseModel: Decodable{
     
     func toEntity() -> FeedbackModel{
         return FeedbackModel(feedbackId: feedbackId,
-                             title: title,
-                             content: content,
-                             category: FeedbackCategory.init(rawValue: category) ?? FeedbackCategory.INQUIRY,
-                             createDate: Date.formatDateStringToDate(dateString: createDate) ?? Date(),
+                             title: title ?? "",
+                             content: content ?? "",
+                             category: FeedbackCategory.init(rawValue: category ?? "") ?? FeedbackCategory.INQUIRY,
+                             createDate: Date.formatDateStringToDate(dateString: createDate ?? "") ?? Date(),
                              updateDate: Date.formatDateStringToDate(dateString: updateDate ?? "") ?? Date(),
-                             hasReply: hasReply,
-                             reply: reply,
-                             nickname: nickname)
+                             hasReply: hasReply ?? false,
+                             reply: reply ?? "",
+                             nickname: nickname ?? "")
     }
 }
