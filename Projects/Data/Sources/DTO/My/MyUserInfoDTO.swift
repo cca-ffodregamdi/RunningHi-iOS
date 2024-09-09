@@ -21,7 +21,7 @@ public struct MyUserInfoResponseModel: Decodable{
     public let nickname: String?
     public let level: Int?
     public let totalDistance: Double?
-    public let distanceToNextLevel: Int?
+    public let distanceToNextLevel: Double?
     public let totalKcal: Double?
     public let profileImageUrl: String?
     
@@ -30,8 +30,8 @@ public struct MyUserInfoResponseModel: Decodable{
                                nickname: nickname ?? "",
                                level: level ?? 0,
                                totalDistance: totalDistance ?? 0.0,
-                               distanceToNextLevel: distanceToNextLevel ?? 0,
-                               totalKcal: totalKcal ?? 0,
+                               distanceToNextLevel: distanceToNextLevel ?? 0.0,
+                               totalKcal: totalKcal ?? 0.0,
                                profileImageUrl: profileImageUrl)
     }
 }

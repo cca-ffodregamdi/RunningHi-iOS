@@ -110,11 +110,11 @@ class MyLevelView: UIView {
         }
     }
     
-    func configureModel(totalDistance: Double, currentLevel: Int, remainDistance: Int){
+    func configureModel(totalDistance: Double, currentLevel: Int, remainDistance: Double){
         totalDistanceLabel.text = "누적 \(Int(totalDistance))km"
         currentLevelLabel.text = "Lv.\(currentLevel)"
         nextLevelLabel.text = "Lv.\(currentLevel+1)"
-        remainDistanceLabel.text = "\(remainDistance)km만 더 뛰면"
+        remainDistanceLabel.text = "\(Int(remainDistance))km만 더 뛰면"
         
         var current: Int
         if Int(totalDistance) - (currentLevel) * 2 >= 2{
