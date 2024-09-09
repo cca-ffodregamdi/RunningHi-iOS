@@ -1,5 +1,5 @@
 //
-//  EditCommentRequestDTO.swift
+//  EditCommentRequestModel.swift
 //  Domain
 //
 //  Created by 유현진 on 7/13/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct EditCommentRequestDTO: Codable{
+public struct EditCommentRequestModel: Codable{
     let replyContent: String
     
     public init(commentContent: String) {

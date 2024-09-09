@@ -12,7 +12,7 @@ import KakaoSDKAuth
 protocol LoginUseCaseProtocol{
     func loginWithKakao() -> Observable<OAuthToken>
     func signWithKakao(kakaoAccessToken: String) -> Observable<(String, String)>
-    func signWithApple(requestModel: SignWithApple) -> Observable<(String, String)>
+    func signWithApple(requestModel: SignWithAppleRequestModel) -> Observable<(String, String)>
     func loginWithApple() -> Observable<(String, String)>
     func loginFromReviewer() -> Observable<(String, String)>
     

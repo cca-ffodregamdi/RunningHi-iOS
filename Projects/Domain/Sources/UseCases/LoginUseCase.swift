@@ -24,7 +24,7 @@ final public class LoginUseCase: LoginUseCaseProtocol{
         return loginRepository.signWithKakao(kakaoAccessToken: kakaoAccessToken)
     }
     
-    public func signWithApple(requestModel: SignWithApple) -> Observable<(String, String)> {
+    public func signWithApple(requestModel: SignWithAppleRequestModel) -> Observable<(String, String)> {
         return loginRepository.signWithApple(requestModel: requestModel)
     }
     

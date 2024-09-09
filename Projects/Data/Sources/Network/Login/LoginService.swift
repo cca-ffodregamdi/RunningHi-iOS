@@ -10,8 +10,8 @@ import Moya
 import Domain
 
 public enum LoginService{
-    case signWithKakao(SignWithKakao)
-    case signWithApple(SignWithApple)
+    case signWithKakao(SignWithKakaoRequestModel)
+    case signWithApple(SignWithAppleRequestModel)
     case loginFromReviewer
     case setUserLocation(UserLocation)
 }

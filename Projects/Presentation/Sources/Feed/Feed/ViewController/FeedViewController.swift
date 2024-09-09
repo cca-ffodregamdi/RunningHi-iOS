@@ -127,7 +127,7 @@ extension FeedViewController: View{
                         if cell.bookmarkButton.isSelected{
                             return Reactor.Action.deleteBookmark(feed.postId, indexPath.item)
                         }else{
-                            return Reactor.Action.makeBookmark(BookmarkRequestDTO(postNo: feed.postId), indexPath.item)
+                            return Reactor.Action.makeBookmark(BookmarkRequestModel(postNo: feed.postId), indexPath.item)
                         }
                     }.bind(to: reactor.action)
                     .disposed(by: cell.disposeBag)

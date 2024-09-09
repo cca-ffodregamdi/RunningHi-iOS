@@ -125,7 +125,7 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
     }
     
     public func signWithKakao(kakaoAccessToken: String) -> Observable<(String, String)>{
-        return service.rx.request(.signWithKakao(SignWithKakao(kakaoToken: kakaoAccessToken)))
+        return service.rx.request(.signWithKakao(SignWithKakaoRequestModel(kakaoToken: kakaoAccessToken)))
             .filterSuccessfulStatusCodes()
             .map{ response in
                 let accessToken = response.response?.allHeaderFields["Authorization"] as! String
@@ -134,7 +134,7 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
             }.asObservable()
     }
     
-    public func signWithApple(requestModel: SignWithApple) -> Observable<(String, String)> {
+    public func signWithApple(requestModel: SignWithAppleRequestModel) -> Observable<(String, String)> {
         return service.rx.request(.signWithApple(requestModel))
             .filterSuccessfulStatusCodes()
             .map{ response in
@@ -149,7 +149,7 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
             .filterSuccessfulStatusCodes()
             .map{ response in
                 let responseData = try JSONDecoder().decode(CheckReviewerResponseDTO.self, from: response.data)
-                let reviewer = responseData.data?.user
+                let reviewer = responseData.data?.user?.toEntity()
                 return (reviewer?.accessToken ?? "", reviewer?.refreshToken ?? "")
             }.asObservable()
     }

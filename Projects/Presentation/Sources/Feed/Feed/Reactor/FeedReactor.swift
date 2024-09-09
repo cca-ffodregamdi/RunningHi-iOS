@@ -15,7 +15,7 @@ final public class FeedReactor: Reactor{
     public enum Action{
         case fetchFeeds
         case refresh
-        case makeBookmark(BookmarkRequestDTO, Int)
+        case makeBookmark(BookmarkRequestModel, Int)
         case deleteBookmark(Int, Int)
         case deleteFeed(Int)
         case updateSortFilter(SortFilter)

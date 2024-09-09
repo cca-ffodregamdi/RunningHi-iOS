@@ -70,7 +70,7 @@ public final class ChallengeRepositoryImplementation: ChallengeRepositoryProtoco
             }
     }
     
-    public func joinChallenge(joinChallengeRequestModel: JoinChallengeRequestDTO) -> Observable<Any> {
+    public func joinChallenge(joinChallengeRequestModel: JoinChallengeRequestModel) -> Observable<Any> {
         return service.rx.request(.joinChallenge(joinChallengeRequestModel: joinChallengeRequestModel))
             .filterSuccessfulStatusCodes()
             .map{ _ in

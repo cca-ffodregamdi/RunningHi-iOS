@@ -15,12 +15,12 @@ public class FeedDetailReactor: Reactor{
     public enum Action{
         case fetchPost
         case fetchComment
-        case writeComment(WriteCommentReqesutDTO)
-        case makeBookmark(BookmarkRequestDTO)
+        case writeComment(WriteCommentReqesutModel)
+        case makeBookmark(BookmarkRequestModel)
         case deleteBookmark(Int)
         case deleteComment(CommentModel)
         case deletePost(Int)
-        case likePost(FeedLikeRequestDTO)
+        case likePost(FeedLikeRequestModel)
         case unLikePost(Int)
     }
     

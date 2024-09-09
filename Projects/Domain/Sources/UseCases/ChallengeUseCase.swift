@@ -32,7 +32,7 @@ public class ChallengeUseCase: ChallengeUseCaseProtocol{
         return repository.fetchMyChallengeDetail(challengeId: challengeId)
     }
     
-    public func joinChallenge(joinChallengeRequestModel: JoinChallengeRequestDTO) -> Observable<Any> {
+    public func joinChallenge(joinChallengeRequestModel: JoinChallengeRequestModel) -> Observable<Any> {
         return repository.joinChallenge(joinChallengeRequestModel: joinChallengeRequestModel)
     }
 }

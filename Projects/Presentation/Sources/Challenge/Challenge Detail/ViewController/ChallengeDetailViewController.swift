@@ -175,7 +175,7 @@ extension ChallengeDetailViewController: View{
         
         challengeDetailView.joinButton.rx.tap
             .map{ _ in
-                return Reactor.Action.joinChallenge(JoinChallengeRequestDTO(challengeId: reactor.currentState.challengeId))
+                return Reactor.Action.joinChallenge(JoinChallengeRequestModel(challengeId: reactor.currentState.challengeId))
             }.bind(to: reactor.action)
             .disposed(by: self.disposeBag)
         
