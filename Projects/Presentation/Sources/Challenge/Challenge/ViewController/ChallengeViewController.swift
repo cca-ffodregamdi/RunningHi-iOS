@@ -76,8 +76,8 @@ final public class ChallengeViewController: UIViewController{
 extension ChallengeViewController: View{
     
     public func bind(reactor: ChallengeReactor) {
-        reactor.action.onNext(.fetchChallenge)
-        reactor.action.onNext(.fetchMyChallenge)
+        
+        reactor.action.onNext(.fetchChallengeSection)
         
         self.dataSource = RxCollectionViewSectionedReloadDataSource<ChallengeSectionModel>(configureCell:{ dataSource, collectionView, indexPath, item in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChallengeCollectionViewCell.identifier, for: indexPath) as! ChallengeCollectionViewCell
@@ -85,8 +85,10 @@ extension ChallengeViewController: View{
             switch item{
             case .participating(let myChallengeModel):
                 cell.configureWithMyChallengeModel(model: myChallengeModel)
-            case .notParticipaing(let challgensModel):
-                cell.configureModel(model: challgensModel)
+            case .notParticipating(let challengeModel):
+                cell.configureModel(model: challengeModel)
+            case .completed(let myChallengeModel):
+                cell.configureWithMyChallengeModel(model: myChallengeModel)
             }
             return cell
         }, configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
@@ -111,9 +113,12 @@ extension ChallengeViewController: View{
                 case .participating(let myChallengeModel):
                     challengeId = myChallengeModel.challengeId
                     self.coordinator?.showChallengeDetailView(viewController: self, challengeId: challengeId, isParticipated: true)
-                case .notParticipaing(let challengeModel):
+                case .notParticipating(let challengeModel):
                     challengeId = challengeModel.challengeId
                     self.coordinator?.showChallengeDetailView(viewController: self, challengeId: challengeId, isParticipated: false)
+                case .completed(let myChallengeModel):
+                    challengeId = myChallengeModel.challengeId
+                    self.coordinator?.showChallengeDetailView(viewController: self, challengeId: challengeId, isParticipated: true)
                 }
             }.disposed(by: self.disposeBag)
         
@@ -145,7 +150,6 @@ extension ChallengeViewController: UICollectionViewDelegate, UICollectionViewDel
 
 extension ChallengeViewController: ChallengeDetailViewControllerDelegate{
     public func joined() {
-        reactor?.action.onNext(.fetchChallenge)
-        reactor?.action.onNext(.fetchMyChallenge)
+        reactor?.action.onNext(.fetchChallengeSection)
     }
 }

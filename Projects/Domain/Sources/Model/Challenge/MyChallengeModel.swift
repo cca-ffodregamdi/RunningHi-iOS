@@ -7,24 +7,24 @@
 
 import Foundation
 
-public struct MyChallengeModel: Decodable{
+public struct MyChallengeModel{
     public let myChallengeId: Int
     public let challengeId: Int
     public let title: String
     public let imageUrl: String
-    let startDate: String
-    let endDate: String
+    public let startDate: Date
+    public let endDate: Date
     public let remainingTime: Int
     public let participantsCount: Int
     
-    enum CodingKeys: String, CodingKey {
-        case myChallengeId = "memberChallengeId"
-        case challengeId
-        case title
-        case imageUrl
-        case startDate
-        case endDate
-        case remainingTime
-        case participantsCount
+    public init(myChallengeId: Int, challengeId: Int, title: String, imageUrl: String, startDate: Date, endDate: Date, remainingTime: Int, participantsCount: Int) {
+        self.myChallengeId = myChallengeId
+        self.challengeId = challengeId
+        self.title = title
+        self.imageUrl = imageUrl
+        self.startDate = startDate
+        self.endDate = endDate
+        self.remainingTime = remainingTime
+        self.participantsCount = participantsCount
     }
 }

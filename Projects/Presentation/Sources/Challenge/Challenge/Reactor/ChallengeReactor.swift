@@ -9,30 +9,19 @@ import Foundation
 import ReactorKit
 import RxSwift
 import Domain
+import Common
 
 public class ChallengeReactor: Reactor{
     public enum Action{
-        case fetchChallenge
-        case fetchMyChallenge
+        case fetchChallengeSection
     }
     
     public enum Mutation{
-        case setTotalChallenge([ChallengeModel])
-        case setMyChallenge([MyChallengeModel])
+        case setChallengeSection([ChallengeModel], [MyChallengeModel], [MyChallengeModel])
     }
     
     public struct State{
-        var totalChallenges: [ChallengeModel] = []
-        var myChallenges: [MyChallengeModel] = []
-        var section: [ChallengeSectionModel] {
-            let myChallengeItems = myChallenges.map{ChallengeItem.participating($0)}
-            let challengeItems = totalChallenges.map { ChallengeItem.notParticipaing($0) }
-            
-            let myChallengeSection = ChallengeSectionModel(header: "참여 중인 챌린지", items: myChallengeItems)
-            let challengeSection = ChallengeSectionModel(header: "진행 중인 챌린지", items: challengeItems)
-    
-            return [myChallengeSection, challengeSection]
-        }
+        var section: [ChallengeSectionModel] = []
     }
     
     public var initialState: State
@@ -45,22 +34,23 @@ public class ChallengeReactor: Reactor{
     
     public func mutate(action: Action) -> Observable<Mutation> {
         switch action{
-        case .fetchChallenge:
-            return self.challengeUseCase.fetchChallenge(status: .IN_PROGRESS)
-                .map{ Mutation.setTotalChallenge($0) }
+        case .fetchChallengeSection:
+            return Observable.zip(challengeUseCase.fetchChallenge(status: .IN_PROGRESS),
+                                  challengeUseCase.fetchMyChallenge(status: .IN_PROGRESS),
+                                  challengeUseCase.fetchMyChallenge(status: .COMPLETED))
+            .map{Mutation.setChallengeSection($0, $1, $2)}
             
-        case .fetchMyChallenge:
-            return challengeUseCase.fetchMyChallenge(status: .IN_PROGRESS).map{ Mutation.setMyChallenge($0)}
         }
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation{
-        case .setTotalChallenge(let challenges):
-            newState.totalChallenges = challenges
-        case .setMyChallenge(let challenges):
-            newState.myChallenges = challenges
+        case .setChallengeSection(let notParticipating, let participating, let completed):
+            let notParticipatingSection = ChallengeSectionModel(header: "\(Date.getCurrentMonth())월의 챌린지", items: notParticipating.map{ChallengeItem.notParticipating($0)})
+            let participatingSection = ChallengeSectionModel(header: "참여 중인 챌린지", items: participating.map{ChallengeItem.participating($0)})
+            let completedSection = ChallengeSectionModel(header: "완료한 챌린지", items: completed.map{ChallengeItem.completed($0)})
+            newState.section = [participatingSection, notParticipatingSection, completedSection]
         }
         return newState
     }

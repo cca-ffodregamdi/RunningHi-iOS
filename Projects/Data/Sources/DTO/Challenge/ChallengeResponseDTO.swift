@@ -12,9 +12,29 @@ public struct ChallengeResponseDTO: Decodable{
     let timeStamp: String
     let status: String
     let message: String
-    public let data: ChallengeModelDTO
+    let data: ChallengeModelDTO
 }
 
 public struct ChallengeModelDTO: Decodable{
-    public let challengeList: [ChallengeModel]
+    let challengeList: [ChallengeResponseModel]
+}
+
+public struct ChallengeResponseModel: Decodable{
+    let challengeNo: Int
+    let title: String?
+    let imageUrl: String?
+    let startDate: String?
+    let endDate: String?
+    let remainingTime: Int?
+    let participantsCount: Int?
+    
+    func toEntity() -> ChallengeModel{
+        return ChallengeModel(challengeId: challengeNo,
+                              title: title ?? "",
+                              imageUrl: imageUrl ?? "",
+                              startDate: Date.formatDateStringToDate(dateString: startDate ?? "") ?? Date(),
+                              endDate: Date.formatDateStringToDate(dateString: endDate ?? "") ?? Date(),
+                              remainingTime: remainingTime ?? 0,
+                              participantsCount: participantsCount ?? 0)
+    }
 }
