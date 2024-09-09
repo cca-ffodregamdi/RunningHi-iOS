@@ -98,7 +98,7 @@ class BaseTabBarCoordinator: Coordinator {
     
     private func addTabBarController(){
         if let tabBarController = tabBarController {
-            self.navigationController.pushViewController(tabBarController, animated: true)
+            self.navigationController?.setViewControllers([tabBarController], animated: true)
         }
     }
 }
