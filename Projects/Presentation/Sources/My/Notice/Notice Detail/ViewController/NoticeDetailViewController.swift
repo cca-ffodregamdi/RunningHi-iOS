@@ -35,6 +35,7 @@ public final class NoticeDetailViewController: UIViewController {
     }
     
     private func configureUI(){
+        self.view.backgroundColor = .systemBackground
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(noticeDetailView)
         
