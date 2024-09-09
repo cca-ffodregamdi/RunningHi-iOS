@@ -73,7 +73,7 @@ public final class MyRepositoryImplementation: MyRepositoryProtocol{
             .filterSuccessfulStatusCodes()
             .map{ response -> MyUserInfoModel in
                 let userInfoResponse = try JSONDecoder().decode(MyUserInfoDTO.self, from: response.data)
-                return userInfoResponse.data
+                return userInfoResponse.data.toEntity()
             }.asObservable()
             .catch { error in
                 print("MyRepositoryImplementation fetchUserInfo error = \(error)")
