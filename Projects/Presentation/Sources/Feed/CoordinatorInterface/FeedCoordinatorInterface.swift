@@ -18,4 +18,5 @@ public protocol FeedCoordinatorInterface{
     func showDistanceFilter(viewController: FeedViewController, distanceState: DistanceFilter)
     func showSortFilter(viewController: FeedViewController, sortState: SortFilter)
     func showAnnounce()
+    func showMapDetail(routeList: [RouteInfo])
 }

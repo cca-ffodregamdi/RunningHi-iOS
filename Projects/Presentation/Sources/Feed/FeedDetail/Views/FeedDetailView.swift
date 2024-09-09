@@ -67,9 +67,14 @@ class FeedDetailView: UIView {
         return CommentInputView()
     }()
     
+    lazy var tapGesture: UITapGestureRecognizer = {
+        return UITapGestureRecognizer()
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureUI()
+        configureTapGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -131,5 +136,9 @@ class FeedDetailView: UIView {
             make.bottom.equalToSuperview()
             make.left.right.equalToSuperview()
         }
+    }
+    
+    private func configureTapGesture(){
+        self.runningResultMapView.mapView.addGestureRecognizer(tapGesture)
     }
 }

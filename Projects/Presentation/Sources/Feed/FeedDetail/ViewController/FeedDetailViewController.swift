@@ -409,6 +409,10 @@ extension FeedDetailViewController: View{
             }.bind(to: reactor.action)
             .disposed(by: self.disposeBag)
             
+        feedDetailView.tapGesture.rx.event
+            .bind{ [weak self] _ in
+                self?.coordinator?.showMapDetail(routeList: reactor.currentState.postModel!.routeList)
+            }.disposed(by: self.disposeBag)
     }
 }
 
