@@ -80,4 +80,9 @@ extension FeedCoordinator: FeedCoordinatorInterface{
         let vc = feedDIContainer.showAnnounceViewController()
         self.navigationController.pushViewController(vc, animated: true)
     }
+    
+    func showMapDetail(routeList: [RouteInfo]) {
+        let vc = RunningMapViewController(routeList: routeList)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
 }

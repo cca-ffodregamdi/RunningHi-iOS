@@ -32,7 +32,8 @@ class ChallengeView: UIView {
         self.addSubview(challengeCollectionView)
         
         challengeCollectionView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.left.right.equalToSuperview()
+            make.bottom.equalToSuperview().inset(15)
         }
     }
 }

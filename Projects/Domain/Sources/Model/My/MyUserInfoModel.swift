@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct MyUserInfoModel: Decodable{
+public struct MyUserInfoModel{
     public let userId: Int
     public let nickname: String
     public let level: Int
@@ -16,13 +16,13 @@ public struct MyUserInfoModel: Decodable{
     public let totalKcal: Double
     public let profileImageUrl: String?
     
-    enum CodingKeys: String, CodingKey {
-        case userId = "memberNo"
-        case nickname
-        case level
-        case totalDistance
-        case distanceToNextLevel
-        case totalKcal
-        case profileImageUrl
+    public init(userId: Int, nickname: String, level: Int, totalDistance: Double, distanceToNextLevel: Int, totalKcal: Double, profileImageUrl: String?) {
+        self.userId = userId
+        self.nickname = nickname
+        self.level = level
+        self.totalDistance = totalDistance
+        self.distanceToNextLevel = distanceToNextLevel
+        self.totalKcal = totalKcal
+        self.profileImageUrl = profileImageUrl
     }
 }

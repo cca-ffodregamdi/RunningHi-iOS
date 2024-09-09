@@ -17,7 +17,8 @@ extension Date {
         for format in possibleFormats{
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = format
-            dateFormatter.locale = Locale(identifier: "ko_KR")
+            dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
             if let date = dateFormatter.date(from: dateString) {
                 return date
             }

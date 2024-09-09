@@ -28,6 +28,13 @@ final public class RunningMapViewController: UIViewController, MKMapViewDelegate
         self.mapView.delegate = delegate
     }
     
+    public init(routeList: [RouteInfo]){
+        super.init(nibName: nil, bundle: nil)
+        
+        self.mapView.configureMapForFeedDetail(routeList: routeList)
+        self.mapView.delegate = delegate
+    }
+    
     deinit {
         print("deinit RunningMapViewController")
     }
