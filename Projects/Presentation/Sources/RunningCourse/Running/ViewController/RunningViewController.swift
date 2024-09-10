@@ -53,7 +53,6 @@ final public class RunningViewController: UIViewController {
         super.viewDidLoad()
         
         configureUI()
-        configureNotification()
     }
     
     //MARK: - Configure
@@ -65,22 +64,6 @@ final public class RunningViewController: UIViewController {
         runningView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-    }
-    
-    public func configureNotification() {
-        NotificationCenter.default.rx.notification(UIApplication.didEnterBackgroundNotification)
-            .subscribe(onNext: { [weak self] _ in
-                guard let self = self, let reactor = self.reactor else { return }
-                reactor.action.onNext(.didEnterBackground)
-            })
-            .disposed(by: disposeBag)
-
-        NotificationCenter.default.rx.notification(UIApplication.willEnterForegroundNotification)
-            .subscribe(onNext: { [weak self] _ in
-                guard let self = self, let reactor = self.reactor else { return }
-                reactor.action.onNext(.didEnterForeground)
-            })
-            .disposed(by: disposeBag)
     }
 }
 
