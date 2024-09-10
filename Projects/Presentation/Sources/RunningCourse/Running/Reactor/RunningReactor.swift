@@ -26,9 +26,6 @@ final public class RunningReactor: Reactor{
         case startRunning
         case pauseRunning
         case stopRunning
-        
-        case didEnterBackground
-        case didEnterForeground
     }
     
     public enum Mutation{
@@ -37,7 +34,6 @@ final public class RunningReactor: Reactor{
         case setRunningTime
         case setCurrentLocation(RouteInfo)
         case setPaused(Bool)
-        case setElapsedSeconds
     }
     
     public struct State{
@@ -82,13 +78,6 @@ final public class RunningReactor: Reactor{
         case .pauseRunning, .stopRunning:
             runningUseCase.stopRunning()
             return Observable.just(Mutation.setPaused(true))
-        
-        case .didEnterBackground:
-            backgroundEntryTime = Date()
-            return Observable.empty()
-            
-        case .didEnterForeground:
-            return Observable.just(Mutation.setElapsedSeconds)
         }
     }
     
@@ -115,15 +104,6 @@ final public class RunningReactor: Reactor{
         case .setCurrentLocation(let location):
             if state.isRunning {
                 newState.currentLocation = location
-            }
-            
-        case .setElapsedSeconds:
-            if state.isRunning {
-                if let backgroundEntryTime = self.backgroundEntryTime {
-                    newState.runningTime += Int(Date().timeIntervalSince(backgroundEntryTime))
-                    self.backgroundEntryTime = nil
-                    timerSubject.onNext(())
-                }
             }
         }
         return newState
