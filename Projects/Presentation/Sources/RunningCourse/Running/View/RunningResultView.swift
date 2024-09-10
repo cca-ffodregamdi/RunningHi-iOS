@@ -94,6 +94,9 @@ class RunningResultView: UIView {
     private func setupConstraints() {
         scrollView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+            if isRunningResult {
+                make.bottom.equalToSuperview().inset(10)
+            }
         }
         
         runningResultStackView.snp.makeConstraints { make in
@@ -105,7 +108,7 @@ class RunningResultView: UIView {
         if isRunningResult {
             buttonStackView.snp.makeConstraints { make in
                 make.left.right.equalToSuperview().inset(21)
-                make.bottom.equalToSuperview().inset(0)
+                make.bottom.equalToSuperview().inset(10)
             }
         }
     }
