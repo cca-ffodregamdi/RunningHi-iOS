@@ -20,6 +20,7 @@ public struct WeeklyRecordDataDTO: Decodable {
     public let weeklyRecordData: [RecordChartDataListDTO]?
     public let monthlyRecordData: [RecordChartDataListDTO]?
     public let yearlyRecordData: [RecordChartDataListDTO]?
+    public let runCnt: Int?
     public let totalTime: Int?
     public let meanPace: Int?
     public let totalKcal: Int?
@@ -39,6 +40,7 @@ public struct WeeklyRecordDataDTO: Decodable {
         return RecordData(chartType: chartType,
                           date: date,
                           chartDatas: chartData.map{$0.toEntity},
+                          runCnt: runCnt ?? 0,
                           totalTime: totalTime ?? 0,
                           meanPace: meanPace ?? 0,
                           totalKcal: totalKcal ?? 0,

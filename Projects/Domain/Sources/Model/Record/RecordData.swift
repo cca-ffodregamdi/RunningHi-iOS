@@ -11,6 +11,7 @@ public struct RecordData {
     public var chartType: RecordChartType = .weekly
     public var date: Date = Date()
     public var chartDatas: [RunningRecordChartData]
+    public let runCnt: Int
     public let totalTime: Int
     public let meanPace: Int
     public let totalKcal: Int
@@ -19,6 +20,7 @@ public struct RecordData {
     public init(chartType: RecordChartType,
                 date: Date,
                 chartDatas: [RunningRecordChartData]?,
+                runCnt: Int,
                 totalTime: Int,
                 meanPace: Int,
                 totalKcal: Int,
@@ -28,6 +30,7 @@ public struct RecordData {
         self.chartDatas = chartDatas ?? []
         self.totalTime = totalTime
         self.meanPace = meanPace
+        self.runCnt = runCnt
         self.totalKcal = totalKcal
         self.runningRecords = runningRecords
     }
