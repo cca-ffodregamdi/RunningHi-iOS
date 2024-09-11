@@ -16,6 +16,8 @@ protocol LoginUseCaseProtocol{
     func loginWithApple() -> Observable<(String, String)>
     func loginFromReviewer() -> Observable<(String, String)>
     
+    func fetchIsTermsAgreement() -> Observable<Bool>
+    func setTermsAgreement() -> Observable<Any>
     func createKeyChain(key: KeyChainKeys, value: String)
     func readKeyChain(key: KeyChainKeys) -> String?
     func deleteKeyChain(key: KeyChainKeys)

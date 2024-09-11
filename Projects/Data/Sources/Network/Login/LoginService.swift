@@ -14,6 +14,8 @@ public enum LoginService{
     case signWithApple(SignWithAppleRequestModel)
     case loginFromReviewer
     case setUserLocation(UserLocation)
+    case fetchTermsAgreement
+    case setTermsAgreement
 }
 
 extension LoginService: TargetType{
@@ -36,6 +38,8 @@ extension LoginService: TargetType{
         case .signWithApple: "/login/apple"
         case .setUserLocation:  "/member/geometry"
         case .loginFromReviewer: "/test/token"
+        case .fetchTermsAgreement: "/member/terms-agreement"
+        case .setTermsAgreement: "/member/terms-agreement/consent"
         }
     }
 
@@ -45,8 +49,11 @@ extension LoginService: TargetType{
             .signWithApple,
             .loginFromReviewer:
                 .post
-        case .setUserLocation:
+        case .setUserLocation,
+                .setTermsAgreement:
                 .put
+        case .fetchTermsAgreement:
+                .get
         }
     }
     
@@ -58,7 +65,9 @@ extension LoginService: TargetType{
                 .requestJSONEncodable(request)
         case .setUserLocation(let request):
                 .requestJSONEncodable(request)
-        case .loginFromReviewer:
+        case .loginFromReviewer,
+                .fetchTermsAgreement,
+                .setTermsAgreement:
                 .requestPlain
         }
     }
@@ -66,9 +75,11 @@ extension LoginService: TargetType{
     public var headers: [String : String]?{
         switch self{
         case .signWithKakao,
-                .signWithApple:
+                .signWithApple,
+                .setTermsAgreement:
             return ["Content-Type": "application/json"]
-        case .setUserLocation:
+        case .setUserLocation,
+                .fetchTermsAgreement:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]
         case .loginFromReviewer:

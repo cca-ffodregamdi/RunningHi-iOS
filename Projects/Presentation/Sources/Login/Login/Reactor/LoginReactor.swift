@@ -23,23 +23,23 @@ final public class LoginReactor: Reactor{
         case appleLogin
         case reviewerLogin
         case resetSuccessed
+        case signIn
     }
     
     public enum Mutation{
         case setLoading(Bool)
         case resetSuccessed(Bool)
-        case successdKakaoLogin(String)
-        case successedAppleLogin(String, String)
+        case successdKakaoLogin(String, Bool)
+        case successedAppleLogin(String, String, Bool)
         case successedReviewerLogin(String)
+        case signed(String, String)
     }
     
     public struct State{
-        var isLoading: Bool
-        var successed: Bool
-        init() {
-            isLoading = false
-            successed = false
-        }
+        var isLoading: Bool = false
+        var successed: Bool = false
+        var isTermsAgreed: Bool?
+        var successedSignIn: Bool = false
     }
     
     public let initialState: State
@@ -55,19 +55,21 @@ final public class LoginReactor: Reactor{
         case .kakaoLogin:
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                loginUseCase.loginWithKakao()
-                    .map{ token in
-                        Mutation.successdKakaoLogin(token.accessToken)
-                    }.catchAndReturn(Mutation.setLoading(false)),
+                Observable.zip(loginUseCase.loginWithKakao(), loginUseCase.fetchIsTermsAgreement())
+                    .map{ token, isTermsAgreed in
+                        return Mutation.successdKakaoLogin(token.accessToken, isTermsAgreed)
+                    },
                 Observable.just(Mutation.setLoading(false))
             ])
         case .appleLogin:
             return Observable.concat([
                 Observable.just(Mutation.setLoading(true)),
-                loginUseCase.loginWithApple()
-                    .map { identityToken, authorizationCode in
-                        Mutation.successedAppleLogin(identityToken, authorizationCode)
-                    }.catchAndReturn(Mutation.setLoading(false)),
+                Observable.zip(loginUseCase.loginWithApple(), loginUseCase.fetchIsTermsAgreement())
+                    .map{ appleResponse, isTermsAgreed in
+                        let identityToken = appleResponse.0
+                        let authorizationCode = appleResponse.1
+                        return Mutation.successedAppleLogin(identityToken, authorizationCode, isTermsAgreed)
+                    },
                 Observable.just(Mutation.setLoading(false))
             ])
         case .reviewerLogin:
@@ -77,29 +79,46 @@ final public class LoginReactor: Reactor{
                 }
         case .resetSuccessed:
             return Observable.just(Mutation.resetSuccessed(false))
+        case .signIn:
+            if let loginType = LoginType(rawValue:
+                                            UserDefaultsManager.get(forKey: .loginTypeKey) as! String){
+                switch loginType{
+                case .apple:
+                    return loginUseCase.signWithApple(requestModel: .init(authorizationCode: loginUseCase.readKeyChain(key: .appleLoginAuthorizationCodeKey) ?? "", identityToken: loginUseCase.readKeyChain(key: .appleLoginIdentityTokenKey) ?? "")).map{ Mutation.signed($0, $1)}
+                case .kakao:
+                    return loginUseCase.signWithKakao(kakaoAccessToken: loginUseCase.readKeyChain(key: .kakaoLoginAccessTokenKey) ?? "").map{Mutation.signed($0, $1)}
+                }
+            }
+            return Observable.empty()
         }
     }
     
     public func reduce(state: State, mutation: Mutation) -> State {
-        var state = state
+        var newState = state
         switch mutation{
         case .setLoading(let value):
-            state.isLoading = value
+            newState.isLoading = value
         case .resetSuccessed(let value):
-            state.successed = value
-        case .successdKakaoLogin(let kakaoAccessToken):
+            newState.successed = value
+        case .successdKakaoLogin(let kakaoAccessToken, let isTermsAgreed):
             UserDefaultsManager.set(to: LoginType.kakao.rawValue, forKey: .loginTypeKey)
             loginUseCase.createKeyChain(key: .kakaoLoginAccessTokenKey, value: kakaoAccessToken)
-            state.successed = true
-        case .successedAppleLogin(let identityToken, let authorizationCode):
+            newState.successed = true
+            newState.isTermsAgreed = isTermsAgreed
+        case .successedAppleLogin(let identityToken, let authorizationCode, let isTermsAgreed):
             UserDefaultsManager.set(to: LoginType.apple.rawValue, forKey: .loginTypeKey)
             loginUseCase.createKeyChain(key: .appleLoginIdentityTokenKey, value: identityToken)
             loginUseCase.createKeyChain(key: .appleLoginAuthorizationCodeKey, value: authorizationCode)
-            state.successed = true
+            newState.successed = true
+            newState.isTermsAgreed = isTermsAgreed
         case .successedReviewerLogin(let accessToken):
             loginUseCase.createKeyChain(key: .runningHiAccessTokenkey, value: accessToken)
-            state.successed = true
+            newState.successed = true
+        case .signed(let accessToken, let refreshToken):
+            loginUseCase.createKeyChain(key: .runningHiAccessTokenkey, value: accessToken)
+            loginUseCase.createKeyChain(key: .runningHiRefreshTokenKey, value: refreshToken)
+            newState.successedSignIn = true
         }
-        return state
+        return newState
     }
 }

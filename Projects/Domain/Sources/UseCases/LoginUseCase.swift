@@ -71,5 +71,13 @@ final public class LoginUseCase: LoginUseCaseProtocol{
     public func deleteKeyChain(key: KeyChainKeys) {
         return loginRepository.deleteKeyChain(key: key)
     }
+    
+    public func fetchIsTermsAgreement() -> Observable<Bool> {
+        return loginRepository.fetchIsTermsAgreement()
+    }
+    
+    public func setTermsAgreement() -> Observable<Any> {
+        return loginRepository.setTermsAgreement()
+    }
 }
 

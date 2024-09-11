@@ -153,6 +153,26 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
                 return (reviewer?.accessToken ?? "", reviewer?.refreshToken ?? "")
             }.asObservable()
     }
+    
+    public func fetchIsTermsAgreement() -> Observable<Bool> {
+        return service.rx.request(.fetchTermsAgreement)
+            .map{ response in
+                let isTermsAgreementResponse = try JSONDecoder().decode(TermsAgreementResponseDTO.self, from: response.data)
+                return isTermsAgreementResponse.data.isTermsAgreed
+            }.asObservable()
+            .catch { error in
+                print("LoginRepositoryImplementation fetchIsTermsAgreement error = \(error)")
+                return Observable.error(error)
+            }
+    }
+    
+    public func setTermsAgreement() -> Observable<Any> {
+        return service.rx.request(.setTermsAgreement)
+            .filterSuccessfulStatusCodes()
+            .map{ _ in
+                return Observable.just(())
+            }.asObservable()
+    }
 }
 
 extension LoginRepositoryImplementation: ASAuthorizationControllerDelegate{
