@@ -60,6 +60,7 @@ class RunningResultRecordView: UIView {
     lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.isScrollEnabled = false
+        tableView.allowsSelection = false
         tableView.showsVerticalScrollIndicator = false
         tableView.showsHorizontalScrollIndicator = false
         tableView.register(RunningResultRecordTableViewCell.self, forCellReuseIdentifier: RunningResultRecordTableViewCell.identifier)

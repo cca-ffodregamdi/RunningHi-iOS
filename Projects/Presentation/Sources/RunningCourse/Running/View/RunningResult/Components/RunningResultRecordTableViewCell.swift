@@ -87,9 +87,15 @@ class RunningResultRecordTableViewCell: UITableViewCell {
     //MARK: - Helpers
     
     func setData(distance: Double, time: Int) {
-        distanceLabel.text = "\(distance)"
+        distanceLabel.text = "\(Int(distance))"
         averagePaceLabel.text = "\(Int.convertTimeAndDistanceToPace(time: time, distance: distance))"
         calorieLabel.text = "\(Int.convertTimeToCalorie(time: time))"
+    }
+    
+    func setData(distance: Int, kcal: Int, pace: Int) {
+        distanceLabel.text = "\(distance)"
+        averagePaceLabel.text = "\(pace)"
+        calorieLabel.text = "\(kcal)"
     }
     
     func removeLine() {
