@@ -88,9 +88,8 @@ class LoginView: UIView {
         }
         
         welcomeTextLabel.snp.makeConstraints { make in
-            make.top.equalTo(logoImageView.snp.bottom).offset(-10)
+            make.top.equalTo(logoImageView.snp.bottom).offset(10)
             make.left.equalToSuperview().inset(40)
-            
         }
         
         [kakaoLoginButton, appleLoginButton].forEach{
@@ -98,7 +97,6 @@ class LoginView: UIView {
         }
         
         loginButtonStackView.snp.makeConstraints { make in
-            make.top.lessThanOrEqualTo(welcomeTextLabel.snp.bottom).offset(200)
             make.left.equalToSuperview().offset(44)
             make.right.equalToSuperview().offset(-44)
             make.bottom.equalToSuperview().offset(-80)
