@@ -47,7 +47,7 @@ final public class LoginViewController: UIViewController {
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-//        reactor?.action.onNext(.resetSuccessed)
+        reactor?.action.onNext(.resetSuccessed)
     }
     
     func configureUI(){

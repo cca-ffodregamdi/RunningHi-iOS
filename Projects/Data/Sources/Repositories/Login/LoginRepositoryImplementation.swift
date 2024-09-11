@@ -172,6 +172,9 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
             .map{ _ in
                 return Observable.just(())
             }.asObservable()
+            .catch { error in
+                return Observable.just(false)
+            }
     }
 }
 
