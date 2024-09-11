@@ -147,7 +147,7 @@ class RecordChartView: UIView {
     
     func setData(data: RecordData) {
         self.distanceLabel.text = "\(String(format: "%.2f", data.chartDatas.map{$0.distance}.reduce(0,+)))km"
-        self.runningCountLabel.text = "/\(data.chartDatas.filter {$0.distance > 0.0}.count)번"
+        self.runningCountLabel.text = "/\(data.runCnt)번"
         
         self.setChartDataView(time: data.totalTime, pace: data.meanPace, kcal: data.totalKcal)
         self.setChartView(data: data)

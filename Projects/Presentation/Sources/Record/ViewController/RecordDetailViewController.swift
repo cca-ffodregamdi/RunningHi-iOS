@@ -175,10 +175,11 @@ extension RecordDetailViewController: View {
             }.disposed(by: self.disposeBag)
         
         reactor.state
-            .compactMap {$0.runningResult}
-            .map { self.calculateTotalRunningTimePerKm(runningResult: $0) }
+            .compactMap {$0.runningResult?.sectionKcal}
             .bind(to: runningResultView.recordView.tableView.rx.items(cellIdentifier: RunningResultRecordTableViewCell.identifier, cellType: RunningResultRecordTableViewCell.self)) { index, model, cell in
-                cell.setData(distance: model.key, time: Int(model.value.runningTime))
+                let kcal = reactor.currentState.runningResult?.sectionKcal[index] ?? 0
+                let pace = reactor.currentState.runningResult?.sectionPace[index] ?? 0
+                cell.setData(distance: index, kcal: kcal, pace: pace)
             }
             .disposed(by: disposeBag)
         
