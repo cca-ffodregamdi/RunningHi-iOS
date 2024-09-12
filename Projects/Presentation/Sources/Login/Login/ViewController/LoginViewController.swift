@@ -27,6 +27,7 @@ final public class LoginViewController: UIViewController {
     public init(reactor: LoginReactor){
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
+        print("init LoginViewController")
     }
     
     required init?(coder: NSCoder) {
@@ -73,13 +74,29 @@ extension LoginViewController: View{
             .disposed(by: self.disposeBag)
         
         reactor.state
-            .map{$0.successed}
+            .compactMap{$0.successed}
+            .distinctUntilChanged()
+            .filter{$0}
+            .compactMap{ _ -> Bool? in
+                return reactor.currentState.isTermsAgreed
+            }
+            .distinctUntilChanged()
+            .bind{ isTermsAgreed in
+                switch isTermsAgreed{
+                case true:
+                    reactor.action.onNext(.signIn)
+                case false:
+                    self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                    self.coordinator?.showAccess()
+                }
+            }.disposed(by: self.disposeBag)
+        
+        reactor.state.map{$0.successedSignIn}
             .distinctUntilChanged()
             .filter{$0}
             .bind{ [weak self] _ in
                 guard let self = self else { return }
-                self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                self.coordinator?.showAccess()
+                self.coordinator?.successedSignIn()
             }.disposed(by: self.disposeBag)
         
         reactor.state

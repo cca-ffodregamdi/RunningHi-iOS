@@ -1,5 +1,5 @@
 //
-//  EditFeedRequestDTO.swift
+//  EditFeedRequestModel.swift
 //  Domain
 //
 //  Created by 유현진 on 6/26/24.
@@ -10,7 +10,7 @@ import Foundation
 //    1: 시간
 //    2: 칼로리
 //    3: 평균페이스
-public struct EditFeedRequestDTO: Codable{
+public struct EditFeedRequestModel: Codable{
     let postContent: String
     let mainData: Int
     let imageUrl: String

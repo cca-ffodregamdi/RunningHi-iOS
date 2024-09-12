@@ -1,13 +1,13 @@
 //
-//  RefreshTokenValidationResponseDTO.swift
-//  Domain
+//  AccessTokenValidationResponseDTO.swift
+//  Data
 //
-//  Created by 유현진 on 6/7/24.
+//  Created by 유현진 on 9/10/24.
 //
 
 import Foundation
 
-public struct RefreshTokenValidationResponseDTO: Decodable{
+public struct AccessTokenValidationResponseDTO: Decodable{
     let timeStamp: String
     let status: String
     let message: String

@@ -331,7 +331,7 @@ extension FeedDetailViewController: View{
             .tap
             .throttle(.seconds(3), latest: false, scheduler: MainScheduler.instance)
             .map{ [weak self] in
-                Reactor.Action.writeComment(WriteCommentReqesutDTO(postId: reactor.currentState.postId, content: self?.feedDetailView.commentInputView.getCommentText() ?? ""))
+                Reactor.Action.writeComment(WriteCommentReqesutModel(postId: reactor.currentState.postId, content: self?.feedDetailView.commentInputView.getCommentText() ?? ""))
             }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)
@@ -360,7 +360,7 @@ extension FeedDetailViewController: View{
                 if reactor.currentState.isBookmark{
                     return Reactor.Action.deleteBookmark(reactor.currentState.postId)
                 }else{
-                    return Reactor.Action.makeBookmark(BookmarkRequestDTO(postNo: reactor.currentState.postId))
+                    return Reactor.Action.makeBookmark(BookmarkRequestModel(postNo: reactor.currentState.postId))
                 }
             }.bind(to: reactor.action)
             .disposed(by: self.disposeBag)
@@ -404,7 +404,7 @@ extension FeedDetailViewController: View{
                 if reactor.currentState.isLike{
                     return Reactor.Action.unLikePost(reactor.currentState.postId)
                 }else{
-                    return Reactor.Action.likePost(FeedLikeRequestDTO(postNo: reactor.currentState.postId))
+                    return Reactor.Action.likePost(FeedLikeRequestModel(postNo: reactor.currentState.postId))
                 }
             }.bind(to: reactor.action)
             .disposed(by: self.disposeBag)

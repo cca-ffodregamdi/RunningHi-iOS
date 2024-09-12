@@ -84,7 +84,7 @@ extension EditCommentViewController: View{
             .compactMap{ [weak self] _ in
                 guard let self = self else { return nil }
                 self.textView.resignFirstResponder()
-                return Reactor.Action.editComment(EditCommentRequestDTO(commentContent: self.textView.text.trimmingCharacters(in: .whitespacesAndNewlines)))
+                return Reactor.Action.editComment(EditCommentRequestModel(commentContent: self.textView.text.trimmingCharacters(in: .whitespacesAndNewlines)))
             }
             .bind(to: reactor.action)
             .disposed(by: self.disposeBag)

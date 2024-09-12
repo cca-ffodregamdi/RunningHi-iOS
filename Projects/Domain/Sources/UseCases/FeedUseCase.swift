@@ -32,11 +32,11 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         return  repository.fetchComment(postId: postId)
     }
     
-    public func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentModel> {
+    public func writeComment(commentModel: WriteCommentReqesutModel) -> Observable<WriteCommentModel> {
         return repository.writeComment(commentModel: commentModel)
     }
     
-    public func makeBookmark(post: BookmarkRequestDTO) -> Observable<Any> {
+    public func makeBookmark(post: BookmarkRequestModel) -> Observable<Any> {
         return repository.makeBookmark(post: post)
     }
     
@@ -48,7 +48,7 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         return repository.deleteComment(postId: postId)
     }
     
-    public func reportComment(reportCommentModel: ReportCommentRequestDTO) -> Observable<Any> {
+    public func reportComment(reportCommentModel: ReportCommentRequestModel) -> Observable<Any> {
         return repository.reportComment(reportCommentModel: reportCommentModel)
     }
     
@@ -56,11 +56,11 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         return repository.deletePost(postId: postId)
     }
     
-    public func editPost(postId: Int, editPostModel: EditFeedRequestDTO) -> Observable<Any> {
+    public func editPost(postId: Int, editPostModel: EditFeedRequestModel) -> Observable<Any> {
         return repository.editPost(postId: postId, editPostModel: editPostModel)
     }
     
-    public func likePost(likePost: FeedLikeRequestDTO) -> Observable<FeedLikeModel> {
+    public func likePost(likePost: FeedLikeRequestModel) -> Observable<FeedLikeModel> {
         return repository.likePost(likePost: likePost)
     }
     
@@ -68,7 +68,7 @@ public final class FeedUseCase: FeedUseCaseProtocol{
         return repository.unLikePost(postId: postId)
     }
     
-    public func editComment(commentId: Int, editCommentModel: EditCommentRequestDTO) -> Observable<Any> {
+    public func editComment(commentId: Int, editCommentModel: EditCommentRequestModel) -> Observable<Any> {
         return repository.editComment(commentId: commentId, editCommentModel: editCommentModel)
     }
     

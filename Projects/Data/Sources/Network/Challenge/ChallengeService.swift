@@ -15,7 +15,7 @@ public enum ChallengeService{
     case fetchMyChallenge(status: ChallengeStatus)
     case fetchOtherChallengeDetail(challengeId: Int)
     case fetchMyChallengeDetail(challengeId: Int)
-    case joinChallenge(joinChallengeRequestModel: JoinChallengeRequestDTO)
+    case joinChallenge(joinChallengeRequestModel: JoinChallengeRequestModel)
 }
 
 extension ChallengeService: TargetType{

@@ -25,5 +25,6 @@ extension ChallengeSectionModel: SectionModelType {
 
 enum ChallengeItem{
     case participating(MyChallengeModel)
-    case notParticipaing(ChallengeModel)
+    case notParticipating(ChallengeModel)
+    case completed(MyChallengeModel)
 }

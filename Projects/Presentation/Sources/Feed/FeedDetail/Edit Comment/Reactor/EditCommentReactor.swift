@@ -11,7 +11,7 @@ import Domain
 
 public class EditCommentReactor: Reactor{
     public enum Action{
-        case editComment(EditCommentRequestDTO)
+        case editComment(EditCommentRequestModel)
     }
     
     public enum Mutation{

@@ -24,7 +24,7 @@ final public class LoginUseCase: LoginUseCaseProtocol{
         return loginRepository.signWithKakao(kakaoAccessToken: kakaoAccessToken)
     }
     
-    public func signWithApple(requestModel: SignWithApple) -> Observable<(String, String)> {
+    public func signWithApple(requestModel: SignWithAppleRequestModel) -> Observable<(String, String)> {
         return loginRepository.signWithApple(requestModel: requestModel)
     }
     
@@ -70,6 +70,14 @@ final public class LoginUseCase: LoginUseCaseProtocol{
     
     public func deleteKeyChain(key: KeyChainKeys) {
         return loginRepository.deleteKeyChain(key: key)
+    }
+    
+    public func fetchIsTermsAgreement() -> Observable<Bool> {
+        return loginRepository.fetchIsTermsAgreement()
+    }
+    
+    public func setTermsAgreement() -> Observable<Any> {
+        return loginRepository.setTermsAgreement()
     }
 }
 

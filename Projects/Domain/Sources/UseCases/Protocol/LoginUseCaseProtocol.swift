@@ -12,10 +12,12 @@ import KakaoSDKAuth
 protocol LoginUseCaseProtocol{
     func loginWithKakao() -> Observable<OAuthToken>
     func signWithKakao(kakaoAccessToken: String) -> Observable<(String, String)>
-    func signWithApple(requestModel: SignWithApple) -> Observable<(String, String)>
+    func signWithApple(requestModel: SignWithAppleRequestModel) -> Observable<(String, String)>
     func loginWithApple() -> Observable<(String, String)>
     func loginFromReviewer() -> Observable<(String, String)>
     
+    func fetchIsTermsAgreement() -> Observable<Bool>
+    func setTermsAgreement() -> Observable<Any>
     func createKeyChain(key: KeyChainKeys, value: String)
     func readKeyChain(key: KeyChainKeys) -> String?
     func deleteKeyChain(key: KeyChainKeys)

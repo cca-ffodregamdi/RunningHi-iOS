@@ -14,7 +14,7 @@ public class ReportCommentReactor: Reactor{
     public enum Action{
         case fetchCell
         case selectedType(Int)
-        case reportComment(ReportCommentRequestDTO)
+        case reportComment(ReportCommentRequestModel)
     }
     
     public enum Mutation{

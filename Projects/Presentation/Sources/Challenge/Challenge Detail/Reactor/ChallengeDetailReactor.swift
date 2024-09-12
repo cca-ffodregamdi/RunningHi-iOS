@@ -13,7 +13,7 @@ import Domain
 public class ChallengeDetailReactor: Reactor{
     public enum Action{
         case fetchChallengeInfo
-        case joinChallenge(JoinChallengeRequestDTO)
+        case joinChallenge(JoinChallengeRequestModel)
     }
     
     public enum Mutation{

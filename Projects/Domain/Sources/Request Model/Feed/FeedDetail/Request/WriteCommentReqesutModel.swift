@@ -1,5 +1,5 @@
 //
-//  WriteCommentReqesutDTO.swift
+//  WriteCommentReqesutModel.swift
 //  Domain
 //
 //  Created by 유현진 on 6/13/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct WriteCommentReqesutDTO: Codable{
+public struct WriteCommentReqesutModel: Codable{
     public let postNo: Int
     let replyContent: String
     

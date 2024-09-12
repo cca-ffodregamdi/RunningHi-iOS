@@ -1,5 +1,5 @@
 //
-//  SignWithApple.swift
+//  SignWithAppleRequestModel.swift
 //  Domain
 //
 //  Created by 유현진 on 7/3/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct SignWithApple: Codable{
+public struct SignWithAppleRequestModel: Codable{
     let authorizationCode: String
     let identityToken: String
     

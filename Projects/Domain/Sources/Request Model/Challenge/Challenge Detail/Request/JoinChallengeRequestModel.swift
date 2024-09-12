@@ -1,5 +1,5 @@
 //
-//  JoinChallengeRequestDTO.swift
+//  JoinChallengeRequestModel.swift
 //  Domain
 //
 //  Created by 유현진 on 7/8/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct JoinChallengeRequestDTO: Codable{
+public struct JoinChallengeRequestModel: Codable{
     var challengeNo: Int
     
     public init(challengeId: Int) {

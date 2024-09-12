@@ -94,7 +94,7 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }
     }
     
-    public func writeComment(commentModel: WriteCommentReqesutDTO) -> Observable<WriteCommentModel> {
+    public func writeComment(commentModel: WriteCommentReqesutModel) -> Observable<WriteCommentModel> {
         return service.rx.request(.writeComment(commentModel: commentModel))
             .filterSuccessfulStatusCodes()
             .map{ response -> WriteCommentModel in
@@ -107,7 +107,7 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }
     }
     
-    public func makeBookmark(post: BookmarkRequestDTO) -> Observable<Any> {
+    public func makeBookmark(post: BookmarkRequestModel) -> Observable<Any> {
         return service.rx.request(.makeBookmark(post: post))
             .filterSuccessfulStatusCodes()
             .map{ _ in
@@ -132,7 +132,7 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }.asObservable()
     }
     
-    public func reportComment(reportCommentModel: ReportCommentRequestDTO) -> Observable<Any> {
+    public func reportComment(reportCommentModel: ReportCommentRequestModel) -> Observable<Any> {
         return service.rx.request(.reportComment(reportCommentModel: reportCommentModel))
             .filterSuccessfulStatusCodes()
             .map{ _ in
@@ -148,7 +148,7 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }.asObservable()
     }
     
-    public func editPost(postId: Int, editPostModel: EditFeedRequestDTO) -> Observable<Any> {
+    public func editPost(postId: Int, editPostModel: EditFeedRequestModel) -> Observable<Any> {
         return service.rx.request(.editPost(postId: postId, editPostModel: editPostModel))
             .filterSuccessfulStatusCodes()
             .map{ _ in
@@ -156,7 +156,7 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }.asObservable()
     }
     
-    public func likePost(likePost: FeedLikeRequestDTO) -> Observable<FeedLikeModel> {
+    public func likePost(likePost: FeedLikeRequestModel) -> Observable<FeedLikeModel> {
         return service.rx.request(.likePost(likePost: likePost))
             .filterSuccessfulStatusCodes()
             .map{ response -> FeedLikeModel in
@@ -182,7 +182,7 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }
     }
     
-    public func editComment(commentId: Int, editCommentModel: EditCommentRequestDTO) -> Observable<Any> {
+    public func editComment(commentId: Int, editCommentModel: EditCommentRequestModel) -> Observable<Any> {
         return service.rx.request(.editComment(commentId: commentId, editCommentModel: editCommentModel))
             .filterSuccessfulStatusCodes()
             .map{ _ in
@@ -247,7 +247,7 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
     }
     
     public func editFeed(feedModel: EditFeedModel, imageURL: String) -> Observable<Void> {
-        let requestDTO = EditFeedRequestDTO(postContent: feedModel.postContent, dataType: feedModel.mainData.typeNo, imageUrl: imageURL)
+        let requestDTO = EditFeedRequestModel(postContent: feedModel.postContent, dataType: feedModel.mainData.typeNo, imageUrl: imageURL)
         return service.rx.request(.editFeed(postNo: feedModel.postNo, feedData: requestDTO))
             .filterSuccessfulStatusCodes()
             .map{ response -> Void in

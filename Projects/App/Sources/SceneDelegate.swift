@@ -14,10 +14,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        sleep(2)
+//        sleep(2)
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
+        
+        window?.backgroundColor = UIColor(hexaRGB: "2265C9") ?? UIColor.white
         
         let navigationController = UINavigationController()
         navigationController.isNavigationBarHidden = true

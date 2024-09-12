@@ -233,11 +233,11 @@ extension ReportCommentViewController: View{
             .map{ [weak self] _ in
                 if self?.reportTextField.text?.isEmpty ?? true{
                     return Reactor.Action.reportComment(
-                        ReportCommentRequestDTO(category: reactor.currentState.items[reactor.currentState.seletedTypeIndex].category,
+                        ReportCommentRequestModel(category: reactor.currentState.items[reactor.currentState.seletedTypeIndex].category,
                                                 commentId: reactor.currentState.commentId))
                 }else{
                     return Reactor.Action.reportComment(
-                        ReportCommentRequestDTO(category: reactor.currentState.items[reactor.currentState.seletedTypeIndex].category,
+                        ReportCommentRequestModel(category: reactor.currentState.items[reactor.currentState.seletedTypeIndex].category,
                                                 content: self?.reportTextField.text,
                                                 commentId: reactor.currentState.commentId))
                 }

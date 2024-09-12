@@ -1,5 +1,5 @@
 //
-//  ReportCommentRequestDTO.swift
+//  ReportCommentRequestModel.swift
 //  Domain
 //
 //  Created by 유현진 on 6/23/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct ReportCommentRequestDTO: Codable{
+public struct ReportCommentRequestModel: Codable{
     let category: String
     var content: String?
     let reportedReplyNo: Int
