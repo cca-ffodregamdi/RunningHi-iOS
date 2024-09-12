@@ -75,10 +75,10 @@ extension LoginService: TargetType{
     public var headers: [String : String]?{
         switch self{
         case .signWithKakao,
-                .signWithApple,
-                .setTermsAgreement:
+                .signWithApple:
             return ["Content-Type": "application/json"]
         case .setUserLocation,
+                .setTermsAgreement,
                 .fetchTermsAgreement:
             return ["Content-type": "application/json",
                     "Authorization": accessToken]

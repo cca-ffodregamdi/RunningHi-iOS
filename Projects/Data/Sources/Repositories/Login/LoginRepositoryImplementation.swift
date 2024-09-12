@@ -155,26 +155,27 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
     }
     
     public func fetchIsTermsAgreement() -> Observable<Bool> {
-        return service.rx.request(.fetchTermsAgreement)
-            .map{ response in
-                let isTermsAgreementResponse = try JSONDecoder().decode(TermsAgreementResponseDTO.self, from: response.data)
-                return isTermsAgreementResponse.data.isTermsAgreed
-            }.asObservable()
-            .catch { error in
-                print("LoginRepositoryImplementation fetchIsTermsAgreement error = \(error)")
-                return Observable.error(error)
-            }
+        if KeyChainManager.read(key: .runningHiAccessTokenkey) != nil{
+            return service.rx.request(.fetchTermsAgreement)
+                .map{ response in
+                    let isTermsAgreementResponse = try JSONDecoder().decode(TermsAgreementResponseDTO.self, from: response.data)
+                    return isTermsAgreementResponse.data.isTermsAgreed
+                }.asObservable()
+                .catch { error in
+                    print("LoginRepositoryImplementation fetchIsTermsAgreement error = \(error)")
+                    return Observable.error(error)
+                }
+        }
+        else{
+            return Observable.just(false)
+        }
     }
-    
     public func setTermsAgreement() -> Observable<Any> {
         return service.rx.request(.setTermsAgreement)
             .filterSuccessfulStatusCodes()
             .map{ _ in
                 return Observable.just(())
             }.asObservable()
-            .catch { error in
-                return Observable.just(false)
-            }
     }
 }
 
