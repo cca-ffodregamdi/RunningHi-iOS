@@ -129,7 +129,7 @@ final class CommentInputView: UIView {
                     sendButton.isEnabled = false
                 }
                 
-                let size = CGSize(width: self.frame.width, height: .infinity)
+                let size = CGSize(width: self.frame.width - 75, height: .infinity)
                 let estimatedSize = commentTextView.sizeThatFits(size)
                
                 self.commentTextView.isScrollEnabled = estimatedSize.height >= 130
