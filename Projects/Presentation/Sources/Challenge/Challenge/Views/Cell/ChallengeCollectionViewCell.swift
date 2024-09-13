@@ -107,18 +107,24 @@ class ChallengeCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    func configureModel(model: ChallengeModel){
-        challengeTitleLabel.text = model.title
-        paricipatedMemberCountLabel.text = "\(model.participantsCount)명"
-        remainingDateLabel.text = "\(model.remainingTime)일 남음"
-        challengeThumbnailImageView.setImage(urlString: model.imageUrl)
-    }
-    
-    func configureWithMyChallengeModel(model: MyChallengeModel){
-        challengeTitleLabel.text = model.title
-        paricipatedMemberCountLabel.text = "\(model.participantsCount)명"
-        remainingDateLabel.text = "\(model.remainingTime)일 남음"
-        challengeThumbnailImageView.setImage(urlString: model.imageUrl)
+    func configureModel(item: ChallengeSectionModel.Item){
+        switch item{
+        case .completed(let myChallengeModel):
+            challengeTitleLabel.text = myChallengeModel.title
+            paricipatedMemberCountLabel.text = "\(myChallengeModel.participantsCount)명"
+            challengeThumbnailImageView.setImage(urlString: myChallengeModel.imageUrl)
+            remainingDateLabel.text = "-"
+        case .participating(let myChallengeModel):
+            challengeTitleLabel.text = myChallengeModel.title
+            paricipatedMemberCountLabel.text = "\(myChallengeModel.participantsCount)명"
+            remainingDateLabel.text = "\(myChallengeModel.remainingTime)일 남음"
+            challengeThumbnailImageView.setImage(urlString: myChallengeModel.imageUrl)
+        case .notParticipating(let challengeModel):
+            challengeTitleLabel.text = challengeModel.title
+            paricipatedMemberCountLabel.text = "\(challengeModel.participantsCount)명"
+            remainingDateLabel.text = "\(challengeModel.remainingTime)일 남음"
+            challengeThumbnailImageView.setImage(urlString: challengeModel.imageUrl)
+        }
     }
     
     override func prepareForReuse() {

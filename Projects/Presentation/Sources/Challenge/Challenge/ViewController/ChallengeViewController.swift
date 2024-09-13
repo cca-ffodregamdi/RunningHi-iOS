@@ -81,15 +81,7 @@ extension ChallengeViewController: View{
         
         self.dataSource = RxCollectionViewSectionedReloadDataSource<ChallengeSectionModel>(configureCell:{ dataSource, collectionView, indexPath, item in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChallengeCollectionViewCell.identifier, for: indexPath) as! ChallengeCollectionViewCell
-            
-            switch item{
-            case .participating(let myChallengeModel):
-                cell.configureWithMyChallengeModel(model: myChallengeModel)
-            case .notParticipating(let challengeModel):
-                cell.configureModel(model: challengeModel)
-            case .completed(let myChallengeModel):
-                cell.configureWithMyChallengeModel(model: myChallengeModel)
-            }
+            cell.configureModel(item: item)
             return cell
         }, configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ChallengeCollectionReusableView.identifier, for: indexPath) as! ChallengeCollectionReusableView
