@@ -70,7 +70,6 @@ public class FeedWithOptionViewController: UIViewController {
     }
     
     private func configureNavigationBar(){
-        self.title = "북마크"
         self.navigationController?.navigationBar.tintColor = .black
     }
     
@@ -150,6 +149,15 @@ extension FeedWithOptionViewController: View{
                 return offset + self.feedView.feedCollectionView.frame.size.height + 300 > self.feedView.feedCollectionView.contentSize.height
             }.map{ _ in Reactor.Action.fetchFeeds }
             .bind(to: reactor.action)
+            .disposed(by: self.disposeBag)
+        
+        reactor.state.map{$0.feedOption}
+            .map{ type in
+                switch type{
+                case .bookmark: return "북마크"
+                case .myFeed: return "나의 피드"
+                }
+            }.bind(to: self.rx.title)
             .disposed(by: self.disposeBag)
     }
 }
