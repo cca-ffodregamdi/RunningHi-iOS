@@ -13,6 +13,7 @@ class MyProfileView: UIView {
     
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
         imageView.image = CommonAsset.defaultLargeProfile.image
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 24
