@@ -27,7 +27,6 @@ final public class TabBarViewController: UITabBarController, UITabBarControllerD
         
         if vcIndex == 2 {
             toggleCourseTabBar(isActive: !isActiveRunningTab)
-            
             if isActiveRunningTab {
                 coordinator?.showRunningPopup(viewController)
             }
@@ -36,10 +35,17 @@ final public class TabBarViewController: UITabBarController, UITabBarControllerD
             if isActiveRunningTab {
                 toggleCourseTabBar(isActive: !isActiveRunningTab)
             }
-            return true
+            guard let fromView = tabBarController.selectedViewController?.view,
+                  let toView = viewController.view else { return false }
+            if fromView == toView {
+                return false
+            } else {
+                UIView.transition(from: fromView, to: toView, duration: 0.2, options: .transitionCrossDissolve)
+                return true
+            }
         }
     }
-    
+
     func toggleCourseTabBar(isActive: Bool) {
         if let courseTabBarItem = self.viewControllers?[2].tabBarItem {
             isActiveRunningTab = isActive

@@ -65,24 +65,20 @@ class BaseTabBarCoordinator: Coordinator {
             let feedCoordinator: FeedCoordinator = FeedCoordinator(navigationController: tabNavigationController)
             self.childCoordinator.append(feedCoordinator)
             feedCoordinator.start()
-            tabNavigationController.viewControllers.first?.title = TabBarItemType.Feed.getTitle()
         case .Challenge:
             let challengeCoordinator: ChallengeCoordinator = ChallengeCoordinator(navigationController: tabNavigationController)
             self.childCoordinator.append(challengeCoordinator)
             challengeCoordinator.start()
-            tabNavigationController.viewControllers.first?.title = TabBarItemType.Challenge.getTitle()
         case .Course:
             return
         case .Record:
             let recordCoordinator: RecordCoordinator = RecordCoordinator(navigationController: tabNavigationController)
             self.childCoordinator.append(recordCoordinator)
             recordCoordinator.start()
-            tabNavigationController.viewControllers.first?.title = TabBarItemType.Record.getTitle()
         case .My:
             let myCoordinator: MyCoordinator = MyCoordinator(parentCoordinator: self, navigationController: tabNavigationController)
             self.childCoordinator.append(myCoordinator)
             myCoordinator.start()
-            tabNavigationController.viewControllers.first?.title = TabBarItemType.My.getTitle()
         }
     }
     
@@ -102,7 +98,6 @@ class BaseTabBarCoordinator: Coordinator {
         }
     }
 }
-
 extension BaseTabBarCoordinator: TabBarCoordinatorInterface {
     
     func showRunningPopup(_ viewController: UIViewController) {

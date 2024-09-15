@@ -25,6 +25,7 @@ final public class MyViewController: UIViewController{
     private lazy var announceButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bellOutline.image, for: .normal)
+        button.alpha = 0
         return button
     }()
     
@@ -35,8 +36,8 @@ final public class MyViewController: UIViewController{
     // MARK: LifeCycle
     public override func viewDidLoad() {
         super.viewDidLoad()
+        configureNavigationBar()
         configureUI()
-        configureNavigationBarItem()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -64,10 +65,14 @@ final public class MyViewController: UIViewController{
         }
     }
     
-    private func configureNavigationBarItem(){
-        var barButtonItems: [UIBarButtonItem] = []
-        barButtonItems.append(UIBarButtonItem(customView: announceButton))
-        self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
+    private func configureNavigationBar(){
+        self.title = "마이페이지"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.19){
+            self.navigationItem.setRightBarButton(UIBarButtonItem(customView: self.announceButton), animated: false)
+            UIView.animate(withDuration: 0.2) {
+                self.announceButton.alpha = 1
+            }
+        }
     }
 }
 

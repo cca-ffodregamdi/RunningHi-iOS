@@ -47,7 +47,7 @@ final public class FeedViewController: UIViewController{
     public override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        configureNavigationBarItem()
+        configureNavigationBar()
         addRefreshControl()
         setFeedCollectionView()
     }
@@ -59,10 +59,6 @@ final public class FeedViewController: UIViewController{
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.tabBarController?.tabBar.isHidden = false
-        
-//        Observable.just(Reactor.Action.refresh)
-//            .bind(to: reactor!.action)
-//            .disposed(by: self.disposeBag)
     }
     
     private func configureUI(){
@@ -86,7 +82,8 @@ final public class FeedViewController: UIViewController{
         addRefreshControl()
     }
     
-    private func configureNavigationBarItem(){
+    private func configureNavigationBar(){
+        self.title = "피드"
         var barButtonItems: [UIBarButtonItem] = []
         barButtonItems.append(UIBarButtonItem(customView: announceButton))
         barButtonItems.append(UIBarButtonItem(customView: showBookMarkButton))

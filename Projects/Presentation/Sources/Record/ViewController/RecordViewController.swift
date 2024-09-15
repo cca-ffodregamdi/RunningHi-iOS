@@ -55,7 +55,7 @@ final public class RecordViewController: UIViewController {
         super.viewDidLoad()
         
         configureUI()
-        
+        self.title = "기록"
         self.recordView.chartArea.chartView.delegate = self
     }
     
