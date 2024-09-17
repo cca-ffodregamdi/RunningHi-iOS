@@ -175,8 +175,7 @@ final public class FeedDetailViewController: UIViewController {
         }
         
         let cancel = UIAlertAction(title: "취소", style: .cancel)
-        //TODO: njshin 추후 수정기능 추가되면 주석 해제
-//        actionSheetController.addAction(editComment)
+        actionSheetController.addAction(editComment)
         actionSheetController.addAction(deleteComment)
         actionSheetController.addAction(cancel)
         self.present(actionSheetController, animated: true)

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum FeedRepresentType: String {
+public enum FeedRepresentType: String, Decodable, CaseIterable {
     case distance = "거리"
     case time = "시간"
     case pace = "페이스"
