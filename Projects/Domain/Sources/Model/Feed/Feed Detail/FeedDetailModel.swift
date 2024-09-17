@@ -26,6 +26,7 @@ public struct FeedDetailModel: Decodable, Equatable{
     public var isLiked: Bool
     public var isBookmarked: Bool
     public var difficulty: FeedDetailDifficultyType
+    public var mainData: FeedRepresentType
     
     public var routeList: [RouteInfo] = []
     public var sectionPace: [Int] = []
@@ -49,10 +50,11 @@ public struct FeedDetailModel: Decodable, Equatable{
         lhs.isOwner == rhs.isOwner &&
         lhs.isLiked == rhs.isLiked &&
         lhs.difficulty == rhs.difficulty &&
-        lhs.isBookmarked == rhs.isBookmarked
+        lhs.isBookmarked == rhs.isBookmarked &&
+        lhs.mainData == rhs.mainData
     }
     
-    public init(nickname: String, profileImageUrl: String?, level: Int, postContent: String, role: String, locationName: String, distance: Float, time: Int, meanPace: Int, kcal: Int, imageUrl: String?, createDate: Date, commentCount: Int, likeCount: Int, isOwner: Bool, isLiked: Bool, isBookmarked: Bool, difficulty: FeedDetailDifficultyType) {
+    public init(nickname: String, profileImageUrl: String?, level: Int, postContent: String, role: String, locationName: String, distance: Float, time: Int, meanPace: Int, kcal: Int, imageUrl: String?, createDate: Date, commentCount: Int, likeCount: Int, isOwner: Bool, isLiked: Bool, isBookmarked: Bool, difficulty: FeedDetailDifficultyType, mainData: FeedRepresentType) {
         self.nickname = nickname
         self.profileImageUrl = profileImageUrl
         self.level = level
@@ -71,6 +73,7 @@ public struct FeedDetailModel: Decodable, Equatable{
         self.isLiked = isLiked
         self.isBookmarked = isBookmarked
         self.difficulty = difficulty
+        self.mainData = mainData
     }
 }
 

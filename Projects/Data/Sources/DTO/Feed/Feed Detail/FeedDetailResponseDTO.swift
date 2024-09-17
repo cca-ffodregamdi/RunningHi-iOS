@@ -42,6 +42,7 @@ public struct FeedDetailResponseModel: Decodable{
     public let isBookmarked: Bool?
     public let difficulty: String?
     public let gpsUrl: String?
+    public let mainData: Int?
     
     func toEntity() -> FeedDetailModel{
         return FeedDetailModel(nickname: nickname ?? "",
@@ -61,7 +62,8 @@ public struct FeedDetailResponseModel: Decodable{
                                isOwner: owner ?? false,
                                isLiked: isLiked ?? false,
                                isBookmarked: isBookmarked ?? false,
-                               difficulty: FeedDetailDifficultyType(rawValue: difficulty ?? "") ?? .EASY)
+                               difficulty: FeedDetailDifficultyType(rawValue: difficulty ?? "") ?? .EASY,
+                               mainData: FeedRepresentType.allCases.filter{$0.typeNo == mainData}.first ?? .distance)
     }
 }
 
