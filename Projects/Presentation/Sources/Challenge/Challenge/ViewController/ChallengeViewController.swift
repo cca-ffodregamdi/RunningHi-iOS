@@ -25,6 +25,7 @@ final public class ChallengeViewController: UIViewController{
     private lazy var announceButton: UIButton = {
         let button = UIButton()
         button.setImage(CommonAsset.bellOutline.image, for: .normal)
+        button.alpha = 0
         return button
     }()
     
@@ -36,12 +37,11 @@ final public class ChallengeViewController: UIViewController{
     public override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        configureNavigationBarItem()
+        configureNavigationBar()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.title = "챌린지"
         self.navigationController?.navigationBar.prefersLargeTitles = false
         self.tabBarController?.tabBar.isHidden = false
     }
@@ -55,10 +55,14 @@ final public class ChallengeViewController: UIViewController{
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configureNavigationBarItem(){
-        var barButtonItems: [UIBarButtonItem] = []
-        barButtonItems.append(UIBarButtonItem(customView: announceButton))
-        self.navigationItem.setRightBarButtonItems(barButtonItems, animated: false)
+    private func configureNavigationBar(){
+        self.title = "챌린지"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.19){
+            self.navigationItem.setRightBarButton(UIBarButtonItem(customView: self.announceButton), animated: false)
+            UIView.animate(withDuration: 0.2) {
+                self.announceButton.alpha = 1
+            }
+        }
     }
     
     private func configureUI(){
