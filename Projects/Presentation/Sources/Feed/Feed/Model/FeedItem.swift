@@ -16,6 +16,10 @@ extension FeedModel: IdentifiableType, Equatable{
     }
     
     public static func == (lhs: FeedModel, rhs: FeedModel) -> Bool {
-        return lhs.postId == rhs.postId && lhs.isBookmarked == rhs.isBookmarked
+        return lhs.postId == rhs.postId &&
+        lhs.isBookmarked == rhs.isBookmarked &&
+        lhs.likeCount == rhs.likeCount &&
+        lhs.commentCount == rhs.commentCount
     }
+    
 }
