@@ -5,7 +5,7 @@
 //  Created by 유현진 on 5/1/24.
 //
 
-import ProjectDescription
+@preconcurrency import ProjectDescription
 
 let project = Project(
     name: "Presentation",
@@ -15,6 +15,7 @@ let project = Project(
             destinations: .iOS,
             product: .framework,
             bundleId: "com.RunningHi.presentation",
+            deploymentTargets: .iOS("16.0"),
             infoPlist: .default,
             sources: ["Sources/**"],
             resources: ["Resources/**"],
