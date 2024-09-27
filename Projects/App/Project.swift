@@ -46,7 +46,8 @@ let project = Project(
                     "NSLocationWhenInUseUsageDescription": "러닝하이에서 위치 정보 수집을 위해 동의가 필요합니다.",
                     "NSMotionUsageDescription": "러닝하이에서 정확한 위치 정보 수집을 위해 동의가 필요합니다.",
                     "UIBackgroundModes": ["location", "fetch", "remote-notification"],
-                    "ITSAppUsesNonExemptEncryption": false
+                    "ITSAppUsesNonExemptEncryption": false,
+                    "FirebaseAppDelegateProxyEnabled": false,
                 ]
                 
             ),
@@ -57,6 +58,7 @@ let project = Project(
                 .project(target: "Coordinator", path: .relativeToRoot("Projects/Coordinator")),
                 .external(name: "KakaoSDKAuth"),
                 .external(name: "KakaoSDKCommon"),
+                .external(name: "FirebaseMessaging"),
             ]
         ),
     ]
