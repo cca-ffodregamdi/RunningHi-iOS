@@ -8,11 +8,21 @@
 import Presentation
 import Common
 import Moya
+import Data
+import Domain
 
 class TabBarDIContainer {
     
+    private lazy var tabBarRepository: TabBarRepositoryImplementation = {
+        return TabBarRepositoryImplementation()
+    }()
+    
+    private lazy var tabBarUseCae: TabBarUseCase = {
+        return TabBarUseCase(repository: tabBarRepository)
+    }()
+    
     func makeTabBarController(coordinator: BaseTabBarCoordinator) -> TabBarViewController {
-        let vc = TabBarViewController()
+        let vc = TabBarViewController(reactor: TabBarReactor(tabBarUseCase: tabBarUseCae))
         vc.coordinator = coordinator
         return vc
     }
