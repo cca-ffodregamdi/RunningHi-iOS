@@ -25,5 +25,20 @@ let project = Project(
                 .external(name: "RxMoya"),
             ]
         ),
+        .target(
+            name: "RepositoryTests",
+            destinations: .iOS,
+            product: .unitTests,
+            bundleId: "com.RunningHi.repositoryTests",
+            infoPlist: .default,
+            sources: ["RepositoryTests/**"],
+            dependencies: [
+                .external(name: "RxCocoa"),
+                .external(name: "RxSwift"),
+                .external(name: "RxTest"),
+                .external(name: "Quick"),
+                .external(name: "Nimble"),
+            ]
+        )
     ]
 )

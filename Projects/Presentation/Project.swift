@@ -37,5 +37,20 @@ let project = Project(
                 .external(name: "Charts"),
             ]
         ),
+        .target(
+            name: "ReactorTests",
+            destinations: .iOS,
+            product: .unitTests,
+            bundleId: "com.RunningHi.reactorTests",
+            infoPlist: .default,
+            sources: ["ReactorTests/**"],
+            dependencies: [
+                .external(name: "RxCocoa"),
+                .external(name: "RxSwift"),
+                .external(name: "RxTest"),
+                .external(name: "Quick"),
+                .external(name: "Nimble"),
+            ]
+        )
     ]
 )
