@@ -111,18 +111,13 @@ class MyLevelView: UIView {
     }
     
     func configureModel(totalDistance: Double, currentLevel: Int, remainDistance: Double){
-        totalDistanceLabel.text = "누적 \(Int(totalDistance))km"
+        let nextLevel = currentLevel + 1
+        totalDistanceLabel.text = "누적 " + String(format: "%.2f", totalDistance) + "km"
         currentLevelLabel.text = "Lv.\(currentLevel)"
-        nextLevelLabel.text = "Lv.\(currentLevel+1)"
-        remainDistanceLabel.text = "\(Int(remainDistance))km만 더 뛰면"
+        nextLevelLabel.text = "Lv.\(nextLevel)"
+        remainDistanceLabel.text = String(format: "%.2f", remainDistance) + "km만 더 뛰면"
         
-        var current: Int
-        if Int(totalDistance) - (currentLevel) * 2 >= 2{
-            current = Int(totalDistance) - (currentLevel) * 2
-        }else{
-            current = Int(totalDistance)
-        }
-        expBar.progress = Float(current) / Float((currentLevel+1) * 2)
+        expBar.progress =  Float(totalDistance) / Float((nextLevel * (nextLevel - 1) * 2) / 2)
     }
     
     override func layoutSubviews() {
