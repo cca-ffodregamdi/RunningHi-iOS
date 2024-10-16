@@ -79,7 +79,7 @@ class RecordBarChartRenderer: BarChartRenderer {
                 if j == highlightedIndex {
                     guard let entry = dataSet[j] as? BarChartDataEntry, entry.y > 0 else { continue }
                     let transformer = dataProvider.getTransformer(forAxis: dataSet.axisDependency)
-                    let point = transformer.pixelForValues(x: entry.x, y: 1)
+                    let point = transformer.pixelForValues(x: entry.x, y: 0)
                     
                     context.setStrokeColor(UIColor.Primary.cgColor) // 선 색상 설정
                     context.setLineWidth(1.0) // 선 두께 설정
