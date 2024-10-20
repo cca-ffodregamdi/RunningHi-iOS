@@ -18,7 +18,7 @@ let project = Project(
             deploymentTargets: .iOS("16.0"),
             infoPlist: .default,
             sources: ["Sources/**"],
-            resources: ["Resources/**"],
+            resources: [],
             dependencies: [
                 .external(name: "KakaoSDKAuth"),
                 .external(name: "KakaoSDKUser"),

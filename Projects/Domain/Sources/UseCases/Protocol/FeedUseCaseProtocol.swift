@@ -13,7 +13,7 @@ protocol FeedUseCaseProtocol{
     func fetchFeed(postId: Int) -> Observable<FeedModel>
     func fetchPost(postId: Int) -> Observable<FeedDetailModel>
     func fetchComment(postId: Int) -> Observable<[CommentModel]>
-    func writeComment(commentModel: WriteCommentReqesutModel) -> Observable<WriteCommentModel>
+    func writeComment(commentModel: WriteCommentReqesutModel) -> Single<WriteCommentModel>
     func makeBookmark(post: BookmarkRequestModel) -> Observable<Any>
     func deleteBookmark(postId: Int) -> Observable<Any>
     func deleteComment(postId: Int) -> Observable<Any>
