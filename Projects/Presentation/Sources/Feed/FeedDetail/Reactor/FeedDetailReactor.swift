@@ -73,7 +73,7 @@ public class FeedDetailReactor: Reactor{
             
         case .writeComment(let commentModel):
             return Observable.concat([
-                feedUseCase.writeComment(commentModel: commentModel).map{ Mutation.writeComment($0) },
+                feedUseCase.writeComment(commentModel: commentModel).map{ Mutation.writeComment($0) }.asObservable(),
                 Observable.just(Mutation.setLoading(true)),
                 feedUseCase.fetchComment(postId: commentModel.postNo).map{ Mutation.setComment($0) },
                 Observable.just(Mutation.setLoading(false)),

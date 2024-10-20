@@ -94,16 +94,15 @@ public final class FeedRepositoryImplementation: FeedRepositoryProtocol{
             }
     }
     
-    public func writeComment(commentModel: WriteCommentReqesutModel) -> Observable<WriteCommentModel> {
+    public func writeComment(commentModel: WriteCommentReqesutModel) -> Single<WriteCommentModel> {
         return service.rx.request(.writeComment(commentModel: commentModel))
             .filterSuccessfulStatusCodes()
             .map{ response -> WriteCommentModel in
                 let writeCommentResponse = try JSONDecoder().decode(WriteCommentResponseDTO.self, from: response.data)
                 return writeCommentResponse.data.toEntity()
-            }.asObservable()
-            .catch{ error in
+            }.catch{ error in
                 print("FeedRepositoryImplementation writeComment error = \(error)")
-                return Observable.error(error)
+                return Single.error(error)
             }
     }
     
