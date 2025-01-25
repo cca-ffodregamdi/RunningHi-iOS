@@ -77,18 +77,9 @@ extension LoginViewController: View{
             .compactMap{$0.successed}
             .distinctUntilChanged()
             .filter{$0}
-            .compactMap{ _ -> Bool? in
-                return reactor.currentState.isTermsAgreed
-            }
-            .distinctUntilChanged()
-            .bind{ isTermsAgreed in
-                switch isTermsAgreed{
-                case true:
-                    reactor.action.onNext(.signIn)
-                case false:
-                    self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
-                    self.coordinator?.showAccess()
-                }
+            .bind{ [weak self] _ in
+                self?.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+                self?.coordinator?.showAccess()
             }.disposed(by: self.disposeBag)
         
         reactor.state.map{$0.successedSignIn}

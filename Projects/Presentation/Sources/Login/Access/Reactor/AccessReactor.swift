@@ -16,14 +16,12 @@ public class AccessReactor: Reactor{
         case checkRow(Int)
         case touchUpCheckAllButton
         case signIn
-        case setTermsAgreement
     }
     
     public enum Mutation{
         case changeCheckArray(Int)
         case checkAllToggle
         case signed(String, String)
-        case updateSuccessedSignProcess
     }
     
     public struct State{
@@ -31,7 +29,6 @@ public class AccessReactor: Reactor{
         var checkArray: [Bool] = [false, false]
         var checkAllState: Bool = false
         var successdSignIn: Bool = false
-        var successedSignProcess: Bool = false
     }
     
     public var initialState: State
@@ -50,22 +47,18 @@ public class AccessReactor: Reactor{
             return Observable.just(Mutation.checkAllToggle)
             
         case .signIn:
-            if let loginType = LoginType(rawValue: 
-                                            UserDefaultsManager.get(forKey: .loginTypeKey) as! String){
+            if let loginType = LoginType(rawValue: UserDefaultsManager.get(forKey: .loginTypeKey) as! String){
                 switch loginType{
                 case .apple:
                     return loginUseCase.signWithApple(requestModel: .init(authorizationCode: loginUseCase.readKeyChain(key: .appleLoginAuthorizationCodeKey) ?? "", identityToken: loginUseCase.readKeyChain(key: .appleLoginIdentityTokenKey) ?? ""))
                         .map{Mutation.signed($0, $1)}
                 case .kakao:
-                    return
-                        loginUseCase.signWithKakao(kakaoAccessToken: loginUseCase.readKeyChain(key: .kakaoLoginAccessTokenKey) ?? "")
+                    return loginUseCase.signWithKakao(kakaoAccessToken: loginUseCase.readKeyChain(key: .kakaoLoginAccessTokenKey) ?? "")
                         .map{Mutation.signed($0, $1)}
                     
                 }
             }
             return Observable.empty()
-        case .setTermsAgreement:
-            return loginUseCase.setTermsAgreement().map{ _ in Mutation.updateSuccessedSignProcess}
         }
     }
     
@@ -82,8 +75,6 @@ public class AccessReactor: Reactor{
             loginUseCase.createKeyChain(key: .runningHiAccessTokenkey, value: accessToken)
             loginUseCase.createKeyChain(key: .runningHiRefreshTokenKey, value: refreshToken)
             newState.successdSignIn = true
-        case .updateSuccessedSignProcess:
-            newState.successedSignProcess = true
         }
         return newState
     }
