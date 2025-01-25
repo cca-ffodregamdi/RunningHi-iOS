@@ -129,7 +129,7 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
             .filterSuccessfulStatusCodes()
             .map{ response in
                 let accessToken = response.response?.allHeaderFields["Authorization"] as! String
-                let refreshToken = response.response?.allHeaderFields["Refresh-Token"] as! String
+                let refreshToken = response.response?.allHeaderFields["refresh-token"] as! String
                 return (accessToken, refreshToken)
             }.asObservable()
     }
@@ -139,7 +139,7 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
             .filterSuccessfulStatusCodes()
             .map{ response in
                 let accessToken = response.response?.allHeaderFields["Authorization"] as! String
-                let refreshToken = response.response?.allHeaderFields["Refresh-Token"] as! String
+                let refreshToken = response.response?.allHeaderFields["refresh-token"] as! String
                 return (accessToken, refreshToken)
             }.asObservable()
     }
