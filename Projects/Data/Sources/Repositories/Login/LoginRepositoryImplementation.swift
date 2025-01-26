@@ -129,7 +129,7 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
             .filterSuccessfulStatusCodes()
             .map{ response in
                 let accessToken = response.response?.allHeaderFields["Authorization"] as! String
-                let refreshToken = response.response?.allHeaderFields["Refresh-Token"] as! String
+                let refreshToken = response.response?.allHeaderFields["refresh-token"] as! String
                 return (accessToken, refreshToken)
             }.asObservable()
     }
@@ -139,7 +139,7 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
             .filterSuccessfulStatusCodes()
             .map{ response in
                 let accessToken = response.response?.allHeaderFields["Authorization"] as! String
-                let refreshToken = response.response?.allHeaderFields["Refresh-Token"] as! String
+                let refreshToken = response.response?.allHeaderFields["refresh-token"] as! String
                 return (accessToken, refreshToken)
             }.asObservable()
     }
@@ -151,30 +151,6 @@ public class LoginRepositoryImplementation: NSObject, LoginRepositoryProtocol{
                 let responseData = try JSONDecoder().decode(CheckReviewerResponseDTO.self, from: response.data)
                 let reviewer = responseData.data?.user?.toEntity()
                 return (reviewer?.accessToken ?? "", reviewer?.refreshToken ?? "")
-            }.asObservable()
-    }
-    
-    public func fetchIsTermsAgreement() -> Observable<Bool> {
-        if KeyChainManager.read(key: .runningHiAccessTokenkey) != nil{
-            return service.rx.request(.fetchTermsAgreement)
-                .map{ response in
-                    let isTermsAgreementResponse = try JSONDecoder().decode(TermsAgreementResponseDTO.self, from: response.data)
-                    return isTermsAgreementResponse.data.isTermsAgreed
-                }.asObservable()
-                .catch { error in
-                    print("LoginRepositoryImplementation fetchIsTermsAgreement error = \(error)")
-                    return Observable.error(error)
-                }
-        }
-        else{
-            return Observable.just(false)
-        }
-    }
-    public func setTermsAgreement() -> Observable<Any> {
-        return service.rx.request(.setTermsAgreement)
-            .filterSuccessfulStatusCodes()
-            .map{ _ in
-                return Observable.just(())
             }.asObservable()
     }
 }

@@ -8,9 +8,9 @@
 import Foundation
 
 public struct RefreshTokenValidationResponseDTO: Decodable{
-    let timeStamp: String
-    let status: String
-    let message: String
+    let timeStamp: String?
+    let status: Int?
+    let message: String?
     public let data: Bool?
     
     enum CodingKeys: CodingKey {

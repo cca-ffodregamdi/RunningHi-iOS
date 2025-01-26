@@ -152,14 +152,6 @@ extension AccessViewController: View{
         reactor.state.map{$0.successdSignIn}
             .distinctUntilChanged()
             .filter{$0}
-            .observe(on: MainScheduler.asyncInstance)
-            .map{_ in Reactor.Action.setTermsAgreement}
-            .bind(to: reactor.action)
-            .disposed(by: self.disposeBag)
-        
-        reactor.state.map{$0.successedSignProcess}
-            .distinctUntilChanged()
-            .filter{$0}
             .bind{ [weak self] _ in
                 guard let self = self else { return }
                 self.coordinator?.successedSignIn()
