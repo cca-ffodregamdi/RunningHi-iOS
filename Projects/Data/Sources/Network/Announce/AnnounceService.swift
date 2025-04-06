@@ -18,7 +18,7 @@ public enum AnnounceService{
 
 extension AnnounceService: TargetType{
     public var baseURL: URL {
-        return .init(string: "https://runninghi.store/api/v1")!
+        return .init(string: "https://runninghi.kr/api/v1")!
     }
     
     public var accessToken: String{
