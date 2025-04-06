@@ -20,9 +20,9 @@ extension AuthService: TargetType{
         switch self {
         case .isValidAccessToken,
              .isValidRefreshToken :
-            return .init(string: "https://runninghi.store/api/v1")!
+            return .init(string: "https://runninghi.kr/api/v1")!
         case .isReviewerVersion:
-            return .init(string: "https://runninghi.store")!
+            return .init(string: "https://runninghi.kr")!
         }
     }
     

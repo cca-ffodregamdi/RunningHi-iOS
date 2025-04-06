@@ -40,7 +40,7 @@ extension FeedService: TargetType{
         case .fetchGPSData(let url):
             return .init(string: url)!
         default:
-            return .init(string: "https://runninghi.store/api/v1")!
+            return .init(string: "https://runninghi.kr/api/v1")!
         }
         
     }

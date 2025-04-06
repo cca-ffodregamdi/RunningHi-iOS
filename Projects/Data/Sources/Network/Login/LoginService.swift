@@ -20,9 +20,9 @@ extension LoginService: TargetType{
     public var baseURL: URL{
         switch self {
         case .loginFromReviewer:
-            return .init(string: "https://runninghi.store")!
+            return .init(string: "https://runninghi.kr")!
         default:
-            return .init(string: "https://runninghi.store/api/v1")!
+            return .init(string: "https://runninghi.kr/api/v1")!
         }
     }
     
