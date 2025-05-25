@@ -34,7 +34,7 @@ let project = Project(
                 .external(name: "KakaoSDKCommon"),
                 .external(name: "RxKakaoSDKCommon"),
                 .external(name: "RxDataSources"),
-                .external(name: "Charts"),
+                .external(name: "DGCharts"),
             ]
         ),
     ]

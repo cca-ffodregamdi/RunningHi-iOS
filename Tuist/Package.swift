@@ -24,7 +24,7 @@ import PackageDescription
             "KakaoSDKCommon" : .framework,
             "RxKakaoSDKCommon" : .framework,
             "RxDataSources" : .framework,
-            "Charts": .framework
+            "DGCharts": .framework
         ]
     )
 #endif
@@ -39,6 +39,6 @@ let package = Package(
         .package(url: "https://github.com/onevcat/Kingfisher.git", .upToNextMajor(from: "7.0.0")),
         .package(url: "https://github.com/kakao/kakao-ios-sdk-rx.git", .upToNextMajor(from: "2.22.1")),
         .package(url: "https://github.com/RxSwiftCommunity/RxDataSources.git", .upToNextMajor(from: "5.0.0")),
-        .package(url: "https://github.com/danielgindi/Charts.git", .upToNextMajor(from: "4.0.0"))
+        .package(url: "https://github.com/ChartsOrg/Charts.git", .upToNextMajor(from: "5.1.0"))
     ]
 )

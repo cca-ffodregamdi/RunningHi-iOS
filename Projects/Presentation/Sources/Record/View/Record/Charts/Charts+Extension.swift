@@ -6,8 +6,7 @@
 //
 
 import Foundation
-import Charts
-
+import DGCharts
 extension BarChartView {
 
     private class BarChartFormatter: NSObject, AxisValueFormatter {
