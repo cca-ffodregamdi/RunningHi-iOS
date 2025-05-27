@@ -9,22 +9,25 @@ import PackageDescription
         // Default is .staticFramework
         // productTypes: ["Alamofire": .framework,] 
         productTypes: [
-            "Moya" : .framework,
-            "RxMoya" : .framework,
-            "Alamofire" : .framework,
-            "SnapKit" : .framework,
-            "RxSwift" : .framework,
-            "ReactorKit" : .framework,
-            "Kingfisher" : .framework,
-            "RxCocoa" : .framework,
-            "RxKakaoSDKAuth" : .framework,
-            "RxKakaoSDKUser" : .framework,
-            "KakaoSDKAuth" : .framework,
-            "KakaoSDKUser" : .framework,
-            "KakaoSDKCommon" : .framework,
-            "RxKakaoSDKCommon" : .framework,
-            "RxDataSources" : .framework,
-            "DGCharts": .framework
+            "Kingfisher": .framework,
+            "SnapKit": .framework,
+            "DGCharts": .framework,
+            "Moya": .framework,
+            "RxMoya": .framework,
+            "Alamofire": .framework,
+            "RxAlamofire": .framework,
+            "ReactorKit": .framework,
+            "RxSwift": .framework,
+            "RxCocoa": .framework,
+            "RxRelay": .framework,
+            "RxDataSources": .framework,
+            "RxCocoaRuntime" : .framework,
+            "RxKakaoSDKAuth": .framework,
+            "RxKakaoSDKUser": .framework,
+            "KakaoSDKAuth": .framework,
+            "KakaoSDKUser": .framework,
+            "KakaoSDKCommon": .framework,
+            "RxKakaoSDKCommon": .framework,
         ]
     )
 #endif
