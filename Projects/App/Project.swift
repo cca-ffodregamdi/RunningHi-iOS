@@ -55,8 +55,6 @@ let project = Project(
             entitlements: "RunningHi.entitlements",
             dependencies: [
                 .project(target: "Coordinator", path: .relativeToRoot("Projects/Coordinator")),
-                .external(name: "KakaoSDKAuth"),
-                .external(name: "KakaoSDKCommon"),
             ]
         ),
     ]

@@ -21,21 +21,8 @@ let project = Project(
             resources: [],
             dependencies: [
                 .project(target: "Presentation", path: .relativeToRoot("Projects/Presentation")),
-                .project(target: "Domain", path: .relativeToRoot("Projects/Domain")),
                 .project(target: "Data", path: .relativeToRoot("Projects/Data")),
                 .project(target: "Common", path: .relativeToRoot("Projects/Common")),
-                .external(name: "ReactorKit"),
-                .external(name: "RxSwift"),
-                .external(name: "SnapKit"),
-                .external(name: "Kingfisher"),
-                .external(name: "RxCocoa"),
-                .external(name: "KakaoSDKAuth"),
-                .external(name: "KakaoSDKUser"),
-                .external(name: "RxKakaoSDKAuth"),
-                .external(name: "RxKakaoSDKUser"),
-                .external(name: "KakaoSDKCommon"),
-                .external(name: "RxKakaoSDKCommon"),
-                .external(name: "RxDataSources"),
             ]
         ),
     ]
