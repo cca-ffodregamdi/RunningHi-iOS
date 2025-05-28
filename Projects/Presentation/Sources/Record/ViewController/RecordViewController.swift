@@ -10,7 +10,7 @@ import RxSwift
 import ReactorKit
 import RxRelay
 import Domain
-import Charts
+import DGCharts
 import Common
 
 final public class RecordViewController: UIViewController {

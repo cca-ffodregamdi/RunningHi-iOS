@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Domain
 import Common
-import Charts
+import DGCharts
 
 class RecordChartView: UIView {
     
