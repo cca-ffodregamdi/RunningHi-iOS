@@ -12,6 +12,10 @@ let project = Project(
             infoPlist: .extendingDefault(
                 with: [
                     "UILaunchStoryboardName": "LaunchScreen.storyboard",
+                    "LSApplicationCategoryType": "public.app-category.health-fitness", // 앱 카테고리
+                    "UISupportedInterfaceOrientations": [ // 앱 지원 방향
+                            "UIInterfaceOrientationPortrait" // portrait 설정
+                    ],
                     "UIApplicationSceneManifest": [
                         "UIApplicationSupportsMultipleScenes": false,
                         "UISceneConfigurations": [
@@ -55,7 +59,10 @@ let project = Project(
             entitlements: "RunningHi.entitlements",
             dependencies: [
                 .project(target: "Coordinator", path: .relativeToRoot("Projects/Coordinator")),
-            ]
+            ],
+            settings: .settings(base: [
+                "TARGETED_DEVICE_FAMILY" : "1"
+            ])
         ),
     ]
 )
